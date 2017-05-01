@@ -1,0 +1,6 @@
+" vim config file used for writing these files.
+" Used with https://github.com/embear/vim-localvimrc
+set noexpandtab
+set shiftwidth=4
+set tabstop=4
+set colorcolumn=100
