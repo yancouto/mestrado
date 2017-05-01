@@ -1,6 +1,7 @@
 CXXFLAGS += -std=c++11
 
-tests: objs
+all:
 	$(MAKE) -C tests && tests/all_tests
 
-objs: RedBlack.o
+clean:
+	$(MAKE) clean -C tests
