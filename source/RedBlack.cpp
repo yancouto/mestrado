@@ -1,4 +1,4 @@
-#include "red-black.hpp"
+#include "RedBlack.hpp"
 
 // Links nulos são considerados pretos
 template<class T> inline bool isRed(Node<T> *n) {
