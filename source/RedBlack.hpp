@@ -5,6 +5,7 @@
 #include <climits>
 #include <iostream>
 #include <unordered_set>
+#include <cassert>
 
 /* Implementação de uma árvore rubro-negra parcialmente persistente utilizando o método de Node
  * copying. A estrutura não usará ponteiros de pai, então cada nó (que não é a raiz) tem 1 ponteiro
@@ -27,7 +28,7 @@ template<class T> struct Node {
 	// Pai do nó (só é válido para nós atuais)
 	Node *parent;
 
-	Node(const T& val) : extraTimestamp(-1), red(true), value(val),
+	Node(const T& val, int time) : timestamp(time), extraTimestamp(-1), red(true), value(val),
 	  parent(nullptr) { child[0] = child[1] = extra =  nullptr; }
 
 	// Retorna o filho side do nó, considerando o filho adicional, se possível.
@@ -75,6 +76,7 @@ template<class T> inline bool isRed(Node<T> *n) {
 }
 
 template<class T> Node<T>* Node<T>::childAt(bool side, int time) {
+	//std::cerr << "Searching for " << time << " at (" << timestamp << ", " << extraTimestamp << ")" << std::endl;
 	if(extraTimestamp != -1 && time >= extraTimestamp && extraSide == side)
 		return extra;
 	return child[side];
@@ -100,6 +102,7 @@ template<class T> Node<T>* Node<T>::change(Node<T> *v, int time, bool side) {
 		// novo nó com valores atuais e extra vazio
 		Node<T> *u = new Node(*this);
 		//std::cerr << "Copy Time! (" << u << ")" << std::endl;
+		u->timestamp = time;
 		u->extraTimestamp = -1;
 		u->child[extraSide] = extra;
 		u->child[side] = v;
@@ -114,7 +117,6 @@ template<class T> Node<T>* Node<T>::change(Node<T> *v, int time, bool side) {
 }
 
 template<class T> const T* RedBlackTree<T>::find(int time, const T& val) {
-	time = versionCount();
 	Node<T> *u = roots[time];
 	while(u != nullptr && (u->value < val || val < u->value))
 		u = u->childAt(u->value < val, time);
@@ -160,19 +162,19 @@ template<class T> Node<T>* fixUp(Node<T> *z, int time) {
 
 template<class T> int RedBlackTree<T>::insert(const T& val) {
 	//std::cerr << "Inserting " << val << std::endl;
+	int time = versionCount() + 1;
 	if(roots.back() == nullptr) {
-		Node<T> *r = new Node<T>(val);
+		Node<T> *r = new Node<T>(val, time);
 		r->red = false;
 		roots.push_back(r);
 		return versionCount();
 	}
-	int time = versionCount() + 1;
 	Node<T> *u = roots.back(), *v = nullptr;
 	while(u != nullptr) {
 		v = u;
 		u = u->childAt(u->value < val);
 	}
-	v = v->change(u = new Node<T>(val), time, v->value < val);
+	v = v->change(u = new Node<T>(val, time), time, v->value < val);
 	Node<T> *r = helper::fixUp(u, time);
 	r->red = false; // Arrumando a regra 1
 	roots.push_back(r);

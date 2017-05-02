@@ -47,6 +47,14 @@ TEST(Simple, Insert) {
 		EXPECT_NE(rb1.find(rb1.versionCount(), i), nullptr);
 }
 
+TEST(Simple, KeepsRedBlack) {
+	RedBlackTree<int> rb;
+	for(int i = 0; i < 1000; i++) {
+		rb.insert(rand() % 800);
+		check(rb);
+	}
+}
+
 // Coloca os valores em um vetor ordenado
 void traverse(Node<int> *u, std::vector<int> &v) {
 	if(u == nullptr) return;
@@ -100,27 +108,47 @@ TEST(Sorting, Small) { randomVecs(1000, 6, 15); }
 TEST(Sorting, Medium) { randomVecs(1000, 100, 1000); }
 TEST(Sorting, Large) { randomVecs(10, 10000, 100000); }
 
-TEST(Persistence, Simple) {
+void testPersistence(const std::vector<int> &v) {
+	int n = v.size();
+	RedBlackTree<int> rb;
+	for(int i = 0; i < n; i++)
+		rb.insert(v[i]);
+	for(int q = 0; q < 2 * n; q++) {
+		int x = rnd(0, n - 1);
+		int y = rnd(0, n - 1);
+		const int *z = rb.find(x + 1, v[y]);
+		if(z != nullptr) EXPECT_EQ(*z, v[y]);
+		EXPECT_EQ(z != nullptr, y <= x);
+	}
+	for(int i = 0; i < n; i++)
+		for(int q = -2; q <= 2; q++) {
+			if(q + i < 0 || q + i >= n) continue;
+			int x = i, y = q + i;
+			const int *z = rb.find(x + 1, v[y]);
+			if(z != nullptr) EXPECT_EQ(*z, v[y]);
+			EXPECT_EQ(z != nullptr, y <= x);
+		}
+
+}
+
+TEST(Persistence, SortedAndReversed) {
 	for(int n : {10, 100, 1000, 100000}) {
-		RedBlackTree<int> rb;
-		for(int i = 1; i <= n; i++)
-			rb.insert(i);
-		for(int q = 0; q < 3 * n; q++) {
-			int x = rnd(1, n);
-			int y = rnd(1, n);
-			const int *z = rb.find(x, y);
-			if(y <= x) {
-				EXPECT_NE(z, nullptr);
-				if(z != nullptr) EXPECT_EQ(*z, y);
-			} else EXPECT_EQ(z, nullptr);
-		}
-		for(int q = -3; q <= 3; q++) {
-			int x = n / 2, y = n / 2 + q;
-			const int *z = rb.find(x, y);
-			if(y <= x) {
-				EXPECT_NE(z, nullptr);
-				if(z != nullptr) EXPECT_EQ(*z, y);
-			} else EXPECT_EQ(z, nullptr);
-		}
+		std::vector<int> v;
+		for(int i = 0; i < n; i++)
+			v.push_back(i);
+		testPersistence(v);
+		std::reverse(v.begin(), v.end());
+		testPersistence(v);
+	}
+}
+
+
+TEST(Persistence, Shuffled) {
+	for(int n : {10, 100, 1000, 100000}) {
+		std::vector<int> v;
+		for(int i = 0; i < n; i++)
+			v.push_back(i);
+		random_shuffle(v.begin(), v.end());
+		testPersistence(v);
 	}
 }
