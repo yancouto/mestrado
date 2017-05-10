@@ -76,8 +76,19 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-all_tests: RedBlack_tests.o gtest_main.a
+all: all_tests redblack_tests stack_tests
+
+all_tests: RedBlack_tests.o Stack_tests.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+redblack_tests: RedBlack_tests.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+stack_tests: Stack_tests.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 RedBlack_tests.o: RedBlack_tests.cpp ../RedBlack.hpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+
+Stack_tests.o: Stack_tests.cpp ../Stack.hpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<

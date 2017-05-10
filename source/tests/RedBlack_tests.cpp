@@ -46,14 +46,14 @@ template<class T> void check(RedBlackTree<T> &rb) {
 	rec(u, (T*) nullptr, (T*) nullptr);
 }
 
-TEST(Simple, Case3) {
+TEST(RBSimple, Case3) {
 	RedBlackTree<int> rb;
 	rb.insert(1); check(rb);
 	rb.insert(3); check(rb);
 	rb.insert(2); check(rb);
 }
 
-TEST(Simple, Insert) {
+TEST(RBSimple, Insert) {
 	RedBlackTree<int> rb1;
 	for(int i = 0; i < 10; i++)
 		rb1.insert(i);
@@ -62,7 +62,7 @@ TEST(Simple, Insert) {
 		EXPECT_FALSE(rb1.find(rb1.versionCount(), i) == nullptr);
 }
 
-TEST(Simple, KeepsRedBlack) {
+TEST(RBSimple, KeepsRedBlack) {
 	RedBlackTree<int> rb;
 	for(int i = 0; i < 1000; i++) {
 		rb.insert(rnd(1, 800));
@@ -70,7 +70,7 @@ TEST(Simple, KeepsRedBlack) {
 	}
 }
 
-TEST(Simple, Strings) {
+TEST(RBSimple, Strings) {
 	using std::string;
 	RedBlackTree<string> rb;
 	for(string s : {"oi", "tchau", "teste", "aaa", "aa"}) {
@@ -114,12 +114,12 @@ void randomVecs(int T, int l, int r) {
 	}
 }
 
-TEST(Sorting, Repeated) {
+TEST(RBSorting, Repeated) {
 	std::vector<int> v (10000, 10000);
 	testSort(v);
 }
 
-TEST(Sorting, SortedReversed) {
+TEST(RBSorting, SortedReversed) {
 	for(int t = 0; t < 10; t++) {
 		std::vector<int> v;
 		for(int i = 0; i < 30000; i++)
@@ -132,9 +132,9 @@ TEST(Sorting, SortedReversed) {
 	}
 }
 
-TEST(Sorting, Small) { randomVecs(1000, 6, 15); }
-TEST(Sorting, Medium) { randomVecs(1000, 100, 1000); }
-TEST(Sorting, Large) { randomVecs(10, 10000, 100000); }
+TEST(RBSorting, Small) { randomVecs(1000, 6, 15); }
+TEST(RBSorting, Medium) { randomVecs(1000, 100, 1000); }
+TEST(RBSorting, Large) { randomVecs(10, 10000, 100000); }
 
 void testPersistence(const std::vector<int> &v) {
 	int n = v.size();
@@ -158,7 +158,7 @@ void testPersistence(const std::vector<int> &v) {
 		}
 }
 
-TEST(Persistence, SortedAndReversed) {
+TEST(RBPersistence, SortedAndReversed) {
 	for(int n : {10, 100, 1000, 100000}) {
 		std::vector<int> v;
 		for(int i = 0; i < n; i++)
@@ -170,7 +170,7 @@ TEST(Persistence, SortedAndReversed) {
 }
 
 
-TEST(Persistence, Shuffled) {
+TEST(RBPersistence, Shuffled) {
 	for(int n : {10, 100, 1000, 100000}) {
 		std::vector<int> v;
 		int p = 0;
@@ -201,7 +201,7 @@ void testPersRem(const std::vector<int> &v, int k) {
 	}
 }
 
-TEST(Persistence, WithRemove) {
+TEST(RBPersistence, WithRemove) {
 	for(int n : {10, 100, 1000, 50000}) {
 		std::vector<int> v;
 		for(int i = 0; i < n; i++)
@@ -214,7 +214,7 @@ TEST(Persistence, WithRemove) {
 	}
 }
 
-TEST(Remove, Simpler) {
+TEST(RBRemove, Simpler) {
 	RedBlackTree<int> rb;
 	EXPECT_FALSE(rb.erase(10) != nullptr); check(rb);
 	rb.insert(12); check(rb);
@@ -228,7 +228,7 @@ TEST(Remove, Simpler) {
 	EXPECT_TRUE(rb.erase(1) != nullptr); check(rb);
 }
 
-TEST(Remove, Simple) {
+TEST(RBRemove, Simple) {
 	RedBlackTree<int> rb;
 	for(int x : {1, 5, 7, 10})
 		rb.insert(x);
@@ -242,7 +242,7 @@ TEST(Remove, Simple) {
 		EXPECT_FALSE(rb.find(rb.versionCount(), x) != nullptr) << "should not find";
 }
 
-TEST(Remove, Odds) {
+TEST(RBRemove, Odds) {
 	RedBlackTree<long long> rb;
 	for(int i = 0; i <= 100; i++)
 		rb.insert(i);
@@ -254,7 +254,7 @@ TEST(Remove, Odds) {
 		EXPECT_EQ(rb.find(rb.versionCount(), i) != nullptr, (i % 2) == 0);
 }
 
-TEST(Remove, Invalid) {
+TEST(RBRemove, Invalid) {
 	RedBlackTree<char> rb;
 	for(int c = 'a'; c <= 'z'; c++)
 		rb.insert(c);
@@ -267,7 +267,7 @@ TEST(Remove, Invalid) {
 		EXPECT_EQ(rb.find(rb.versionCount(), c) != nullptr, c > 'c' && c < 'z');
 }
 
-TEST(Remove, Repeated) {
+TEST(RBRemove, Repeated) {
 	RedBlackTree<int> rb;
 	int ct[3] = {0, 0, 0};
 	for(int i = 0; i < 50000; i++) {
@@ -287,7 +287,7 @@ TEST(Remove, Repeated) {
 	}
 }
 
-TEST(Remove, Breaks) {
+TEST(RBRemove, Breaks) {
 	RedBlackTree<int> rb;
 	for(int x : {3, 5, 1, 4, 2, 6}) {
 		rb.insert(x);
@@ -327,5 +327,5 @@ void doLarge(bool isOrdered) {
 	}
 }
 
-TEST(Remove, Large) { doLarge(false); }
-TEST(Remove, LargeOrdered) { doLarge(true); }
+TEST(RBRemove, Large) { doLarge(false); }
+TEST(RBRemove, LargeOrdered) { doLarge(true); }
