@@ -96,6 +96,7 @@ template<class T> Node<T>* Node<T>::childAt(bool side, int time) {
 
 template<class T> Node<T>* Node<T>::change(Node<T> *v, bool side, RedBlackTree<T> &rb) {
 	//std::cerr << this << "->" << side << " = " << v << "  |par " << parent <<  std::endl;
+	assert(newestVersion() == this);
 	const int time = rb.versionCount();
 	if(extraTimestamp == time && side == extraSide) {
 		if(extra != nullptr) extra->parent = nullptr;
@@ -215,6 +216,36 @@ template<class T> void transplant(Node<T> *u, Node<T> *v, RedBlackTree<T> &rb) {
 	u->parent = nullptr;
 }
 template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
+	while(!isRed(z->childAt(side))) {
+		if(isRed(z->childAt(!side))) { // caso 1
+			z = rotate(z, !side, rb);
+			std::swap(z->red, z->parent->red);
+			assert(z->childAt(!side));
+		}
+		Node<T> *w = z->childAt(!side);
+		assert(w);
+		assert(!isRed(w));
+		if(!isRed(w->childAt(0)) && !isRed(w->childAt(1))) { // caso 2
+			w->red = true;
+			if(z->parent == nullptr) return;
+			else {
+				side = (z == z->parent->childAt(1));
+				z = z->parent;
+			}
+		} else {
+			if(!isRed(w->childAt(!side))) { // caso 3
+				assert(isRed(w->childAt(side)));
+				w = rotate(w, side, rb);
+				std::swap(w->red, w->parent->red);
+				w = w->parent;
+			}
+			z = rotate(z->newestVersion(), !side, rb);
+			std::swap(z->red, z->parent->red);
+			z->parent->childAt(!side)->red = false;
+			return;
+		}
+	}
+	z->childAt(side)->red = false;
 }
 }
 
@@ -226,28 +257,30 @@ template<class T> const T* RedBlackTree<T>::erase(const T& val) {
 	const T* ret = &u->value;
 	roots.push_back(roots.back());
 	if(u->childAt(1) == nullptr) {
-		Node<T> *l = u->childAt(0), *p = u->parent;
+		Node<T> *l = u->childAt(0);
 		if(l != nullptr) u = u->change(nullptr, 0, *this);
+		Node<T> *p = u->parent;
+		bool side = (p && p->childAt(1) == u);
 		helper::transplant(u, l, *this);
 		if(!isRed(u) && p != nullptr)
-			helper::deleteFixUp(p->newestVersion(), u == p->childAt(1, versionCount() - 1), *this);
+			helper::deleteFixUp(p->newestVersion(), side, *this);
 	} else if(u->childAt(1)->childAt(0) == nullptr) {
 		Node<T> *r = u->childAt(1);
 		u = u->change(nullptr, 1, *this);
 		helper::transplant(u, r, *this);
 		r = r->change(u->childAt(0), 0, *this);
-		if(!isRed(u) && r->parent != nullptr)
-			helper::deleteFixUp(r->parent, r == r->parent->childAt(1), *this);
+		bool was_black = !isRed(r);
+		r->red = u->red;
+		if(was_black)
+			helper::deleteFixUp(r, 1, *this);
 	} else {
 		Node<T> *y = u->childAt(1);
 		while(y->childAt(0) != nullptr)
 			y = y->childAt(0);
-		assert(y != u->childAt(1));
 		Node<T> *yr = y->childAt(1), *yp = y->parent;
 		if(yr != nullptr) y = y->change(nullptr, 1, *this);
-		helper::transplant(y, yr, *this);
-		assert(y->childAt(0) == nullptr && y->childAt(1) == nullptr);
-		// nó y está isolado
+		helper::transplant(y, yr, *this); // nó y está isolado
+
 		u = u->newestVersion();
 		helper::transplant(u, y, *this);
 		y = y->change(u->childAt(1), 1, *this);
