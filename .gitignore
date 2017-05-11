@@ -2,4 +2,10 @@
 **/*.swp
 **/*.o
 **/*.a
+**/*.log
+**/*.aux
+**/*.toc
+**/*.bbl
+**/*.pdf
+**/*.blg
 source/tests/*_tests

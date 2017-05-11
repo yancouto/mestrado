@@ -1,0 +1,21 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+
+\setcounter{secnumdepth}{0}
+
+\chapter*{Introdução}
+\chaptermark{Introdução}
+\addcontentsline{toc}{chapter}{Introdução}
+
+Uma estrutura de dados (ED) é uma forma de organizar dados em programas de computador. Estruturas de dados permitem operações de acesso e de modificação; operações de acesso apenas consultam um ou mais campos de uma ED, enquanto operações de modificação podem alterar os campos da estrutura.
+
+Em geral, operações de acesso só podem ser feitas na configuração atual da ED, ou seja, ao realizar uma operação de modificação, perde-se informação sobre o ``passado'' da estrutura. Dizemos que, ao realizar uma operação de modificação, criamos uma nova versão da ED. Estruturas de dados \deff{persistentes}~\cite{DriscollSST1989} permitem realizar operações em versões criadas anteriormente. Dizemos que uma ED é \deff{parcialmente persistente} se permite apenas operações de acesso a versões anteriores e modificação apenas na versão mais nova, e \deff{totalmente persistente}, ou apenas~\deff{persistente}, se também permite operações de modificação em todas as versões.
+
+Considerando um digrafo das versões onde se a versão $j$ foi criada a partir da versão $i$ então existe um arco de $i$ para $j$, temos que para estruturas parcialmente persistentes esse digrafo é um caminho, e para estruturas totalmente persistentes é uma árvore enraizada, em que as arestas vão para longe da raiz.
+
+O estudo de estruturas persistentes segue dois caminhos: técnicas gerais, para tornar \emph{qualquer} estrutura de dados persistente, ou técnicas para tornar alguma ED específica (como uma pilha ou fila) persistente, deixando-a tão eficiente e simples quanto possível.
+
+\setcounter{secnumdepth}{1}
+
+\end{document}

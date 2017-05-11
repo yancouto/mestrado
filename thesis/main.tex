@@ -1,0 +1,199 @@
+\documentclass[11pt,oneside,a4paper, openany]{book}
+\usepackage[usenames, dvipsnames]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage[a4paper,top=3cm,bottom=2.3cm,left=2.2cm,right=2.2cm]{geometry} % margens
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{listings}
+
+\usepackage{xspace}
+\usepackage{hyperref}
+\usepackage{subfiles}
+\hypersetup{
+	colorlinks,
+	citecolor=violet!85!black,
+	linkcolor=MidnightBlue
+}
+\usepackage{lmodern}
+
+
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\tikzset{>=latex}
+\tikzset{edge from parent/.append style = {->, >=latex, shorten <= 2pt}}
+\usetikzlibrary{matrix, backgrounds, decorations.pathreplacing, arrows, positioning, calc, fit}
+
+\renewcommand{\baselinestretch}{1.3}
+
+\usepackage[tablename=Exemplo]{caption}
+\captionsetup[algorithm]{labelsep=colon}
+%code
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{etoolbox}
+\usepackage{makerobust}
+\MakeRobustCommand{\Call} % Call inside Call is now ok
+\makeatletter
+% start with some helper code
+% This is the vertical rule that is inserted
+\newcommand*{\algrule}[1][\algorithmicindent]{%
+  \makebox[#1][l]{%
+    \color{gray!60}
+    \hspace*{.2em}% <------------- This is where the rule starts from
+    \vrule height .75\baselineskip depth .25\baselineskip
+  }
+}
+
+\newcount\ALG@printindent@tempcnta
+\def\ALG@printindent{%
+    \ifnum \theALG@nested>0% is there anything to print
+    \ifx\ALG@text\ALG@x@notext% is this an end group without any text?
+    % do nothing
+    \else
+    \unskip
+    % draw a rule for each indent level
+    \ALG@printindent@tempcnta=1
+    \loop
+    \algrule[\csname ALG@ind@\the\ALG@printindent@tempcnta\endcsname]%
+    \advance \ALG@printindent@tempcnta 1
+    \ifnum \ALG@printindent@tempcnta<\numexpr\theALG@nested+1\relax
+    \repeat
+    \fi
+    \fi
+}
+% the following line injects our new indent handling code in place of the default spacing
+\patchcmd{\ALG@doentity}{\noindent\hskip\ALG@tlm}{\ALG@printindent}{}{\errmessage{failed to patch}}
+\patchcmd{\ALG@doentity}{\item[]\nointerlineskip}{}{}{} % no spurious vertical space
+% end vertical rule patch for algorithmicx
+\makeatother
+
+\usepackage{subcaption}
+\captionsetup{compatibility=false}
+\DeclareCaptionSubType*{algorithm}
+\renewcommand\thesubalgorithm{\thetable\alph{subalgorithm}}
+
+\let\And\undefined
+\let\Or\undefined
+
+\algrenewcommand\algorithmicthen{:}
+\algrenewcommand\algorithmicdo{:}
+\algnewcommand\And{\textbf{ and }}
+\algnewcommand\Or{\textbf{ or }}
+\algnewcommand\New{\textbf{new }}
+\algnewcommand\To{\textbf{ to }}
+\algnewcommand\DownTo{\textbf{ down to }}
+\algnewcommand\Break{\textbf{break}}
+\algnewcommand\Null{\textbf{null}}
+\algnewcommand\True{\textbf{true}}
+\floatname{algorithm}{Código}
+\algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }
+\algtext*{Indent}
+\algtext*{EndIndent}
+
+\newcommand{\pluseq}{\mathbin{{\tiny +}{=}}}
+
+\renewcommand{\ttdefault}{pcr}
+
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{result}{Resultado}
+\newtheorem*{complexity}{Complexidade}
+\newtheorem{corollary}{Corolário}[theorem]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}[theorem]{Proposição}
+\newtheorem*{definition}{Definição}
+\newtheorem*{invar}{Invariante}
+
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\V}[1]{\mathit{#1}}
+\newcommand{\code}[1]{$\V{#1}$}
+\newcommand{\Oh}{\mathcal{O}}
+\newcommand{\tdots}{\,.\,.\,} % in place of \ldots
+\newcommand{\func}[2]{\mbox{\textsc{#1}$(#2)$}}
+\newcommand{\deff}[1]{\emph{#1}}
+\newcommand*{\nref}[1]{%
+  {\protect\NoHyper\ref{#1}\protect\endNoHyper}%
+}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+
+\usepackage{setspace}                   % espaçamento flexível
+\usepackage{indentfirst}                % indentação do primeiro parágrafo
+\usepackage{type1cm}                    % fontes realmente escaláveis
+\usepackage{titletoc}
+\usepackage[font=small,format=plain,labelfont=bf]{caption}
+\usepackage{courier}                    % usa o Adobe Courier no lugar de Computer Modern Typewriter
+
+
+\fontsize{60}{62}\usefont{OT1}{cmr}{m}{n}{\selectfont}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
+\renewcommand{\sectionmark}[1]{\markright{\MakeUppercase{#1}}{}}
+\renewcommand{\subsectionmark}[1]{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[R]{{\footnotesize\rightmark}}
+\fancyhead[L]{{\footnotesize\leftmark}}
+\fancyfoot[C]{{\thepage}}
+\setlength{\headheight}{13.6pt}
+
+
+\title{Estruturas de dados avançadas}
+\author{Yan Couto}
+\date{\today}
+
+\sloppy
+
+\begin{document}
+
+\frontmatter 
+
+\onehalfspacing  % espaçamento
+
+\thispagestyle{empty}
+\begin{center}
+	\vspace*{2.3cm}
+	\textbf{\huge{Estruturas de dados avançadas}}\\
+
+	\vspace*{1cm}
+	\Large{Yan Soares Couto}
+
+	\vskip 1.8cm
+	Orientadora: Cristina G. Fernandes\\
+
+	\vspace{\fill}
+	\normalsize{São Paulo, 2017}
+\end{center}
+
+\setcounter{tocdepth}{1}
+
+\pagenumbering{gobble}
+\begingroup
+\let\cleardoublepage\clearpage
+\tableofcontents
+\endgroup
+
+\mainmatter
+\pagenumbering{arabic}
+
+\part{Preliminares}
+\subfile{parts/prelim/ancestrais}
+
+\part{Persistência}
+\subfile{parts/persist/intro}
+
+\subfile{parts/persist/pilha}
+\subfile{parts/persist/deque1}
+
+\subfile{parts/persist/deque2}
+\subfile{parts/persist/deque3}
+
+\bibliographystyle{plain}
+\bibliography{main}
+
+\end{document}

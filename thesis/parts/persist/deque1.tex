@@ -1,0 +1,224 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{Deque com LA e LCA} \label{cap:deque1}
+
+Uma~\deff{fila duplamente terminada} ou fila de duas pontas é uma estrutura de dados que generaliza pilhas. Essa estrutura é uma pilha em que é possível adicionar e remover elementos de qualquer uma das suas extremidades. Ela é usualmente chamada de deque, uma abreviatura de dequeue.
+
+Estamos interessados nas seguintes operações:
+
+\begin{itemize}
+	\item \func{Deque}{} --- Retorna uma deque vazia.
+	\item \func{PushFront}{d, x} --- Retorna uma deque igual a~$d$, mas com o valor~$x$ inserido no seu começo.
+	\item \func{PushBack}{d, x} --- Retorna uma deque igual a~$d$, mas com o valor~$x$ inserido no seu final.
+	\item \func{Front}{d} --- Retorna o primeiro elemento de~$d$.
+	\item \func{Back}{d} --- Retorna o último elemento de~$d$.
+	\item \func{PopFront}{d} --- Retorna uma deque igual a~$d$, mas sem o primeiro elemento.
+	\item \func{PopBack}{d} --- Retorna uma deque igual a~$d$, mas sem o último elemento.
+\end{itemize}
+
+Note que, usando apenas \func{PushFront}{d, x}, \func{Front}{d} e \func{PopFront}{d}, simulamos uma pilha. Analogamente, usando apenas \func{PushBack}{d, x}, \func{Front}{d} e \func{PopFront}{d}, simulamos uma fila simples.
+
+Apresentaremos uma implementação persistente de deques, que se baseia nas implementações de pilhas e filas persistentes discutidas no Capítulo~\ref{cap:pilha}, e não na estrutura recursiva discutida nos Capítulos~\ref{cap:deque2} e~\ref{cap:deque3}. Esta implementação utiliza Level Ancestor e Lowest Common Ancestor (ancestral comum mais profundo) como bibliotecas dadas, que serão discutidas na Parte~\ref{part:arvores}.
+
+Esta implementação foi desenvolvida por mim. As implementações de~\textsc{k-th} e fila no Capítulo~\ref{cap:pilha} também são de minha autoria. Desenvolvi inicialmente a ideia para uma pilha persistente ao escrever um problema para a Seletiva USP de 2016, uma prova que seleciona alunos da USP para participar da Maratona de Programação. O problema em inglês pode ser acessado em~\href{http://codeforces.com/gym/101064/problem/G}{\texttt{codeforces.com/gym/101064/problem/G}}.
+
+Acreditamos que, mesmo sendo necessário resolver o problema do Level Ancestor e Lowest Common Ancestor, esta implementação é mais simples que as outras, apresentadas nos capítulos seguintes. O mesmo preprocessamento necessário para resolver o problema do Level Ancestor também permite resolver o problema do Lowest Common Ancestor.
+
+\section{Representação e visão geral}
+
+Na implementação de pilhas no Capítulo~\ref{cap:pilha}, a lista ligada, quando em um contexto persistente, se torna uma arborescência, e a pilha associada a cada nó é o caminho deste nó até a raiz. É possível adicionar novas folhas, pois estas não mudam os ponteiros dos outros elementos; e então é possível adicionar elementos ao começo da pilha.
+
+Na implementação de filas, no mesmo capítulo, também foi discutido como simular a remoção de elementos do final da estrutura, guardando, junto com o nó, o tamanho da fila. Dessa forma, os elementos da estrutura são um prefixo do caminho do vértice até a raiz. Isso, porém, não permite adicionar elementos ao final, pois isso significaria modificar nós presentes em versões anteriores, e a implementação não seria mais funcional.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[sibling distance=40pt, nodes={draw, minimum size=6mm}, edge from parent/.append style={<-, shorten <= 5pt, shorten >= 5pt}, level distance=40pt, level 3/.style={sibling distance=80pt}, level 1/.style={sibling distance=80pt}]
+
+\Tree [.\node[minimum size=6mm](root){};
+    [.\node(v3){3}; [.\node(v2){2}; \node(v1){1}; [.\node(v9){9}; ] ] \node(v4){4}; ]
+    \node(v6){6};
+]
+
+\draw (root.south west) edge (root.north east);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root,yshift=12pt]{$first_0$} edge (root);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root,yshift=12pt]{$last_0$} edge (root);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3,yshift=12pt]{$first_1$} edge (v3);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3,yshift=12pt]{$last_1$} edge (v3);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3]{$first_2$} edge (v3);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=12pt]{$last_2$} edge (v4);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=12pt]{$first_3$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4]{$last_3$} edge (v4);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v1]{$first_4$} edge (v1);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=-12pt]{$last_4$} edge (v4);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2]{$first_5$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3]{$last_5$} edge (v3);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=-12pt]{$first_6$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2,yshift=12pt]{$last_6$} edge (v2);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v9]{$first_7$} edge (v9);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2]{$last_7$} edge (v2);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root]{$first_8$} edge (root);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root]{$last_8$} edge (root);
+
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v6]{$first_9$} edge (v6);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v6]{$last_9$} edge (v6);
+
+\end{tikzpicture}
+\caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:deque}.} \label{fig:deque_ex1}
+\end{figure}
+
+\begin{table}
+\centering
+
+\begin{subalgorithm}{0.55\textwidth}
+\begin{algorithmic}
+
+\State $(\V{first}_0, \V{last}_0) = \Call{Deque}{\null}$
+\State $(\V{first}_1, \V{last}_1) = \Call{PushBack}{(\V{first}_0,\V{last}_0), 3}$
+\State $(\V{first}_2, \V{last}_2) = \Call{PushBack}{(\V{first}_1,\V{last}_1), 4}$
+\State $(\V{first}_3, \V{last}_3) = \Call{PushFront}{(\V{first}_2,\V{last}_2), 2}$
+\State $(\V{first}_4, \V{last}_4) = \Call{PushFront}{(\V{first}_3,\V{last}_3), 1}$
+\State $(\V{first}_5, \V{last}_5) = \Call{PopBack}{(\V{first}_3,\V{last}_3)}$
+\State $(\V{first}_6, \V{last}_6) = \Call{PopBack}{(\V{first}_5,\V{last}_5)}$
+\State $(\V{first}_7, \V{last}_7) = \Call{PushFront}{(\V{first}_6,\V{last}_6), 9}$
+\State $(\V{first}_8, \V{last}_8) = \Call{PopFront}{(\V{first}_6,\V{last}_6)}$
+\State $(\V{first}_9, \V{last}_9) = \Call{PushFront}{(\V{first}_8,\V{last}_8), 6}$
+
+\end{algorithmic}
+\end{subalgorithm} \vrule
+\begin{subalgorithm}{0.4\textwidth}
+\begin{algorithmic}
+
+\State $\Rightarrow$
+\State $\Rightarrow$ 3
+\State $\Rightarrow$ 3 4
+\State $\Rightarrow$ 2 3 4
+\State $\Rightarrow$ 1 2 3 4
+\State $\Rightarrow$ 2 3
+\State $\Rightarrow$ 2
+\State $\Rightarrow$ 9 2
+\State $\Rightarrow$
+\State $\Rightarrow$ 6
+
+\end{algorithmic}
+\end{subalgorithm}
+\caption{Exemplo de uso de uma deque persistente.} \label{ex:deque}
+\end{table}
+
+Para a implementação de deques, ainda usaremos uma arborescência, ou seja, as arestas são em direção à raiz, mas cada versão de uma deque será associada a dois nós,~$\V{first}$ e~$\V{last}$. Os elementos da deque serão os elementos no caminho de~$\V{first}$ para~$\V{last}$, se considerarmos que as arestas não têm direção. Na Figura~\ref{fig:deque_ex1}, a deque apontada pelo par~$(\V{first}_3, \V{last}_3)$, por exemplo, contém os elementos~2,~3 e~4.
+
+Para adicionar um elemento no início da deque, criamos uma nova folha conectada a~$\V{first}$ e substituímos~$\V{first}$ por esta folha; para adicionar um elemento no final da deque, criamos uma nova folha conectada a~$\V{last}$ e substituímos~$\V{last}$. Criar folhas em uma árvore não muda os caminhos entres vértices já existentes, então as versões de deques anteriores continuam válidas, e com um novo nó adicionado ao seu final ou início. Na Figura~\ref{fig:deque_ex1} ao inserir~1 no começo da deque representada por~$(\V{first}_3, \V{last_3})$, obtemos a deque~$(\V{first}_4, \V{last}_4)$.
+
+Para remover um elemento do começo, alteramos apenas~$\V{first}$ para apontar para o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$; para remover um elemento do final, alteramos~$\V{last}$ para apontara para o penúltimo elemento do caminho de~$\V{first}$ para~$\V{last}$. Como fazer essas operações será discutido nas próximas seções. Na Figura~\ref{fig:deque_ex1} ao remover o último elemento da deque~$(\V{first}_5, \V{last}_5)$ obtemos a deque~$(\V{first}_6, \V{last}_6)$.
+
+Devemos ter uma representação especial para deques vazias, por exemplo o valor~\keyword{null} em~$\V{first}$ e~$\V{last}$. Ao remover um elemento de uma deque com um único elemento (quando~$\V{first}=\V{last}$), retornamos este nó vazio; e para adicionar algum elemento à deque vazia basta criamos e retornamos um novo nó que aponta para~\keyword{null}. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em que a raiz é~\keyword{null}, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
+
+\section{Acesso e inserção}
+
+Em cada nó dá arborescência guardaremos: o pai deste nó (o nó para o qual ele aponta), no campo~$\V{parent}$; sua profundidade, no campo~$\V{depth}$; e seu valor associado, que é o valor armazenado na deque, no campo~$\V{val}$. Usamos que~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente. Esta função também realiza o preprocessamento necessário para o algoritmo de Level Ancestor funcionar, assim consome tempo e espaço~$\Oh(\lg d)$.
+
+Uma deque é representada por um par ordenado de nós. Usaremos~$(a, b)$ para criar uma deque associada aos nós~$a$ e~$b$, e estes nós podem ser acessados pelos campos~$\V{first}$ e~$\V{last}$.
+
+\begin{algorithm}
+\caption{Operações de acesso e inserção} \label{lst:deque1_ops1}
+\begin{algorithmic}[1]
+
+\Function{Deque}{\null}
+    \State \Return $(\Null, \Null)$
+\EndFunction
+
+\Function{Swap}{$d$}
+    \State \Return $(d.\V{last}, d.\V{first})$
+\EndFunction
+
+\Function{PushFront}{$d, x$}
+    \If{$d.\V{first} = \Null$}
+        \State $u = \New \Call{Node}{x, \Null, 1}$
+        \State \Return $(u, u)$
+    \Else
+        \State \Return $(\New \Call{Node}{x, d.\V{first}, d.\V{first}.\V{depth} + 1}, d.\V{last})$
+    \EndIf
+\EndFunction
+
+\Function{PushBack}{$d, x$}
+    \State \Return $\Call{Swap}{\Call{PushFront}{\Call{Swap}{d}, x}}$
+\EndFunction
+
+\Function{Front}{$d$}
+    \State \Return $d.\V{first}.\V{val}$
+\EndFunction
+
+\Function{Back}{$d$}
+    \State \Return $d.\V{last}.\V{val}$
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+O Código~\ref{lst:deque1_ops1} mostra a implementação das operações mais simples. A função~$\Call{Swap}{d}$ retorna o inverso da deque~$d$ (basta trocar seus dois vértices), e é usada para diminuir a necessidade de duplicar código entre funções~\textsc{PushFront} e~\textsc{PushBack}, assim como~\textsc{PopFront} e~\textsc{PopBack}.
+
+As implementações dadas são funcionais e mantêm a propriedade que os elementos de uma deque são os valores dos nós no caminho de seu campo~$\V{first}$ para~$\V{last}$.
+
+\section{Remoção}
+
+Discutiremos como determinar o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$, já que encontrar o penúltimo é encontrar o segundo no caminho de~$\V{last}$ para~$\V{first}$, e usaremos~\textsc{Swap} para não ter que tratar esse caso separadamente. Para uma árvore com raiz, dizemos que o~\deff{ancestral comum mais profundo} de~$\V{first}$ e~$\V{last}$ é o ancestral comum de ambos com maior profundidade. Seja~$\V{mid}$ este ancestral. Então o caminho de~$\V{first}$ para~$\V{last}$ é o caminho de~$\V{first}$ para~$\V{mid}$ concatenado com o caminho de~$\V{mid}$ para~$\V{last}$.
+
+O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \ldots, \V{mid})}$; então se~$\V{first} \neq \V{mid}$ temos que~$\V{first}.\V{parent}$ é o segundo elemento do caminho. Se~$\V{first} = \V{mid}$ então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$. Este caminho tem tamanho~${\V{last}.\V{depth} - \V{first}.\V{depth}}$, e então o segundo nó deste caminho é o~${(\V{last}.\V{depth} - \V{first}.\V{depth} - 1)}$-ésimo ancestral de~$\V{last}$, considerando que o~0-ésimo ancestral de um vértice é ele mesmo, primeiro é seu pai, e assim por diante.
+
+\begin{algorithm}
+\caption{Operações de remoção} \label{lst:deque1_ops2}
+\begin{algorithmic}[1]
+
+\Function{PopFront}{$d$}
+    \If{$d.\V{first} = d.\V{last}$}
+        \State \Return \Call{Deque}{\null}
+    \ElsIf{$\Call{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}$}
+        \State \Return $(\Call{LevelAncestor}{d.\V{last}, d.\V{first}.\V{depth} - d.\V{last}.\V{depth}}, d.\V{last})$
+    \Else
+        \State \Return $(d.\V{first}.\V{parent}, d.\V{last})$
+    \EndIf
+\EndFunction
+
+\Function{PopBack}{$d$}
+    \State \Return $\Call{Swap}{\Call{PopFront}{\Call{Swap}{d}}}$
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+O Código~\ref{lst:deque1_ops2} mostra a implementação das operações~\textsc{PopFront} e~\textsc{PopBack}. Usamos o predicado~${\Call{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}}$ para determinar se~$d.\V{first}$ é o ancestral comum mais profundo de~$d.\V{first}$ e~$d.\V{last}$, mas esta condição pode ser verificada usando apenas chamadas para~\mbox{\textsc{LevelAncestor}}. Como discutido anteriormente, se isto ocorre, então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$, mas neste caso~$d.\V{first}$ é o~${(\V{last}.\V{depth} - \V{first}.\V{depth})}$-ésimo ancestral de~$\V{last}$. Então $$ \Call{LCA}{d.\V{first}, d.\V{last}} = d.\V{first} $$ é equivalente a $$ d.\V{first}.\V{depth} < d.\V{last}.\V{depth} \And \Call{LevelAncestor}{d.\V{last}, d.\V{last}.\V{depth} - d.\V{first}.\V{depth}} = d.\V{first}. $$
+
+\section{Acesso a outros elementos}
+
+Para implementar a operação~\textsc{k-th}, é necessário comparar~$k-1$ com o tamanho do caminho de~$\V{first}$ até~$\V{mid}$, o LCA de~$\V{first}$ e~$\V{last}$. Esse caminho tem tamanho~$\ell_1 \coloneqq \V{first}.\V{depth} - \V{mid}.\V{depth}$. Se~$k-1$ for menor ou igual a~$\ell_1$, o~$k$-ésimo elemento da deque é o~$(k-1)$-ésimo ancestral de~$\V{first}$; senão, devemos determinar o~$(k-\ell_1)$-ésimo elemento da segunda parte do caminho. Seja~${\ell_2 \coloneqq \V{last}.\V{depth} - \V{mid}.\V{depth}}$ o tamanho do caminho de~$\V{mid}$ até~$\V{last}$. Então o~$(k-\ell_1)$-ésimo elemento da segunda parte do caminho é o~$(\ell_2 - (k-1-\ell_1)) = (\ell_2 + \ell_1 + 1 - k)$-ésimo ancestral de~$\V{last}$.
+
+\begin{algorithm}
+\caption{Operação~\textsc{k-th}} \label{lst:deque1_ops3}
+\begin{algorithmic}[1]
+
+\Function{k-th}{$d, k$}
+    \State $mid = \Call{LCA}{d.\V{first}, d.\V{last}}$
+    \State $\ell_1 = d.\V{first}.\V{depth} - d.\V{mid}.\V{depth}$
+    \State $\ell_2 = d.\V{last}.\V{depth} - d.\V{mid}.\V{depth}$
+    \If{$k - 1 \leq \ell_1$}
+        \State \Return $\Call{LevelAncestor}{d.\V{first}, k - 1}$
+    \Else
+        \State \Return $\Call{LevelAncestor}{d.\V{last}, \ell_1 + \ell_2 + 1 - k}$
+    \EndIf
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+O Código~\ref{lst:deque1_ops3} faz exatamente o que discutido, e portanto corretamente retorna o $k$-ésimo elemento da deque, se~$k$ é válido, ou seja, está entre~1 e o tamanho da deque.
+
+\end{document}
