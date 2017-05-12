@@ -1,0 +1,46 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{Técnicas gerais} \label{cap:parcial}
+
+Nos capítulos anteriores, discutimos como tornar estruturas de dados específicas (pilhas, filas, deques) persistentes. Como dito na introdução, outro caminho é criar técnicas gerais para tornar qualquer ED persistente.
+
+%Apresentaremos uma técnica chamada \deff{Node Copying}, que permite tornar EDs parcialmente persistentes sem tornar seu tempo assintoticamente pior, ou seja, com overhead de~$\Oh(1)$.  Esta técnica foi inicialmente discutida por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
+
+\section{Modelo de computação}
+
+Para tomar uma abordagem tão geral, é necessário definir formalmente uma estrutura de dados.  Usaremos o modelo de~\deff{estruturas ligadas}, no qual uma estrutura de dados é um conjunto de \emph{nós}, cada um contendo um número constante de campos. Cada campo pode armazenar um valor (um inteiro ou booleano, por exemplo) ou um ponteiro para outro nó. Ponteiros também podem armazenar o valor especial~\keyword{null}.  Acesso à estrutura é dado por um número constante de~\deff{nós de entrada}.
+
+% XXX Preciso assumir que todos os nós são do mesmo tipo? Ou tem um número constante de nós difs?
+
+Uma pilha implementada com lista ligada, como no Capítulo~\ref{cap:pilha}, é uma estrutura desse tipo, onde o primeiro elemento da lista é o nó de entrada. A estrutura recursiva para deques do Capítulo~\ref{cap:deque2} também é dessa forma, e tem nós de~2 tipos, os nós da estrutura, e nós que são os pares. O nó de entrada também é o primeiro nó da estrutura.  Uma árvore de busca binária também é deste tipo, já que cada nó tem dois ponteiros (para o filho esquerdo e direito), e um valor; e a raiz é o nó de entrada.  A estrutura para deque do Capítulo~\ref{cap:deque1} não é deste tipo, pois o preprocessamento para o LA armazena em cada nó um vetor de tamanho~$\floor{\lg d}$, onde~$d$ é a altura do nó.
+
+Vamos formalizar também as definições de operações de acesso e modificação. Uma~\deff{operação de acesso} produz um~\deff{conjunto de acesso}. No início da operação, este conjunto está vazio.  A cada passo, chamado de~\deff{passo de acesso}, adiciona-se um nó a este conjunto. O nó adicionado deve ser um nó de entrada ou deve ser indicado por um ponteiro em algum nó já no conjunto de acesso. O tempo consumido por uma operação de acesso é o número de passos de acesso.
+
+A busca em uma ABB por um elemento é um exemplo de operação de acesso. Um exemplo mais complicado é a operação~\textsc{k-th} da deque recursiva, que primeiro encontra o nó da estrutura em que se localiza o $k$-ésimo elemento, e depois ``descasca'' os pares para encontrar este elemento.
+
+Uma~\deff{operação de modificação} é parecida com uma de acesso. Ela consiste de passos de acesso, que funcionam da mesma forma, e~\deff{passos de modificação}. Em um passo de modificação, cria-se um novo nó, e este é adicionado ao conjunto de acesso, ou modifica-se um campo de algum nó do conjunto de acesso, ou modifica-se um nó de entrada. Se um ponteiro foi modificado, seu novo valor deve ser~\keyword{null} ou deve ser algum ponteiro do conjunto de acesso. O tempo consumido por esta operação é o número de passos, e o tempo de modificação é o número de passos de modificação.
+
+Adicionar um elemento em uma ABB, por exemplo, consiste de achar sua posição, que pode levar até~$h$ passos de acesso, onde~$h$ é a altura da árvore, e criar um novo vértice ali, modificando um dos ponteiros desse nó. Logo esta operação consome tempo~$\Oh(h)$ e tempo de modificação~$\Oh(1)$.
+
+Essas definições descrevem uma estrutura de dados efêmera, ou seja, operações de acesso e modificação podem apenas ser feitas na versão mais atual da estrutura. Nosso objetivo é tornar esta estrutura genérica em uma estrutura total ou parcialmente persistente.
+
+Consideramos que o número total de operações de modificação é~$M$, e o número de operações de acesso é~$A$. A $i$-ésima operação de moficicação cria a versão~$i$ da estrutura. A versão~0 é a estrutura vazia. Se estamos considerando uma estrutura totalmente persistente, temos uma árvore de versões, caso contrário, uma lista. Consideramos que cada operação recebe, além de seus parâmetros normais, também um inteiro que indica sob qual versão deve ser feita essa operação.
+
+Note que assumimos que a estrutura se encontra nesse modelo, mas nossas soluções podem não estar. Por exemplo, é muito comum armazenar um vetor com os nós de entrada para cada versão.
+
+\section{Off-line}
+
+Em geral, estamos interessados em implementações on-line das estruturas persistentes, ou seja, uma operação deve ser completada para se ter acesso à próxima, porém, vamos considerar o caso off-line, em que todas as~$M+A$ operações são conhecidas de antemão. Obteremos uma implementação totalmente persistente que não faz nenhuma suposição adicional sobre a estrutura de dados, não aumenta assintoticamente o tempo consumido pelas operações, e gasta apenas~$\Oh(1)$ de espaço adicional por passo de modificação, o melhor que pode-se esperar.
+
+Inicialmente, constrói-se o grafo de versões. Em cada vértice desse grafo deve-se armazenar, além dos outros dados necessários, como uma lista de adjacência, os parâmetros da operação de modificação que
+
+\section{Implementação funcional}
+
+Uma técnica que já usamos nas estruturas apresentadas até agora é tornar a implementação totalmente persistente, ou seja, nunca modificar nenhum campo de um nó já criado.
+
+Se for possível implementar a estrutura desta forma, (.....)
+
+
+\end{document}
