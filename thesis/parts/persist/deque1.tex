@@ -42,35 +42,35 @@ Na implementação de filas, no mesmo capítulo, também foi discutido como simu
 ]
 
 \draw (root.south west) edge (root.north east);
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root,yshift=12pt]{$first_0$} edge (root);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root,yshift=12pt]{$last_0$} edge (root);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root,yshift=12pt]{$\V{first}_0$} edge (root);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root,yshift=12pt]{$\V{last}_0$} edge (root);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3,yshift=12pt]{$first_1$} edge (v3);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3,yshift=12pt]{$last_1$} edge (v3);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3,yshift=12pt]{$\V{first}_1$} edge (v3);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3,yshift=12pt]{$\V{last}_1$} edge (v3);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3]{$first_2$} edge (v3);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=12pt]{$last_2$} edge (v4);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3]{$\V{first}_2$} edge (v3);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=12pt]{$\V{last}_2$} edge (v4);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=12pt]{$first_3$} edge (v2);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4]{$last_3$} edge (v4);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=12pt]{$\V{first}_3$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4]{$\V{last}_3$} edge (v4);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v1]{$first_4$} edge (v1);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=-12pt]{$last_4$} edge (v4);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v1]{$\V{first}_4$} edge (v1);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=-12pt]{$\V{last}_4$} edge (v4);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2]{$first_5$} edge (v2);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3]{$last_5$} edge (v3);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2]{$\V{first}_5$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3]{$\V{last}_5$} edge (v3);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=-12pt]{$first_6$} edge (v2);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2,yshift=12pt]{$last_6$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=-12pt]{$\V{first}_6$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2,yshift=12pt]{$\V{last}_6$} edge (v2);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v9]{$first_7$} edge (v9);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2]{$last_7$} edge (v2);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v9]{$\V{first}_7$} edge (v9);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2]{$\V{last}_7$} edge (v2);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root]{$first_8$} edge (root);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root]{$last_8$} edge (root);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root]{$\V{first}_8$} edge (root);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root]{$\V{last}_8$} edge (root);
 
-\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v6]{$first_9$} edge (v6);
-\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v6]{$last_9$} edge (v6);
+\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v6]{$\V{first}_9$} edge (v6);
+\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v6]{$\V{last}_9$} edge (v6);
 
 \end{tikzpicture}
 \caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:deque}.} \label{fig:deque_ex1}
@@ -206,7 +206,7 @@ Para implementar a operação~\textsc{k-th}, é necessário comparar~$k-1$ com o
 \begin{algorithmic}[1]
 
 \Function{k-th}{$d, k$}
-    \State $mid = \Call{LCA}{d.\V{first}, d.\V{last}}$
+	\State $\V{mid} = \Call{LCA}{d.\V{first}, d.\V{last}}$
     \State $\ell_1 = d.\V{first}.\V{depth} - d.\V{mid}.\V{depth}$
     \State $\ell_2 = d.\V{last}.\V{depth} - d.\V{mid}.\V{depth}$
     \If{$k - 1 \leq \ell_1$}
