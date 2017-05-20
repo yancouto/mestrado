@@ -6,7 +6,6 @@
 
 Nos capítulos anteriores, discutimos como tornar estruturas de dados específicas (pilhas, filas, deques) persistentes. Como dito na introdução, outro caminho é criar técnicas gerais para tornar qualquer ED persistente.
 
-%Apresentaremos uma técnica chamada \deff{Node Copying}, que permite tornar EDs parcialmente persistentes sem tornar seu tempo assintoticamente pior, ou seja, com overhead de~$\Oh(1)$.  Esta técnica foi inicialmente discutida por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
 
 \section{Modelo de computação}
 
@@ -107,5 +106,39 @@ Esta técnica, de copiar todos os nós adicionados ao conjunto de acesso, funcio
 Se os nós de estrutura formam uma árvore, como no caso da pilha e da deque recursiva, ou mesmo árvores binárias, então esse método pode ser aplicado. Na Seção~\ref{sec:implfunc}, a estrutura foi modificada para ser uma árvore, e dessa forma essa técnica poder ser aplicada.
 
 Se a estrutura segue essas restrições, esse método torna estrutura totalmente persistente com overhead de consumo de tempo de~$\Oh(M+A)$ e espaço~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar o nó mesmo que este não vá ser modificado.
+
+\section{Fat node}
+
+É possível alcançar persistência parcial em uma estrutura ligada genérica aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
+
+Modifica-se cada nó da estrutura para que cada campo seja substituido por um vetor de pares, que guarda pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação modificou aquele campo para armazenar o valor~$v$. Ao invés de modificar um campo de um objeto, adicionasse um par no vetor correspondente, indicando a versão atual e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado (considerando apenas os índices).
+
+Para realizar um acesso do campo~$c$ na versão~$i$, é necessário procurar no vetor associado à~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Diferente das outras técnicas, esta também aumenta o tempo de um passo de acesso.
+
+Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura parcialmente persistente, com overhead de consumo de tempo de~$\Oh((M+A) \lg{M})$ e espaço~$\Oh(M)$.
+
+\section{Node copying}
+
+No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método de~\deff{Node copying} diminui esse tempo armazenando apenas um número constante de versões em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado em~\cite{DriscollSST1989}.
+
+Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada tem grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de nós que tem em um de seus campos um ponteiro para~$u$ é no máximo~$\V{in}$. Note que, pela forma que definimos uma estrutura ligada, o grau de saída de um nó também é constante.
+
+Para representar um nó da estrutura efêmera, teremos uma lista de nós persistentes, cada um representando o nó efêmero em algumas versões. O último nó dessa lista é chamado de nó~\deff{ativo}, pois representa o nó efêmero no estado atual da estrutura, e portanto, como estamos tratando de persistência parcial, é o único nó que precisamos considerar ao fazer operações de modificação. Usamos a notação que~$u_e$ é um nó da estrutura efêmera no estado atual, e~$u_a$ é o nó ativo associado à~$u_e$.
+
+Um nó persistente~$u$ é similar a um nó efêmero, mas com campos adicionais. O campo~$\V{timestamp}$ indica a versão em que~$u$ foi criado. O campo~$\V{copy}$ é um ponteiro para o próximo nó na lista de nós persistentes, ou~\keyword{null} se~$u$ for ativo. Temos um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena as mudanças feitas nos campos de~$u$, ou seja, se este vetor tem a tripla~$(\V{version}, \V{field}, \V{value})$ então na versão~$\V{version}$ o campo~$\V{field}$ de~$u$ foi modificado para o valor~$\V{value}$.
+
+Quando a~$i$-ésima operação de modificação modifica~$u_e.\V{field}$ para~$\V{value}$, fazemos o seguinte
+\begin{enumerate}
+	\item Se~$u$ tem~$\V{timestamp} = i$, apenas modificamos seu campo~$\V{field}$ para~$\V{value}$.
+	\item Se~$u.\V{changes}$ tem uma tripla~$(i, \V{field}, x)$, trocamos o último elemento da tripla para~$\V{value}$.
+	\item Se~$u.\V{changes}$ não está cheio, adicionamos a tripla~$(i, \V{field}, \V{value})$ a este.
+	\item Caso contrário, criamos um novo nó~$u'$. Seus campos recebem as versões mais novas das modificações, e o vetor~$u'.\V{changes}$ fica vazio.
+	
+\end{enumerate}
+
+Além disso, temos um vetor~$\V{parent}$ de tamanho~$\V{in}$, que armazena ponteiros para os nós~$v_a$ tal que~$v_e$ tem um ponteiro para~$u_e$, ou seja, se~$u$ é ativo, esse vetor armazena ponteiros para todos os nós ativos que tem, em seus campos, um ponteiro para~$u$.
+
+
+
 
 \end{document}
