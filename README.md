@@ -5,6 +5,7 @@
 	- Pilha
 	- Fila
 	- Deque
+	- Técnicas gerais
 	- Árvore rubro-negra
 - Estruturas retroativas
 - Árvores de busca binária adaptativas

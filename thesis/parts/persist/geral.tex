@@ -121,23 +121,161 @@ Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura par
 
 No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método de~\deff{Node copying} diminui esse tempo armazenando apenas um número constante de versões em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado em~\cite{DriscollSST1989}.
 
-Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada tem grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de nós que tem em um de seus campos um ponteiro para~$u$ é no máximo~$\V{in}$. Note que, pela forma que definimos uma estrutura ligada, o grau de saída de um nó também é constante.
+Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada tem grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de nós que tem em um de seus campos um ponteiro para~$u$ é no máximo~$\V{in}$.
 
-Para representar um nó da estrutura efêmera, teremos uma lista de nós persistentes, cada um representando o nó efêmero em algumas versões. O último nó dessa lista é chamado de nó~\deff{ativo}, pois representa o nó efêmero no estado atual da estrutura, e portanto, como estamos tratando de persistência parcial, é o único nó que precisamos considerar ao fazer operações de modificação. Usamos a notação que~$u_e$ é um nó da estrutura efêmera no estado atual, e~$u_a$ é o nó ativo associado à~$u_e$.
+Para representar um nó da estrutura efêmera, usaremos um nó persistente, que é um nó efêmero modificado, que pode armazenar até~$\V{in}$ modificações em seus campos. Quando um passo de modificação muda um campo do nó efêmero~$u_e$, criamos uma cópia~$u'$ do nó persistente~$u$, armazenando a versão atual de cada campo. Ao final da operação de modificação, é necessário atualizar cada nó~$v$ que tem ponteiros para nós copiados. Para fazer isso, se~$v$ não estiver cheio, armazenamos estas modificações em seus campos. Se está, o nó~$v$ é copiado, e recursivamente é necessário atualizar os nós que apontam para~$v$.
 
-Um nó persistente~$u$ é similar a um nó efêmero, mas com campos adicionais. O campo~$\V{timestamp}$ indica a versão em que~$u$ foi criado. O campo~$\V{copy}$ é um ponteiro para o próximo nó na lista de nós persistentes, ou~\keyword{null} se~$u$ for ativo. Temos um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena as mudanças feitas nos campos de~$u$, ou seja, se este vetor tem a tripla~$(\V{version}, \V{field}, \V{value})$ então na versão~$\V{version}$ o campo~$\V{field}$ de~$u$ foi modificado para o valor~$\V{value}$.
+Um nó efêmero~$u_e$ é então representado por uma lista~$u_1, \ldots, u_k$ de nós persistentes. Se cada nó tem um campo~$\V{timestamp}$ que indica a versão em que foi criado, então o nó~$u_i$ representa~$u_e$ no intervalo de versões~$[u_i.\V{timestamp}, u_{i+1}.\V{timestamp}]$ para todo~$1 \leq i < k$, e o nó~$u_k$ representa~$u_e$ da versão~$u_k.\V{timestamp}$ até a versão atual. Este nó é chamado de nó~\deff{ativo}, pois representa~$u_e$ na versão atual da estrutura, e portanto, como estamos tratando de persistência parcial, é o único nó da lista que precisamos considerar ao fazer operações de modificação.
 
-Quando a~$i$-ésima operação de modificação modifica~$u_e.\V{field}$ para~$\V{value}$, fazemos o seguinte
-\begin{enumerate}
-	\item Se~$u$ tem~$\V{timestamp} = i$, apenas modificamos seu campo~$\V{field}$ para~$\V{value}$.
-	\item Se~$u.\V{changes}$ tem uma tripla~$(i, \V{field}, x)$, trocamos o último elemento da tripla para~$\V{value}$.
-	\item Se~$u.\V{changes}$ não está cheio, adicionamos a tripla~$(i, \V{field}, \V{value})$ a este.
-	\item Caso contrário, criamos um novo nó~$u'$. Seus campos recebem as versões mais novas das modificações, e o vetor~$u'.\V{changes}$ fica vazio.
-	
-\end{enumerate}
+Cada nó~$u_i$ tem um campo~$\V{copy}$ que aponta para o próximo nó da lista, ou é~\keyword{null} se~$u_i$ é ativo~($i=k$). Para armazenar as mudanças, o nó~$u_i$ tem um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos campos de~$u_i$, ou seja, se este vetor tem a tripla~$(\V{version}, \V{field}, \V{value})$ então na versão~$\V{version}$ o campo~$\V{field}$ de~$u_i$ foi modificado para o valor~$\V{value}$.
 
-Além disso, temos um vetor~$\V{parent}$ de tamanho~$\V{in}$, que armazena ponteiros para os nós~$v_a$ tal que~$v_e$ tem um ponteiro para~$u_e$, ou seja, se~$u$ é ativo, esse vetor armazena ponteiros para todos os nós ativos que tem, em seus campos, um ponteiro para~$u$.
+\subsection{Acesso e modificação}
 
+O acesso a um campo de um nó em uma dada versão pode ser feita da seguinte maneira. Note que estamos assumindo que as modificações estão armazenadas no vetor~$\V{changes}$ na ordem em que foram feitas.
+
+\vspace{1em}
+\hrule
+\begin{algorithmic}[1]
+
+\Function{Access}{$u, \V{field}, \V{version}$}
+	\State $\V{value} = u.\V{field}$
+	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
+		\If{$\V{field} = \V{field}' \And \V{version} \geq \V{version}'$}
+			\State $\V{value} = \V{value}'$
+		\EndIf
+	\EndFor
+	\State \Return $\V{value}$
+\EndFunction
+
+\end{algorithmic}
+\hrule
+\vspace{1em}
+
+A função~\Call{Access}{$u, \V{field}, \V{version}$} só funciona se~$u$ representa a versão~$\V{version}$.
+
+Em uma mesma operação de modificação~$i$, vamos garantir que no máximo uma cópia de cada vértice seja feita, dessa forma, quando um passo de modificação mudar um campo do vértice~$u$, se~$u.\V{copy}$ existir, essa é a cópia de~$u$ e vale~$u.\V{copy}.\V{timestamp} = i$.
+Para poder atualizar os ponteiros para um nó~$u$, armazenamos também um vetor~$\V{parents}$, de~$\V{in}$ posições, que armazena quais nós ativos apontam para~$u$. Se~$u$ não é ativo, esse vetor tem apenas~\keyword{null}s. Dizemos que~$\V{parents}$ armazena~\deff{ponteiros de volta}.
+
+Quando um campo é modificado ou um nó é criado, é necessário atualizar o vetor~$\V{parents}$ dos nós relacionados. A função~\Call{ChangeParent}{$u, a, b$} modifica o vetor~$u.\V{parents}$, trocando uma ocorrência de~$a$ por~$b$. O código abaixo modifica um campo de um nó, e deve ser chamada em um passo de modificação da~$\V{version}$-ésima operação de modificação.
+
+\vspace{1em}
+\hrule
+\begin{algorithmic}[1]
+
+\Function{Modify}{$u, \V{field}, \V{value}, \V{version}$}
+	\If{$u.\V{copy} \neq \Null$}
+		\State $u = u.\V{copy}$
+	\EndIf
+	\If{$u.\V{version} < \V{version}$}
+		\State $u.\V{copy} = \Call{Copy}{u, \V{version}}$ \label{line:modify:copy}
+		\State $u = u.\V{copy}$
+	\EndIf
+	\If{$\V{field}$ é campo de ponteiro}
+		\State \Call{ChangeField}{$u, \V{field}, \V{value}$}
+	\Else
+		\State $u.\V{field} = \V{value}$
+	\EndIf
+\EndFunction
+
+\Function{ChangeField}{$u, \V{field}, \V{value}$}
+	\If{$u.\V{field} \neq \Null$}
+		\State \Call{ChangeParent}{$u.\V{field}, u, \Null$}
+	\EndIf
+	\State $u.\V{field} = \V{value}$
+	\If{$\V{value} \neq \Null$}
+		\State \Call{ChangeParent}{$\V{value}, \Null, u$}
+	\EndIf
+\EndFunction
+
+\Function{ChangeParent}{$u, a, b$}
+	\For{$i = 1 \To \V{in}$}
+		\If{$u.\V{parents}[i] = a$}
+			\State $u.\V{parents}[i] = b$
+			\State \Return
+		\EndIf
+	\EndFor
+\EndFunction
+
+\end{algorithmic}
+\hrule
+\vspace{1em}
+
+A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ está atualizado pois, ao trocar~$a$ por~$b$, se~$a \neq \Null$, então~$a$ apontava para~$u$, logo estava em parents; se~$a = \Null$, então, como~$\V{in}$ é o grau de entrada máximo de um nó, pelo menos uma posição do vetor tem o valor~$\Null$.
+
+Se~$u$ não foi criado nessa versão e não tem cópia, a função~\Call{Modify}{$u, \V{field}, \V{value}, \V{version}$} copia~$u$, utilizando~\Call{Copy}{$u, \V{version}$}, que copia o nó~$u$ e retorna a cópia, modificando apropriadamente os vetores~$\V{parent}$ e os nós que apontam para~$u$. Após isso, o campo~$\V{field}$ é alterdo utilizando a função~\textsc{ChangeField}, que apenas modifica o valor em um nó criado na versão atual, arrumando os vetores de volta usando~\textsc{ChangeParent}. Se o campo não é um ponteiro, não é necessário chamar~\textsc{ChangeField}.
+A função~\textsc{Copy} é da seguinte forma.
+
+\vspace{1em}
+\hrule
+\begin{algorithmic}[1]
+
+\Function{Copy}{$u, \V{version}$}
+	\State $u' = \Call{RawCopy}{u}$
+	\State $u.\V{parents} = $ vetor apenas com~\keyword{null}s
+	\State $u'.\V{changes} = \{\}$
+	\State $u'.\V{timestamp} = \V{version}$
+	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
+		\State $u'.\V{field}' = \V{value}'$
+	\EndFor
+	\If{$u$ é nó de acesso}
+		\State Trocar~$u$ por~$u'$ na posição de vetor correspondente.
+	\EndIf
+	\For{$p \in$ campos de ponteiros}
+		\If{$u'.p \neq \Null$}
+			\State \Call{ChangeParent}{$u'.p, u, u'$}
+		\EndIf
+	\EndFor
+	\For{$v \in u'.\V{parents}$} \label{line:copy:parents}
+		\State $\V{field} = $ campo de~$v$ com valor~$u$.
+		\If{$v.\V{timestamp} = \V{version}$} \Comment{$\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
+			\State $v.\V{field} = u'$
+		\ElsIf{$|v.\V{changes}| < \V{in}$}
+			\State $v.\V{changes}.\Call{Add}{(\V{version}, \V{field}, u')}$
+		\Else
+			\State $v.\V{copy} = \Call{Copy}{v, \V{version}}$ \label{line:copy:copy}
+			\State $v.\V{copy}.\V{field} = u'$
+		\EndIf
+	\EndFor
+	\State \Return $u'$
+\EndFunction
+
+\end{algorithmic}
+\hrule
+\vspace{1em}
+
+Assumimos que a função~\Call{RawCopy}{$u$} faz e retorna um novo nó com todos os campos iguais os de~$u$.
+A função~\textsc{Copy} então ``aplica'' todas as modificações em~$\V{changes}$ ao nó~$u'$, e modifica todos os ponteiros de volta dos nós que ele aponta. Depois disso, resta modificar os nós que apontam para~$u$, para fazê-los apontar para~$u'$. Esse passo pode fazer necessária uma cópia de tal nó, usando a própria função~\textsc{Copy}. Como cada nó é copiado no máximo uma vez por versão, a função sempre termina.
+
+\subsection{Análise de espaço e tempo}
+
+A ideia do método é copiar os nós quando fazemos modificações, mas guardam-se algumas versões no mesmo nó para diminuir o número de cópias necessárias. É claro que, aumentando o tamanho do vetor~$\V{changes}$, o número de cópias diminui. Vamos mostrar que ter tamanho~$\V{in}$ é o bastante para que o método consuma espaço amortizado~$\Oh(1)$ por passo de modificação.
+
+Utilizaremos o método do potencial, isso é, seja~$E_i$ o estado da estrutura (persistente) na~$i$-ésima versão, ou seja, depois da~$i$-ésima operação de modificação. Vamos associar um valor não negativo~$\Phi(E_i)$ a cada uma das versões da estrutura, tal que~$\Phi(E_0) = 0$. Seja~$O_i$ o número de nós criados pelo método descrito na~$i$-ésima operação de modificação, então
+$$ \sum\limits_{i=1}^{m}{O_i + \Phi(E_i) - \Phi(E_{i-1})} = \left(\sum\limits_{i=1}^m{O_i}\right) + \Phi(E_m) - \Phi(E_0) \geq \sum\limits_{i=1}^m{O_i} $$
+
+Dessa forma, ainda que calcular~$O_i$ seja complicado, se escolhemos~$\Phi$ tal que seja simples calcular~${O_i + \Phi(E_i) - \Phi(E_{i-1})}$, conseguimos assim um limite superior para o número de nós criado pelo método, que é~$\sum\limits_{i=1}^m{O_i}$.
+
+Queremos escolher~$\Phi$ de forma que~${O_i + \Phi(E_i) - \Phi(E_{i-1})}$ seja~$\Oh(M_i)$, onde~$M_i$ é o número de passos de modificação durante a~$i$-ésima operação de modificação. Para isso, queremos que o potencial ``cancele'' o número de nós adicionais, criados pelas chamadas recursivas de~\textsc{Copy}. A escolha do potencial é~$\Phi(E_i) = A_i \cdot \V{in} - L_i$, onde~$A_i$ é o número de nós ativos em~$E_i$ e~$L_i$ é o número de espaços de modificação vazios em todos os nós ativos, ou seja, o valor~$\V{in} - |u.\V{changes}|$ para todo nó ativo~$u$. Note que como cada nó ativo tem no máximo~$\V{in}$ espaços livres,~$\Phi(E_i)$ nunca é negativo, e claramente~$\Phi(E_0) = 0$.
+
+Se um passo de modificação cria um novo nó, o potencial não se modifica, já que~$A_i$ aumenta em~1 e~$L_i$ aumenta em~$\V{in}$, e~$O_i$ aumenta em~1. Seja~$N_i$ o número de nós criados.
+
+Vamos considerar a função~\Call{Copy}{$u, i$}, a única outra função que cria nós. Seja~$C_i$ o número de chamadas à função~\textsc{Copy} na~$i$-ésima operação de modificação. Quando~\textsc{Copy} é chamada na linha~\nref{line:copy:copy} da função~\textsc{Copy}, é garantido que~$u$ tem seu vetor~$\V{changes}$ cheio. A única outra chamada à~\textsc{Copy} é na linha~\nref{line:modify:copy} de~\textsc{Modify}, e neste caso pode ser que o vetor~$\V{changes}$ não esteja cheio. Então, pelo menos~$C_i - M_i$ chamadas de~\textsc{Copy} são feitas quando~$u$ está cheio, e cada uma dessas chamadas diminui~$\Phi$ em~$\V{in}$, pois o novo nó é ativo e tem o vetor~$\V{changes}$ vazio. Seja~$x \geq C_i - M_i$ o número de tais chamadas.
+
+O for da linha~\nref{line:copy:parents} pode adicionar mudanças aos vetores~$\V{changes}$ dos nós, aumentando~$\Phi$. Seja~$y$ a quantidade de tais adições. Cada nó pode adicionar até~$\V{in}$ modificações, porém, quando~\textsc{Copy} é chamada recursivamente na linha~\nref{line:copy:copy}, a adição da modificação não é feita, logo~$y \leq C_i \cdot \V{in} - x$. Utilizando a notação definida acima temos:
+
+\begin{align*}
+	O_i + \Phi(E_i) - \Phi(E_{i-1}) & = N_i + C_i - t \cdot \V{in} + y
+	\\ &\stackrel{\text{(1)}}{\leq} N_i + (1 + \V{in})\cdot C_i - (1 + \V{in}) \cdot x
+	\\ &\stackrel{\text{(2)}}{\leq} N_i + (1 + \V{in})\cdot C_i - (1 + \V{in}) \cdot (C_i - M_i)
+	\\ &\stackrel{\text{(3)}}{=} N_i + (1 + \V{in}) \cdot M_i
+	\\ &\stackrel{\text{(4)}}{=} \Oh(M_i)
+\end{align*}
+
+A relação (1) vale pois~$y \leq C_i \cdot \V{in} - x$, (2) vale pois~$x \geq C_i - M_i$,~(3) é uma simplificação da linha acima e~(4) usa que~$N_i \leq M_i$ e~$\V{in}$ é uma constante.
+
+Isso prova que o espaço amortizado gasto pela estrutura é~${\Oh(\sum\limits_{i=1}^m{M_i}) = \Oh(M)}$. Além disso, gasta-se tempo constante para criar cada nó, e cada chamada de~\textsc{Copy} cria um novo nó, logo o consumo de tempo dos passos de modificação é limitado pela criação de nós, e os passos de acesso funcionam em tempo~$\Oh(1)$ usando a função~\textsc{Access}, logo o tempo amortizado consumido por esse método é~$\Oh(M+A)$.
+
+Concluindo, este método transforma qualquer estrutura ligada com grau de entrada constante em uma estrutura parcialmente persistente, sem aumentar o consumo de tempo assintóticamente, apenas deixando esse tempo amortizado (se já não era). Variações desta técnica também permitem deixar a estrutura totalmente persistente~\cite{DriscollSST1989}, porém, são bem mais complicadas e usam EDs adicionais.
 
 
 
