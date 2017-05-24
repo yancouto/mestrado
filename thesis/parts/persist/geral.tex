@@ -91,7 +91,7 @@ Dessa forma, as chamadas da função~\textsc{DFS} para todos os filhos de~$v_i$ 
 
 Então, é possível transformar qualquer estrutura ligada em totalmente persistente, de forma off-line, com overhead de consumo de tempo de~$\Oh(M+A)$ e~$\Oh(M)$ de espaço.
 
-\section{Implementação funcional}
+\section{Implementação funcional} \label{sec:implfuncional}
 
 A técnica que usamos nas estruturas apresentadas até agora é tornar a implementação funcional, ou seja, nunca modificar nenhum campo de um nó já criado.
 
@@ -117,7 +117,7 @@ Para realizar um acesso do campo~$c$ na versão~$i$, é necessário procurar no 
 
 Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura parcialmente persistente, com overhead de consumo de tempo de~$\Oh((M+A) \lg{M})$ e espaço~$\Oh(M)$.
 
-\section{Node copying}
+\section{Node copying} \label{sec:nodecopying}
 
 No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método de~\deff{Node copying} diminui esse tempo armazenando apenas um número constante de versões em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado em~\cite{DriscollSST1989}.
 
