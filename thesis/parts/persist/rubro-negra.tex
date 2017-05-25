@@ -4,7 +4,7 @@
 
 \chapter{Árvore rubro-negra} \label{cap:rubronegra}
 
-Iremos implementar uma árvore rubro-negra utilizando a técnica de Node copying, discutida na Seção~\label{sec:nodecopying}. Uma árvore rubro-negra é uma árvore de busca binária balanceada, na qual cada nó é vermelho ou preto, e as cores são usadas para auxiliar no rebalanceamento.
+Iremos implementar uma árvore rubro-negra utilizando a técnica de Node copying, discutida na Seção~\ref{sec:nodecopying}. Uma árvore rubro-negra é uma árvore de busca binária balanceada, na qual cada nó é vermelho ou preto, e as cores são usadas para auxiliar no rebalanceamento.
 
 Com uma implementação baseada na de Cormen et. al~\cite{CormenRedBlack}, a cada inserção ou remoção em uma árvore de~$n$ nós, são necessárias apenas~$\Oh(1)$ rotações para rebalancear a árvore, e~$\Oh(\lg n)$ mudanças de cores. Como as cores servem apenas para auxiliar no rebalanceamento, não é necessário que estes dados persistam, ou seja, só precisamos saber a cor dos nós ativos, logo apenas~$\Oh(1)$ passos de modificação~(considerando apenas os ponteiros de filho esquerdo e direito de um nó) por inserção, logo esta implementação parcialmente persistente consome tempo~$\Oh((m + a) \lg(m))$ e espaço~$\Oh(m)$, onde~$m$ é o número de operações de modificação~(inserções e remoções), e~$a$ é o número de operações de acesso~(acessar um elemento, seu teto ou chão, mínimo, etc.).
 
@@ -45,17 +45,53 @@ Considerando apenas os nós pretos, a árvore é totalmente balanceada (propried
 
 \section{Implementação da persistência}
 
-Em uma árvore rubro-negra efêmera, todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, no nó persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra. O ponteiro de volta é armazenado no campo~$\V{parent}$, e é exatamente o ponteiro que aponta para o pai de um nó, o que será conveniente durante a implementação das operações. Note que, de acordo com a implementação da Seção~\ref{sec:nodecopying}, o campo~$\V{parent}$ é nulo para nós que não são ativos.
+\newcommand{\ts}{\mathcal{T}}
+\renewcommand{\copy}{\V{copy}}
+\newcommand{\child}{\V{child}}
+\newcommand{\parent}{\V{parent}}
+\newcommand{\red}{\V{red}}
+\newcommand{\extra}{\V{extra}}
+\newcommand{\eSide}{\V{extraSide}}
+\newcommand{\eTs}{\V{extra\mathcal{T}}}
+\newcommand{\version}{\V{version}}
+\newcommand{\side}{\V{side}}
+\newcommand{\roots}{\V{roots}}
 
-Para evitar a necessidade de replicar código muito parecido, vamos armazenar os filhos como um vetor~$\V{child}$ de~2 posições,~$u.\V{child[0]}$ é o filho esquerdo de~$u$, e~$u.\V{child[1]}$ é seu filho direito. Os campos de um nó serão:
+
+Em uma árvore rubro-negra efêmera, todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, no nó persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra. O ponteiro de volta é armazenado no campo~$\parent$, e é exatamente o ponteiro que aponta para o pai de um nó, o que será conveniente durante a implementação das operações. Note que, de acordo com a implementação da Seção~\ref{sec:nodecopying}, o campo~$\parent$ é nulo para nós que não são ativos, logo não pode ser utilizado para realizar as operações de acesso.
+
+Para evitar a necessidade de replicar código muito parecido, vamos armazenar os filhos como um vetor~$\child$ de~2 posições,~$u.\child[0]$ é o filho esquerdo de~$u$, e~$u.\child[1]$ é seu filho direito. Os campos de um nó serão:
 \begin{itemize}
-\item $\V{timestamp}$ --- Tempo de criação do nó.
-\item $\V{copy}$ --- Próximo nó persistente (se este não é ativo).
-\item $\V{child}$ --- Vetor de filhos.
-\item $\V{parent}$ --- Ponteiro de volta.
-\item $\V{red}$ --- Booleano que indica se o nó é vermelho.
-\item $\V{extra}, \V{extraSide}, \V{extraTimestamp}$ --- Ponteiro extra, seu lado e tempo de modificação.
+\item $\ts$ --- Tempo de criação do nó.
+\item $\copy$ --- Próximo nó persistente (se este não é ativo).
+\item $\child$ --- Vetor de filhos.
+\item $\parent$ --- Ponteiro de volta.
+\item $\red$ --- Booleano que indica se o nó é vermelho.
+\item $\extra, \eSide, \eTs$ --- Ponteiro extra, seu lado e tempo de modificação.
 \end{itemize}
+
+Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois ele pode ser tanto um filho esquerdo quanto direito do nó, e se~$\extra$ for nulo, não há como saber qual filho este é comparando seu valor com o do nó. Para indicar se o ponteiro extra foi utilizado, usaremos que~$\ts = -1$ quando não existe tal ponteiro.
+
+\section{Operações de acesso}
+
+Para acessar o campo de um nó na versão~$\version$, usamos uma versão modificada da função~\textsc{Access}.
+
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+
+\Require $u$ deve ser um nó persistente associado à versão~$\version$.
+\Function{Access}{$u, \side, \version$}
+	\If{$u.\eTs \neq -1 \And u.\eSide = \side \And \version \geq u.\eTs$}
+		\State \Return $u.\extra$
+	\EndIf
+	\State \Return $u.\child[\side]$
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~\keyword{null} se ele não foi encontrado. Se guardarmos um vetor~$\roots$ com os nós de entrada (as raízes), para encontrar um valor~$x$ na versão~$\version$, basta chamar a função~$\Call{Find}{\roots[\version], \version}$.
 
 
 \end{document}
