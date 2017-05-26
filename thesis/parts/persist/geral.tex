@@ -162,6 +162,7 @@ Quando um campo é modificado ou um nó é criado, é necessário atualizar o ve
 \hrule
 \begin{algorithmic}[1]
 
+\Require $u$ é ativo ou era ativo no começo da operação de modificação.
 \Function{Modify}{$u, \V{field}, \V{value}, \V{version}$}
 	\If{$u.\V{copy} \neq \Null$}
 		\State $u = u.\V{copy}$
@@ -177,6 +178,8 @@ Quando um campo é modificado ou um nó é criado, é necessário atualizar o ve
 	\EndIf
 \EndFunction
 
+\Require $u$ é um nó criado nesta versão. \Comment{Não é necessário usar \textsc{Access}}
+\Require $\V{field}$ é um campo de ponteiro.
 \Function{ChangeField}{$u, \V{field}, \V{value}$}
 	\If{$u.\V{field} \neq \Null$}
 		\State \Call{ChangeParent}{$u.\V{field}, u, \Null$}

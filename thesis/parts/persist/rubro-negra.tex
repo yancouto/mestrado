@@ -56,6 +56,7 @@ Considerando apenas os nós pretos, a árvore é totalmente balanceada (propried
 \newcommand{\version}{\V{version}}
 \newcommand{\side}{\V{side}}
 \newcommand{\roots}{\V{roots}}
+\newcommand{\val}{\V{value}}
 
 
 Em uma árvore rubro-negra efêmera, todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, no nó persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra. O ponteiro de volta é armazenado no campo~$\parent$, e é exatamente o ponteiro que aponta para o pai de um nó, o que será conveniente durante a implementação das operações. Note que, de acordo com a implementação da Seção~\ref{sec:nodecopying}, o campo~$\parent$ é nulo para nós que não são ativos, logo não pode ser utilizado para realizar as operações de acesso.
@@ -68,6 +69,7 @@ Para evitar a necessidade de replicar código muito parecido, vamos armazenar os
 \item $\parent$ --- Ponteiro de volta.
 \item $\red$ --- Booleano que indica se o nó é vermelho.
 \item $\extra, \eSide, \eTs$ --- Ponteiro extra, seu lado e tempo de modificação.
+\item $\val$ --- O valor armazenado pelo nó
 \end{itemize}
 
 Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois ele pode ser tanto um filho esquerdo quanto direito do nó, e se~$\extra$ for nulo, não há como saber qual filho este é comparando seu valor com o do nó. Para indicar se o ponteiro extra foi utilizado, usaremos que~$\ts = -1$ quando não existe tal ponteiro.
@@ -91,7 +93,92 @@ Para acessar o campo de um nó na versão~$\version$, usamos uma versão modific
 \end{algorithmic}
 \end{algorithm}
 
-Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~\keyword{null} se ele não foi encontrado. Se guardarmos um vetor~$\roots$ com os nós de entrada (as raízes), para encontrar um valor~$x$ na versão~$\version$, basta chamar a função~$\Call{Find}{\roots[\version], \version}$.
+Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~\keyword{null} se ele não foi encontrado. Se guardarmos um vetor~$\roots$ com os nós de entrada (as raízes), para encontrar um valor~$x$ na versão~$\version$, basta chamar a função~$\Call{Find}{x, \roots[\version], \version}$.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+
+\Function{Find}{$x, u, \version$}
+	\If{$u = \Null$}
+		\State \Return \Null
+	\ElsIf{$x = u.\val$}
+		\State \Return $x.\val$
+	\Else
+		\State \Return \Call{Find}{$x, \Call{Access}{u, [x > u.\val], \version}, \version$} \label{line:findrb:iver}
+	\EndIf
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc{Access} para acessar o filho direito ou esquerdo, em vez de utilizar o campo~$\child$, que pode não ter a versão desejada do ponteiro. Note que, na linha~\nref{line:findrb:iver}, já utilizamos a notação de~Iverson para diminuir o código. Outras operações de acesso (chão e teto, por exemplo) podem ser implementadas da mesma forma.
+
+\section{Modificação de um campo}
+
+Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação. Usamos que apenas ponteiros são modificados em uma árvore rubro-negra.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+
+\Function{Modify}{$u, \side, v, \version$}
+	\If{$u.\copy \neq \Null$}
+		\State $u = u.\copy$
+	\EndIf
+	\If{$u.\version < \version$}
+		\State $u.\copy = \Call{Copy}{u, \version}$
+		\State $u = u.\copy$
+	\EndIf
+	\If{$u.\child[\side] \neq \Null$}
+		\State $u.\child[\side].\parent = \Null$
+	\EndIf
+	\State $u.\child[\side] = v$
+	\If{$v \neq \Null$}
+		\State $v.\parent = u$
+	\EndIf
+\EndFunction
+
+\Function{Copy}{$u, \version$}
+	\State $u' = \Call{RawCopy}{u}$
+	\If{$u.\eTs \neq -1$}
+		\State $u'.\child[u.\eSide] = u.\extra$
+		\State $u'.\eTs = -1$ \Comment{Limpando o campo extra}
+	\EndIf
+	\State $u'.\ts = \version$
+	\State $u.\parent = \Null$
+	\If{$\roots[\version] = u$}
+		\State $\roots[\version] = u'$
+	\EndIf
+	\For{$\side \in \{0, 1\}$}
+		\If{$u'.\child[\side] \neq \Null$}
+			\State $u'.\child[\side].\parent = u'$
+		\EndIf
+	\EndFor
+	\If{$u'.\parent \neq \Null$}
+		\State $v = u'.\parent$
+		\State $\side = [u'.\val > v.\val]$
+		\If{$v.\ts = \version$}
+			\State $v.\child[\side] = u'$
+		\ElsIf{$v.\eTs = -1$}
+			\State $v.\eTs = \version$
+			\State $v.\extra = u'$
+			\State $v.\eSide = \side$
+		\Else
+			\State $v.\copy = \Call{Copy}{v, \version}$
+			\State $v.\child[\side] = u'$
+		\EndIf
+	\EndIf
+	\State \Return $u'$
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+Utilizamos que cada nó tem apenas um campo extra e ponteiro de volta para diminuir o código, e o vetor de filhos para evitar duplicação de código. Com estas funções prontas, é possível manter a persistência da estrutura, e nas próximas seções vamos discutir como implementar as operações de inserir e remover um valor de uma árvore rubro-negra.
+
+\section{Inserção}
+
+TODO
+
 
 
 \end{document}
