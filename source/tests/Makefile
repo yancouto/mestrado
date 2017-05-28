@@ -43,10 +43,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : all_tests
-
-clean :
-	rm -f all_tests gtest.a gtest_main.a *.o
+all : test_all .gitignore
 
 # Builds gtest.a and gtest_main.a.
 
@@ -76,19 +73,34 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-all: all_tests redblack_tests stack_tests
+# Tests all tests automagically
 
-all_tests: RedBlack_tests.o Stack_tests.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+TESTS = $(basename $(wildcard **/*.cpp *.cpp))
 
-redblack_tests: RedBlack_tests.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+.PHONY: clean .gitignore
+clean:
+	rm -f all_tests $(TESTS) gtest.a gtest_main.a **/*.o *.o
 
-stack_tests: Stack_tests.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+lala:
+	@echo $(addsuffix .o, $(TESTS))
 
-RedBlack_tests.o: RedBlack_tests.cpp ../RedBlack.hpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+.SECONDEXPANSION:
+PERCENT=%
 
-Stack_tests.o: Stack_tests.cpp ../Stack.hpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+%.o: %.c ../$$(basename %).hpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -c -o $@
+
+# Testes individuais
+$(TESTS) : % : %.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ gtest_main.a -o $@
+	./$@
+
+# Teste para tudo
+all_tests: $(addsuffix .o, $(TESTS)) gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ gtest_main.a -o $@
+
+.gitignore:
+	@echo "${TESTS} all_tests" | sed -e 's/ /\n/g' >$@
+
+test_all: all_tests
+	./all_tests

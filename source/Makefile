@@ -1,7 +1,5 @@
-CXXFLAGS += -std=c++11
-
 all:
-	$(MAKE) -C tests && tests/all_tests
+	$(MAKE) -C tests
 
-clean:
-	$(MAKE) clean -C tests
+%:
+	$(MAKE) $@ -C tests
