@@ -83,7 +83,7 @@ Para acessar o campo de um nó na versão~$\version$, usamos uma versão modific
 \begin{algorithmic}[1]
 
 \Require $u$ deve ser um nó persistente associado à versão~$\version$.
-\Function{Access}{$u, \side, \version$}
+\Function{ChildAt}{$u, \side, \version$}
 	\If{$u.\eTs \neq -1 \And u.\eSide = \side \And \version \geq u.\eTs$}
 		\State \Return $u.\extra$
 	\EndIf
@@ -93,25 +93,27 @@ Para acessar o campo de um nó na versão~$\version$, usamos uma versão modific
 \end{algorithmic}
 \end{algorithm}
 
-Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~\keyword{null} se ele não foi encontrado. Se guardarmos um vetor~$\roots$ com os nós de entrada (as raízes), para encontrar um valor~$x$ na versão~$\version$, basta chamar a função~$\Call{Find}{x, \roots[\version], \version}$.
+Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~\keyword{null} se ele não foi encontrado. Assumimos que é guardado um vetor~$\roots$, com o nó de entrada (a raiz) para cada versão.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
 
-\Function{Find}{$x, u, \version$}
+\Function{Find}{$x, \version$}
+	\State $u = \roots[\version]$
+	\While{$u \neq \Null \And x \neq u.\val$}
+	\State $u = \Call{ChildAt}{u, [x > u.\val], \version}$ \label{line:findrb:iver}
+	\EndWhile
 	\If{$u = \Null$}
 		\State \Return \Null
-	\ElsIf{$x = u.\val$}
-		\State \Return $x.\val$
 	\Else
-		\State \Return \Call{Find}{$x, \Call{Access}{u, [x > u.\val], \version}, \version$} \label{line:findrb:iver}
+		\State \Return $x.\val$
 	\EndIf
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
 
-O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc{Access} para acessar o filho direito ou esquerdo, em vez de utilizar o campo~$\child$, que pode não ter a versão desejada do ponteiro. Note que, na linha~\nref{line:findrb:iver}, já utilizamos a notação de~Iverson para diminuir o código. Outras operações de acesso (chão e teto, por exemplo) podem ser implementadas da mesma forma.
+O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc{ChildAt} para acessar o filho direito ou esquerdo, em vez de utilizar o campo~$\child$, que pode não ter a versão desejada do ponteiro. Note que, na linha~\nref{line:findrb:iver}, já utilizamos a notação de~Iverson para diminuir o código. Outras operações de acesso (chão e teto, por exemplo) podem ser implementadas da mesma forma.
 
 \section{Modificação de um campo}
 

@@ -31,21 +31,22 @@ template<class T> struct Node {
 	Node *parent;
 
 	// Aponta para a próxima cópia (versão mais nova) deste nó, se ele não é atual.
-	Node *nextVersion;
+	Node *copy;
 
 	Node(const T& val, int time) : timestamp(time), extraTimestamp(-1), red(true), value(val),
-	  parent(nullptr), nextVersion(nullptr) { child[0] = child[1] = extra =  nullptr; }
+	  parent(nullptr), copy(nullptr) { child[0] = child[1] = extra =  nullptr; }
 
-	// Retorna o filho side do nó, considerando o filho adicional, se possível.
-	Node* childAt(bool side, int time=INT_MAX);
 	/* Muda o filho apropriado para v, possivelmente propagando essa mudança, e retorna o ponteiro
 	 * para o nó que atualmente representa este nó. rb é a árvore à qual este nó pertence.
 	 * É necessário informar side pois v pode ser nullptr ou ter valor igual. */
 	Node* change(Node *v, bool side, RedBlackTree<T> &rb);
 
 	// Returna a cópia desse nó, se ela foi criada nessa versão.
-	inline Node* newestVersion() { return nextVersion == nullptr? this : nextVersion; }
+	inline Node* newestVersion() { return copy == nullptr? this : copy; }
 };
+
+// Retorna o filho side de u, considerando o filho adicional, se possível.
+template<class T> Node<T>* ChildAt(Node<T> *u, bool side, int version=INT_MAX);
 
 /* Arvore rubro negra que armazena objetos do tipo T.
  * T deve ser comparável (possuir operator <) */
@@ -88,10 +89,10 @@ template<class T> inline bool isRed(Node<T> *n) {
 	else return n->red;
 }
 
-template<class T> Node<T>* Node<T>::childAt(bool side, int time) {
-	if(extraTimestamp != -1 && time >= extraTimestamp && extraSide == side)
-		return extra;
-	return child[side];
+template<class T> Node<T>* ChildAt(Node<T> *u, bool side, int version) {
+	if(u->extraTimestamp != -1 && u->extraSide == side && version >= u->extraTimestamp)
+		return u->extra;
+	return u->child[side];
 }
 
 template<class T> Node<T>* Node<T>::change(Node<T> *v, bool side, RedBlackTree<T> &rb) {
@@ -115,8 +116,8 @@ template<class T> Node<T>* Node<T>::change(Node<T> *v, bool side, RedBlackTree<T
 	} else {
 		// novo nó com valores atuais e extra vazio
 		for(int i = 0; i < 2; i++)
-			if(childAt(i) != nullptr)
-				childAt(i)->parent = nullptr;
+			if(ChildAt(this, i) != nullptr)
+				ChildAt(this, i)->parent = nullptr;
 		Node<T> *u = new Node(*this);
 		u->timestamp = time;
 		u->extraTimestamp = -1;
@@ -125,9 +126,9 @@ template<class T> Node<T>* Node<T>::change(Node<T> *v, bool side, RedBlackTree<T
 		for(int i = 0; i < 2; i++)
 			if(u->child[i] != nullptr)
 				u->child[i]->parent = u;
-		if(parent) u->parent = parent->change(u, parent->childAt(1) == this, rb);
+		if(parent) u->parent = parent->change(u, ChildAt(parent, 1) == this, rb);
 		else if(this == rb.roots.back()) rb.roots.back() = u;
-		nextVersion = u;
+		copy = u;
 		return u;
 	}
 	return this;
@@ -136,7 +137,7 @@ template<class T> Node<T>* Node<T>::change(Node<T> *v, bool side, RedBlackTree<T
 template<class T> const T* RedBlackTree<T>::find(int time, const T& val) {
 	Node<T> *u = roots[time];
 	while(u != nullptr && (u->value < val || val < u->value))
-		u = u->childAt(u->value < val, time);
+		u = ChildAt(u, u->value < val, time);
 	return u? &u->value : nullptr;
 }
 
@@ -145,11 +146,11 @@ namespace helper { // funções auxiliares
  * Assume que tal filho existe. Retorna o nó x, ou sua cópia, se foi necessário copiar. */
 template<class T> Node<T>* rotate(Node<T> *x, bool side, RedBlackTree<T> &rb) {
 	//std::cerr << "rotate " << x << "  " << side << std::endl;
-	Node<T> *y = x->childAt(side);
-	Node<T> *b = y->childAt(!side);
+	Node<T> *y = ChildAt(x, side);
+	Node<T> *b = ChildAt(y, !side);
 	if(b != nullptr) y = y->change(nullptr, !side, rb);
 	x = x->newestVersion()->change(b, side, rb);
-	if(x->parent != nullptr) x->parent->change(y, x->parent->childAt(1) == x, rb);
+	if(x->parent != nullptr) x->parent->change(y, ChildAt(x->parent, 1) == x, rb);
 	else {
 		y->parent = nullptr;
 		assert(x == rb.roots.back());
@@ -163,14 +164,14 @@ template<class T> Node<T>* rotate(Node<T> *x, bool side, RedBlackTree<T> &rb) {
 template<class T> void fixUp(Node<T> *z, RedBlackTree<T> &rb) {
 	while(z->parent != nullptr && z->parent->parent != nullptr && isRed(z->parent)) {
 		Node<T> *y = z->parent->parent;
-		if(isRed(y->childAt(0)) && isRed(y->childAt(1))) { // caso 1
+		if(isRed(ChildAt(y, 0)) && isRed(ChildAt(y, 1))) { // caso 1
 			y->red = true;
-			y->childAt(0)->red = false;
-			y->childAt(1)->red = false;
+			ChildAt(y, 0)->red = false;
+			ChildAt(y, 1)->red = false;
 			z = y;
 		} else {
-			bool side1 = (y->childAt(1) == z->parent);
-			bool side2 = (z->parent->childAt(1) == z);
+			bool side1 = (ChildAt(y, 1) == z->parent);
+			bool side2 = (ChildAt(z->parent, 1) == z);
 			if(side1 != side2) z = rotate(z->parent, side2, rb); // caso 2 -> caso 3
 			z = rotate(z->parent->parent, side1, rb);
 			z->red = true;
@@ -194,7 +195,7 @@ template<class T> void RedBlackTree<T>::insert(const T& val) {
 	Node<T> *u = roots.back(), *v = nullptr;
 	while(u != nullptr) {
 		v = u;
-		u = u->childAt(u->value < val);
+		u = ChildAt(u, u->value < val);
 	}
 	v = v->change(u = new Node<T>(val, time), v->value < val, *this);
 	helper::fixUp(u, *this);
@@ -207,88 +208,88 @@ namespace helper {
  * Muda apenas os pais dos vxs, nem u nem v são invalidados pelo procedimento */
 template<class T> void transplant(Node<T> *u, Node<T> *v, RedBlackTree<T> &rb) {
 	if(v != nullptr && v->parent != nullptr) {
-		v->parent->change(nullptr, v->parent->childAt(1) == v, rb);
+		v->parent->change(nullptr, ChildAt(v->parent, 1) == v, rb);
 		v->parent = nullptr;
 	}
-	assert(u->nextVersion == nullptr);
-	if(u->parent != nullptr) u->parent->change(v, u == u->parent->childAt(1), rb);
+	assert(u->copy == nullptr);
+	if(u->parent != nullptr) u->parent->change(v, u == ChildAt(u->parent, 1), rb);
 	else rb.roots.back() = v;
 	u->parent = nullptr;
 }
 template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
-	while(!isRed(z->childAt(side))) {
-		if(isRed(z->childAt(!side))) { // caso 1
+	while(!isRed(ChildAt(z, side))) {
+		if(isRed(ChildAt(z, !side))) { // caso 1
 			z = rotate(z, !side, rb);
 			std::swap(z->red, z->parent->red);
-			assert(z->childAt(!side));
+			assert(ChildAt(z, !side));
 		}
-		Node<T> *w = z->childAt(!side);
+		Node<T> *w = ChildAt(z, !side);
 		assert(w);
 		assert(!isRed(w));
-		if(!isRed(w->childAt(0)) && !isRed(w->childAt(1))) { // caso 2
+		if(!isRed(ChildAt(w, 0)) && !isRed(ChildAt(w, 1))) { // caso 2
 			w->red = true;
 			if(z->parent == nullptr) return;
 			else {
-				side = (z == z->parent->childAt(1));
+				side = (z == ChildAt(z->parent, 1));
 				z = z->parent;
 			}
 		} else {
-			if(!isRed(w->childAt(!side))) { // caso 3
-				assert(isRed(w->childAt(side)));
+			if(!isRed(ChildAt(w, !side))) { // caso 3
+				assert(isRed(ChildAt(w, side)));
 				w = rotate(w, side, rb);
 				std::swap(w->red, w->parent->red);
 				w = w->parent;
 			}
 			z = rotate(z->newestVersion(), !side, rb);
 			std::swap(z->red, z->parent->red);
-			z->parent->childAt(!side)->red = false;
+			ChildAt(z->parent, !side)->red = false;
 			return;
 		}
 	}
-	z->childAt(side)->red = false;
+	ChildAt(z, side)->red = false;
 }
 }
 
 template<class T> const T* RedBlackTree<T>::erase(const T& val) {
 	Node<T> *u = roots.back();
 	while(u != nullptr && (u->value < val || val < u->value))
-		u = u->childAt(u->value < val);
+		u = ChildAt(u, u->value < val);
 	if(u == nullptr) return nullptr;
 	const T* ret = &u->value;
 	roots.push_back(roots.back());
-	if(u->childAt(1) == nullptr) {
-		Node<T> *l = u->childAt(0);
+	if(ChildAt(u, 1) == nullptr) {
+		Node<T> *l = ChildAt(u, 0);
 		if(l != nullptr) u = u->change(nullptr, 0, *this);
 		Node<T> *p = u->parent;
-		bool side = (p && p->childAt(1) == u);
+		bool side = (p && ChildAt(p, 1) == u);
 		helper::transplant(u, l, *this);
 		if(!isRed(u) && p != nullptr)
 			helper::deleteFixUp(p->newestVersion(), side, *this);
-	} else if(u->childAt(1)->childAt(0) == nullptr) {
-		Node<T> *r = u->childAt(1);
+	} else if(ChildAt(ChildAt(u, 1), 0) == nullptr) {
+		Node<T> *r = ChildAt(u, 1);
 		u = u->change(nullptr, 1, *this);
 		helper::transplant(u, r, *this);
-		r = r->change(u->childAt(0), 0, *this);
+		r = r->change(ChildAt(u, 0), 0, *this);
 		bool was_black = !isRed(r);
 		r->red = u->red;
 		if(was_black)
 			helper::deleteFixUp(r, 1, *this);
 	} else {
-		Node<T> *y = u->childAt(1);
-		while(y->childAt(0) != nullptr)
-			y = y->childAt(0);
-		Node<T> *yr = y->childAt(1), *yp = y->parent;
+		Node<T> *y = ChildAt(u, 1);
+		while(ChildAt(y, 0) != nullptr)
+			y = ChildAt(y, 0);
+		Node<T> *yr = ChildAt(y, 1), *yp = y->parent;
 		if(yr != nullptr) y = y->change(nullptr, 1, *this);
 		helper::transplant(y, yr, *this); // nó y está isolado
 
 		u = u->newestVersion();
 		helper::transplant(u, y, *this);
-		y = y->change(u->childAt(1), 1, *this);
-		y = y->change(u->childAt(0), 0, *this);
+		y = y->change(ChildAt(u, 1), 1, *this);
+		y = y->change(ChildAt(u, 0), 0, *this);
 		bool was_black = !isRed(y);
 		y->red = u->red;
 		yp = yp->newestVersion();
-		if(was_black) helper::deleteFixUp(yp, yp->childAt(1) == yr, *this);
+		if(was_black) helper::deleteFixUp(yp, ChildAt(yp, 1) == yr, *this);
 	}
 	if(roots.back() != nullptr) roots.back()->red = false;
 	return ret;

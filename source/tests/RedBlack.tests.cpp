@@ -13,9 +13,9 @@ inline int rnd(int l, int r) {
 template<class T> void deb(Node<T> *x) {
 	if(x == nullptr) return;
 	std::cerr << '(';
-	deb(x->childAt(0));
+	deb(ChildAt(x, 0));
 	std::cerr << ' ' << x->value << (x->red? " " : "_");
-	deb(x->childAt(1));
+	deb(ChildAt(x, 1));
 	std::cerr << ')';
 }
 
@@ -28,12 +28,12 @@ template<class T> int rec(Node<T> *u, T *min, T *max) {
 	if(u == nullptr) return 0;
 	if(min) EXPECT_FALSE(u->value < *min) << "Não é uma ABB";
 	if(max) EXPECT_FALSE(*max < u->value) << "Não é uma ABB";
-	int bh1 = rec(u->childAt(0), min, &u->value);
-	int bh2 = rec(u->childAt(1), &u->value, max);
+	int bh1 = rec(ChildAt(u, 0), min, &u->value);
+	int bh2 = rec(ChildAt(u, 1), &u->value, max);
 	EXPECT_EQ(bh1, bh2) << "Alturas pretas devem ser iguais";
 	if(u->red) {
-		EXPECT_FALSE(isRed(u->childAt(0))) << "Não devem existir nós vermelhos consecutivos";
-		EXPECT_FALSE(isRed(u->childAt(1))) << "Não devem existir nós vermelhos consecutivos";
+		EXPECT_FALSE(isRed(ChildAt(u, 0))) << "Não devem existir nós vermelhos consecutivos";
+		EXPECT_FALSE(isRed(ChildAt(u, 1))) << "Não devem existir nós vermelhos consecutivos";
 	}
 	return bh1 + (!u->red);
 }
@@ -86,9 +86,9 @@ TEST(RBSimple, Strings) {
 // Coloca os valores em um vetor ordenado
 void traverse(Node<int> *u, std::vector<int> &v) {
 	if(u == nullptr) return;
-	traverse(u->childAt(0), v);
+	traverse(ChildAt(u, 0), v);
 	v.push_back(u->value);
-	traverse(u->childAt(1), v);
+	traverse(ChildAt(u, 1), v);
 }
 
 // Testa se a árvore rubronegra ordena um vetor específico
