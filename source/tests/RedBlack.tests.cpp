@@ -10,30 +10,33 @@ inline int rnd(int l, int r) {
 	return l + (r - l + 1) * p;
 }
 
-template<class T> void deb(Node<T> *x) {
+template<class T> void deb(Node<T> *x, RedBlackTree<T> &rb) {
 	if(x == nullptr) return;
 	std::cerr << '(';
-	deb(ChildAt(x, 0));
+	deb(rb.ChildAt(x, 0), rb);
 	std::cerr << ' ' << x->value << (x->red? " " : "_");
-	deb(ChildAt(x, 1));
+	deb(rb.ChildAt(x, 1), rb);
 	std::cerr << ')';
 }
 
-template<class T> void debug(Node<T> *root) {
-	deb(root);
+template<class T> void debug(Node<T> *root, RedBlackTree<T> &rb) {
+	deb(root, rb);
 	std::cerr << std::endl;
 }
 
-template<class T> int rec(Node<T> *u, T *min, T *max) {
+template<class T> int rec(Node<T> *u, T *min, T *max, RedBlackTree<T> &rb) {
 	if(u == nullptr) return 0;
+	EXPECT_TRUE(u->copy == nullptr) << "Nó ativo não deve ter cópia";
 	if(min) EXPECT_FALSE(u->value < *min) << "Não é uma ABB";
 	if(max) EXPECT_FALSE(*max < u->value) << "Não é uma ABB";
-	int bh1 = rec(ChildAt(u, 0), min, &u->value);
-	int bh2 = rec(ChildAt(u, 1), &u->value, max);
+	//if(rb.ChildAt(u, 0)) EXPECT_EQ(u, rb.ChildAt(u, 0)->parent) << "Links de pai errados";
+	//if(rb.ChildAt(u, 1)) EXPECT_EQ(u, rb.ChildAt(u, 1)->parent) << "Links de pai errados";
+	int bh1 = rec(rb.ChildAt(u, 0), min, &u->value, rb);
+	int bh2 = rec(rb.ChildAt(u, 1), &u->value, max, rb);
 	EXPECT_EQ(bh1, bh2) << "Alturas pretas devem ser iguais";
 	if(u->red) {
-		EXPECT_FALSE(isRed(ChildAt(u, 0))) << "Não devem existir nós vermelhos consecutivos";
-		EXPECT_FALSE(isRed(ChildAt(u, 1))) << "Não devem existir nós vermelhos consecutivos";
+		EXPECT_FALSE(isRed(rb.ChildAt(u, 0))) << "Não devem existir nós vermelhos consecutivos";
+		EXPECT_FALSE(isRed(rb.ChildAt(u, 1))) << "Não devem existir nós vermelhos consecutivos";
 	}
 	return bh1 + (!u->red);
 }
@@ -41,9 +44,19 @@ template<class T> int rec(Node<T> *u, T *min, T *max) {
 // Checa se as propriedades rubronegras são seguidas nos nós ativos
 template<class T> void check(RedBlackTree<T> &rb) {
 	Node<T> *u = rb.roots.back();
+	//debug(u, rb);
 	if(u == nullptr) return;
 	EXPECT_FALSE(u->red) << "Raiz deve ser preta";
-	rec(u, (T*) nullptr, (T*) nullptr);
+	rec(u, (T*) nullptr, (T*) nullptr, rb);
+}
+
+TEST(RBSimple, SimpleDuplicate) {
+	RedBlackTree<int> rb;
+	rb.insert(1); check(rb);
+	rb.insert(1); check(rb);
+	Node<int> *u = rb.roots.back();
+	EXPECT_TRUE((rb.ChildAt(u, 0) != nullptr) ^ (rb.ChildAt(u, 1) != nullptr)) << "Exatamente um"
+	             << " filho";
 }
 
 TEST(RBSimple, Case3) {
@@ -84,11 +97,11 @@ TEST(RBSimple, Strings) {
 }
 
 // Coloca os valores em um vetor ordenado
-void traverse(Node<int> *u, std::vector<int> &v) {
+void traverse(Node<int> *u, std::vector<int> &v, RedBlackTree<int> &rb) {
 	if(u == nullptr) return;
-	traverse(ChildAt(u, 0), v);
+	traverse(rb.ChildAt(u, 0), v, rb);
 	v.push_back(u->value);
-	traverse(ChildAt(u, 1), v);
+	traverse(rb.ChildAt(u, 1), v, rb);
 }
 
 // Testa se a árvore rubronegra ordena um vetor específico
@@ -99,7 +112,7 @@ void testSort(std::vector<int> &v) {
 	check(rb);
 	std::sort(v.begin(), v.end()); // STL sort
 	std::vector<int> ans;
-	traverse(rb.roots.back(), ans);
+	traverse(rb.roots.back(), ans, rb);
 	ASSERT_EQ(v, ans) << "Ordenacao incorreta";
 }
 

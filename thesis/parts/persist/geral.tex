@@ -214,7 +214,6 @@ A função~\textsc{Copy} é da seguinte forma.
 
 \Function{Copy}{$u, \V{version}$}
 	\State $u' = \Call{RawCopy}{u}$
-	\State $u.\V{parents} = $ vetor apenas com~\keyword{null}s
 	\State $u'.\V{changes} = \{\}$
 	\State $u'.\V{timestamp} = \V{version}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
@@ -228,6 +227,7 @@ A função~\textsc{Copy} é da seguinte forma.
 			\State \Call{ChangeParent}{$u'.p, u, u'$}
 		\EndIf
 	\EndFor
+	\State $u.\V{parents} = $ vetor apenas com~\keyword{null}s
 	\For{$v \in u'.\V{parents}$} \label{line:copy:parents}
 		\State $\V{field} = $ campo de~$v$ com valor~$u$.
 		\If{$v.\V{timestamp} = \V{version}$} \Comment{$\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
@@ -237,6 +237,7 @@ A função~\textsc{Copy} é da seguinte forma.
 		\Else
 			\State $v.\V{copy} = \Call{Copy}{v, \V{version}}$ \label{line:copy:copy}
 			\State $v.\V{copy}.\V{field} = u'$
+			\State $v = v.\V{copy}$ ou algo assim (XXX)
 		\EndIf
 	\EndFor
 	\State \Return $u'$

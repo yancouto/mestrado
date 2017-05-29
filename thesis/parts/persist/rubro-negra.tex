@@ -41,7 +41,7 @@ Uma árvore rubro-negra segue as seguintes propriedades:
 \item Para todo nó, todos os caminhos até links nulos de sua subárvore têm o mesmo número de nós pretos.
 \end{enumerate}
 
-Considerando apenas os nós pretos, a árvore é totalmente balanceada (propriedade 3). Como um nó vermelho não tem filhos vermelhos (propriedade 2), é possível ``juntar'' os nós vermelhos aos seus pais pretos (a raiz não é vermelha pela propriedade 1), e assim cada nó preto fica associado até~3 valores. Logo, um simples limitante superior para a altura de uma árvore rubro-negra de~$n$ nós é~$3\floor{\lg(n)}$. Se mantivermos essas propriedades a cada inserção ou remoção, e o consumo de tempo destas for proporcional à altura da árvore, então o consumo de tempo será~$\Oh(\lg n)$ para todas as operações.
+Considerando apenas os nós pretos, a árvore é totalmente balanceada (propriedade 3). Como um nó vermelho não tem filhos vermelhos (propriedade 2), é possível ``juntar'' os nós vermelhos aos seus pais pretos (a raiz não é vermelha pela propriedade 1), e assim cada nó preto fica associado até~3 valores (e pode ter até 4 filhos). Logo, um simples limitante superior para a altura de uma árvore rubro-negra de~$n$ nós é~$3\floor{\lg(n)}$, pois esta árvore comprimida é totalemente balanceada. Logo, se mantivermos essas propriedades a cada inserção ou remoção, e o consumo de tempo destas for proporcional à altura da árvore, então o consumo de tempo será~$\Oh(\lg n)$ para todas as operações.
 
 \section{Implementação da persistência}
 
@@ -77,7 +77,6 @@ Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois ele p
 \section{Operações de acesso}
 
 Para acessar o campo de um nó na versão~$\version$, usamos uma versão modificada da função~\textsc{Access}.
-
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -117,7 +116,7 @@ O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc
 
 \section{Modificação de um campo}
 
-Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação. Usamos que apenas ponteiros são modificados em uma árvore rubro-negra.
+Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação. Usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -126,7 +125,7 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 	\If{$u.\copy \neq \Null$}
 		\State $u = u.\copy$
 	\EndIf
-	\If{$u.\version < \version$}
+	\If{$u.\ts < \version$}
 		\State $u.\copy = \Call{Copy}{u, \version}$
 		\State $u = u.\copy$
 	\EndIf
@@ -146,7 +145,6 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 		\State $u'.\eTs = -1$ \Comment{Limpando o campo extra}
 	\EndIf
 	\State $u'.\ts = \version$
-	\State $u.\parent = \Null$
 	\If{$\roots[\version] = u$}
 		\State $\roots[\version] = u'$
 	\EndIf
@@ -155,6 +153,7 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 			\State $u'.\child[\side].\parent = u'$
 		\EndIf
 	\EndFor
+	\State $u.\parent = \Null$
 	\If{$u'.\parent \neq \Null$}
 		\State $v = u'.\parent$
 		\State $\side = [u'.\val > v.\val]$
@@ -166,7 +165,8 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 			\State $v.\eSide = \side$
 		\Else
 			\State $v.\copy = \Call{Copy}{v, \version}$
-			\State $v.\child[\side] = u'$
+			\State $v.\copy.\child[\side] = u'$
+			\State $u'.\parent = v.\copy$
 		\EndIf
 	\EndIf
 	\State \Return $u'$
@@ -180,7 +180,5 @@ Utilizamos que cada nó tem apenas um campo extra e ponteiro de volta para dimin
 \section{Inserção}
 
 TODO
-
-
 
 \end{document}

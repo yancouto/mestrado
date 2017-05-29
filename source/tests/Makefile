@@ -81,19 +81,15 @@ TESTS = $(basename $(wildcard **/*.cpp *.cpp))
 clean:
 	rm -f all_tests $(TESTS) gtest.a gtest_main.a **/*.o *.o
 
-lala:
-	@echo $(addsuffix .o, $(TESTS))
-
 .SECONDEXPANSION:
 PERCENT=%
 
-%.o: %.c ../$$(basename %).hpp
+$(addsuffix .o, $(TESTS)) : %.o : %.cpp ../$$(basename %).hpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -c -o $@
 
 # Testes individuais
 $(TESTS) : % : %.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ gtest_main.a -o $@
-	./$@
 
 # Teste para tudo
 all_tests: $(addsuffix .o, $(TESTS)) gtest_main.a
