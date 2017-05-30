@@ -69,6 +69,8 @@
 \patchcmd{\ALG@doentity}{\noindent\hskip\ALG@tlm}{\ALG@printindent}{}{\errmessage{failed to patch}}
 \patchcmd{\ALG@doentity}{\item[]\nointerlineskip}{}{}{} % no spurious vertical space
 % end vertical rule patch for algorithmicx
+% line comment
+\algnewcommand{\LineComment}[1]{\Statex \hskip\ALG@thistlm \(\triangleright\) #1}
 \makeatother
 
 \usepackage{subcaption}
@@ -89,6 +91,8 @@
 \algnewcommand\Break{\textbf{break}}
 \algnewcommand\Null{\textbf{null}}
 \algnewcommand\True{\textbf{true}}
+\algnewcommand\False{\textbf{false}}
+\algnewcommand\Not{\textbf{not}}
 \floatname{algorithm}{Código}
 \algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }
 \algtext*{Indent}

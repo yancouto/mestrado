@@ -121,13 +121,15 @@ Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura par
 
 No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método de~\deff{Node copying} diminui esse tempo armazenando apenas um número constante de versões em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado em~\cite{DriscollSST1989}.
 
-Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada tem grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de nós que tem em um de seus campos um ponteiro para~$u$ é no máximo~$\V{in}$.
+Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada tem grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de campos que tem ponteiros que apontam para~$u$, entre todos os nós da estrutura, é no máximo~$\V{in}$.
 
 Para representar um nó da estrutura efêmera, usaremos um nó persistente, que é um nó efêmero modificado, que pode armazenar até~$\V{in}$ modificações em seus campos. Quando um passo de modificação muda um campo do nó efêmero~$u_e$, criamos uma cópia~$u'$ do nó persistente~$u$, armazenando a versão atual de cada campo. Ao final da operação de modificação, é necessário atualizar cada nó~$v$ que tem ponteiros para nós copiados. Para fazer isso, se~$v$ não estiver cheio, armazenamos estas modificações em seus campos. Se está, o nó~$v$ é copiado, e recursivamente é necessário atualizar os nós que apontam para~$v$.
 
+%%% MUDAR VARIAVEIS E FAZER ACCESS PARA MODIFICACAO QUE OLHA A COPIA
+
 Um nó efêmero~$u_e$ é então representado por uma lista~$u_1, \ldots, u_k$ de nós persistentes. Se cada nó tem um campo~$\V{timestamp}$ que indica a versão em que foi criado, então o nó~$u_i$ representa~$u_e$ no intervalo de versões~$[u_i.\V{timestamp}, u_{i+1}.\V{timestamp}]$ para todo~$1 \leq i < k$, e o nó~$u_k$ representa~$u_e$ da versão~$u_k.\V{timestamp}$ até a versão atual. Este nó é chamado de nó~\deff{ativo}, pois representa~$u_e$ na versão atual da estrutura, e portanto, como estamos tratando de persistência parcial, é o único nó da lista que precisamos considerar ao fazer operações de modificação.
 
-Cada nó~$u_i$ tem um campo~$\V{copy}$ que aponta para o próximo nó da lista, ou é~\keyword{null} se~$u_i$ é ativo~($i=k$). Para armazenar as mudanças, o nó~$u_i$ tem um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos campos de~$u_i$, ou seja, se este vetor tem a tripla~$(\V{version}, \V{field}, \V{value})$ então na versão~$\V{version}$ o campo~$\V{field}$ de~$u_i$ foi modificado para o valor~$\V{value}$.
+Cada nó~$u_i$ tem um campo~$\V{copy}$ que aponta para o próximo nó da lista, ou é~\keyword{null} se~$u_i$ é ativo~(${i=k}$). Para armazenar as mudanças, o nó~$u_i$ tem um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos campos de~$u_i$, ou seja, se este vetor tem a tripla~$(\V{version}, \V{field}, \V{value})$ então na versão~$\V{version}$ o campo~$\V{field}$ de~$u_i$ foi modificado para o valor~$\V{value}$.
 
 \subsection{Acesso e modificação}
 
@@ -137,6 +139,7 @@ O acesso a um campo de um nó em uma dada versão pode ser feita da seguinte man
 \hrule
 \begin{algorithmic}[1]
 
+\Require $u$ representa a versão~$\V{version}$
 \Function{Access}{$u, \V{field}, \V{version}$}
 	\State $\V{value} = u.\V{field}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
@@ -150,8 +153,6 @@ O acesso a um campo de um nó em uma dada versão pode ser feita da seguinte man
 \end{algorithmic}
 \hrule
 \vspace{1em}
-
-A função~\Call{Access}{$u, \V{field}, \V{version}$} só funciona se~$u$ representa a versão~$\V{version}$.
 
 Em uma mesma operação de modificação~$i$, vamos garantir que no máximo uma cópia de cada vértice seja feita, dessa forma, quando um passo de modificação mudar um campo do vértice~$u$, se~$u.\V{copy}$ existir, essa é a cópia de~$u$ e vale~$u.\V{copy}.\V{timestamp} = i$.
 Para poder atualizar os ponteiros para um nó~$u$, armazenamos também um vetor~$\V{parents}$, de~$\V{in}$ posições, que armazena quais nós ativos apontam para~$u$. Se~$u$ não é ativo, esse vetor tem apenas~\keyword{null}s. Dizemos que~$\V{parents}$ armazena~\deff{ponteiros de volta}.
@@ -282,6 +283,7 @@ Isso prova que o espaço amortizado gasto pela estrutura é~${\Oh(\sum\limits_{i
 
 Concluindo, este método transforma qualquer estrutura ligada com grau de entrada constante em uma estrutura parcialmente persistente, sem aumentar o consumo de tempo assintóticamente, apenas deixando esse tempo amortizado (se já não era). Variações desta técnica também permitem deixar a estrutura totalmente persistente~\cite{DriscollSST1989}, porém, são bem mais complicadas e usam EDs adicionais.
 
+% MUDAR O ACCESS E PÁ
 
 
 \end{document}
