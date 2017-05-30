@@ -18,23 +18,26 @@ Uma árvore de busca binária é uma árvore em que cada nó possui um valor, e 
 
 Um nó que não tem algum filho armazena~\keyword{null} no campo correspondente a esse filho. Uma folha é um nó que não tem filhos, e um link nulo é um campo de filho de algum nó que tem valor~\keyword{null}, na Figura~\ref{fig:arv_bin_ex} são as arestas tracejadas.
 
-\begin{figure}
-\centering
-\begin{tikzpicture}[
+\tikzset{
 nodes = {draw, circle, minimum size = 8mm},
 edge from parent path = {(\tikzparentnode) -- (\tikzchildnode)},
 sibling distance=20pt,
-ed/.style = {densely dashed, shorten >= 5pt},
 n/.style = {draw=none},
 r/.style = {fill=white},
 b/.style = {fill=gray},
-edge from parent/.append style={-, shorten >= 0, shorten <= 0}]
+edge from parent/.append style={-, shorten >= 0, shorten <= 0}
+}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[
+ed/.style = {densely dashed, shorten >= 5pt}]
 \Tree [.\node[b]{7}; [.\node[b]{5}; [.\node[r]{1}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] [.\node[b]{10}; [.\node[r]{8}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] ]
 \end{tikzpicture}
 \caption{Exemplo de árvore rubro-negra. Como no resto das figuras do capítulo, os nós negros tem fundo cinza e os nós vermelhos tem fundo branco. Nas próximas figuras, o valor de cada nó não é especificado.} \label{fig:arv_bin_ex}
 \end{figure}
 
-Uma árvore rubro-negra segue as seguintes propriedades:
+Uma árvore rubro-negra segue as seguintes propriedades rubro-negras:
 \begin{enumerate}
 \item A raiz é preta.
 \item Se um nó é vermelho, este não tem filhos vermelhos.
@@ -46,7 +49,7 @@ Considerando apenas os nós pretos, a árvore é totalmente balanceada (propried
 \section{Implementação da persistência}
 
 \newcommand{\ts}{\mathcal{T}}
-\renewcommand{\copy}{\V{copy}}
+\newcommand{\ccopy}{\V{copy}}
 \newcommand{\child}{\V{child}}
 \newcommand{\parent}{\V{parent}}
 \newcommand{\red}{\V{red}}
@@ -64,7 +67,7 @@ Em uma árvore rubro-negra efêmera, todo nó precisa de dois campos para seus f
 Para evitar a necessidade de replicar código muito parecido, vamos armazenar os filhos como um vetor~$\child$ de~2 posições,~$u.\child[0]$ é o filho esquerdo de~$u$, e~$u.\child[1]$ é seu filho direito. Os campos de um nó serão:
 \begin{itemize}
 \item $\ts$ --- Tempo de criação do nó.
-\item $\copy$ --- Próximo nó persistente (se este não é ativo).
+\item $\ccopy$ --- Próximo nó persistente (se este não é ativo).
 \item $\child$ --- Vetor de filhos.
 \item $\parent$ --- Ponteiro de volta.
 \item $\red$ --- Booleano que indica se o nó é vermelho.
@@ -82,7 +85,7 @@ Para acessar o campo de um nó na versão~$\version$, usamos uma versão modific
 \begin{algorithmic}[1]
 
 \Require $u$ deve ser um nó persistente associado à versão~$\version$.
-\Function{ChildAt}{$u, \side, \version$}
+\Function{Child}{$u, \side, \version$}
 	\If{$u.\eTs \neq -1 \And u.\eSide = \side \And \version \geq u.\eTs$}
 		\State \Return $u.\extra$
 	\EndIf
@@ -100,7 +103,7 @@ Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~
 \Function{Find}{$x, \version$}
 	\State $u = \roots[\version]$
 	\While{$u \neq \Null \And x \neq u.\val$}
-	\State $u = \Call{ChildAt}{u, [x > u.\val], \version}$ \label{line:findrb:iver}
+	\State $u = \Call{Child}{u, [x > u.\val], \version}$ \label{line:findrb:iver}
 	\EndWhile
 	\If{$u = \Null$}
 		\State \Return \Null
@@ -112,7 +115,7 @@ Vamos apresentar a operação de~\textsc{Find}, que retorna o valor buscado, ou~
 \end{algorithmic}
 \end{algorithm}
 
-O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc{ChildAt} para acessar o filho direito ou esquerdo, em vez de utilizar o campo~$\child$, que pode não ter a versão desejada do ponteiro. Note que, na linha~\nref{line:findrb:iver}, já utilizamos a notação de~Iverson para diminuir o código. Outras operações de acesso (chão e teto, por exemplo) podem ser implementadas da mesma forma.
+O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc{Child} para acessar o filho direito ou esquerdo, em vez de utilizar o campo~$\child$, que pode não ter a versão desejada do ponteiro. Note que, na linha~\nref{line:findrb:iver}, já utilizamos a notação de~Iverson para diminuir o código. Outras operações de acesso (chão e teto, por exemplo) podem ser implementadas da mesma forma.
 
 \section{Modificação de um campo}
 
@@ -122,12 +125,12 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 \begin{algorithmic}[1]
 
 \Function{Modify}{$u, \side, v, \version$}
-	\If{$u.\copy \neq \Null$}
-		\State $u = u.\copy$
+	\If{$u.\ccopy \neq \Null$}
+		\State $u = u.\ccopy$
 	\EndIf
 	\If{$u.\ts < \version$}
-		\State $u.\copy = \Call{Copy}{u, \version}$
-		\State $u = u.\copy$
+		\State $u.\ccopy = \Call{Copy}{u, \version}$
+		\State $u = u.\ccopy$
 	\EndIf
 	\If{$u.\child[\side] \neq \Null$}
 		\State $u.\child[\side].\parent = \Null$
@@ -156,7 +159,7 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 	\State $u.\parent = \Null$
 	\If{$u'.\parent \neq \Null$}
 		\State $v = u'.\parent$
-		\State $\side = [u'.\val > v.\val]$
+		\State $\side = [\Call{Child}{v, 1} = u]$ \label{line:copyrb:side}
 		\If{$v.\ts = \version$}
 			\State $v.\child[\side] = u'$
 		\ElsIf{$v.\eTs = -1$}
@@ -164,9 +167,9 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 			\State $v.\extra = u'$
 			\State $v.\eSide = \side$
 		\Else
-			\State $v.\copy = \Call{Copy}{v, \version}$
-			\State $v.\copy.\child[\side] = u'$
-			\State $u'.\parent = v.\copy$
+			\State $v.\ccopy = \Call{Copy}{v, \version}$
+			\State $v.\ccopy.\child[\side] = u'$
+			\State $u'.\parent = v.\ccopy$
 		\EndIf
 	\EndIf
 	\State \Return $u'$
@@ -177,8 +180,148 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 
 Utilizamos que cada nó tem apenas um campo extra e ponteiro de volta para diminuir o código, e o vetor de filhos para evitar duplicação de código. Com estas funções prontas, é possível manter a persistência da estrutura, e nas próximas seções vamos discutir como implementar as operações de inserir e remover um valor de uma árvore rubro-negra.
 
-\section{Inserção}
+Note que na linha~\nref{line:copyrb:side} devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois a segunda versão não funciona quando a ABB pode armazenar valores repetidos, pois~$v$ pode ter~2 filhos com o mesmo valor.
+
+\section{Inserção em ABB}
+
+Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB (efêmera e não rubro-negra). Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente á árvore continua sendo uma ABB válida.
+
+Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituimos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda.
+
+Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda tem valores menores ou iguais e os nós da subárvore direita tem valores maiores ou iguais.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+
+\Function{Insert}{$\val$}
+	\State $x = \New \Call{Node}{\val}$ \Comment{Nó com valor $\val$ e outros campos vazios.}
+	\If{$\V{root} = \Null$}
+		\State $\V{root} = x$
+	\Else
+		\State $u = \V{root}$
+		\While{$u \neq \Null$} \Comment{$v$ é o pai de~$u$.}
+			\State $v = u$
+			\State $u = u.\child[[\val > u.\val]]$
+		\EndWhile
+		\State $v.\child[[\val > v.\val]]$
+	\EndIf
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
+
+\section{Inserção em rubro-negra}
+
+A inserção em uma árvore rubro-negra começa exatamente como a de uma ABB simples, porém pintamos~$x$ de vermelho.
+Se a árvore era vazia,~$x$ é a raiz e apenas a propriedade~1 é violada. Caso contrário, apenas a propriedade~2 pode estar sendo violada, caso o pai de~$x$ seja vermelho. A propriedade~3 sempre continua a valer, pois adicionamos um nó vermelho.
+
+Para arrumar a possível violação da propriedade, vamos fazer um laço com as seguintes invariantes (valem no começo da iteração do laço):
+\begin{enumerate}[(A)]
+\item $x$ é vermelho
+\item Se~$x$ é a raiz, a propriedade~1 é violada.
+\item Se~$x$ tem pai vermelho, a propriedade~2 é violada.
+\item As propriedades não são violadas por outros vértices.
+\end{enumerate}
+
+Numa iteração deste laço, vamos ou acabar com todas as violações, ou mudar~$x$ para um nó de altura menor. Dessa forma ``subimos'' a violação, e conseguimos acabar com todas as violações em tempo~$\Oh(\lg n)$, pois a árvore é balanceada.
+
+Se, no começo da iteração, a raiz é~$x$, então para arrumar esta violação basta pintar~$x$ de preto. Caso contrário vamos recolorir ou rotacionar vértices, sempre mantendo a propriedade~3, para diminuir a altura do vértice que viola as propriedades.
+
+\subsection{Rotações}
+
+Rotações são modificações locais de nós de uma ABB que mantém as propriedades de uma ABB. Elas serão usadas para ``subir'' a violação na árvore rubro-negra. Uma rotação troca um nó~$u$ por um de seus filhos, fazendo as modificações necessárias para manter as propriedades de uma~ABB.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{scope}[local bounding box=scope1]
+\Tree [.$u$ \node[n]{$\alpha$}; [.$v$ \node[n]{$\beta$}; \node[n]{$\gamma$}; ] ]
+\end{scope}
+\begin{scope}[xshift=6cm, local bounding box=scope2]
+\Tree [.$v$ [.$u$ \node[n]{$\alpha$}; \node[n]{$\beta$}; ] \node[n]{$\gamma$}; ]
+\end{scope}
+
+%\draw (0cm, 0cm) grid (6cm, 3cm);
+\draw[->] (2cm, 0cm) -- node [n, yshift=1em] {\Call{Rotate}{$u, 1$}}  (4cm, 0cm);
+\draw[->] (4cm, -3em) -- node [n, yshift=1em] {\Call{Rotate}{$v, 0$}}  (2cm, -3em);
+
+\end{tikzpicture}
+\caption{Exemplo de rotação direita e esquerda em uma ABB. Os símbolos~$\alpha,~\beta$ e~$\gamma$ indicam subárvores, possivelmente vazias.} \label{fig:rot_ex}
+\end{figure}
+
+A Figura~\ref{fig:rot_ex} mostra uma rotação genérica. Note que, nos dois lados da figura, com certo abuso de notação, temos~${\alpha \leq u \leq \beta \leq v \leq \gamma}$, isto é, se as propriedades de ABBs são seguidas em um lado da figura, elas continuam a ser respeitadas no outro lado da figura, após a rotação. % muito abuso de notação?
+
+\subsection{Subindo a violação}
+
+Quando~$x$ não é a raiz no começo da iteração, o pai de~$x$, denotamos~$y$, é vermelho, logo não é a raiz (pois a propriedade~1 não é quebrada), e por isso também tem um pai~$z$ (o avô de~$x$). Como~$x$ é o único nó que viola alguma propriedade, seu avô~$z$ com certeza é preto. Seja~$w$ o tio de~$x$ (o filho de~$z$ que não é~$y$).
+
+
+\begin{description}
+	\item[Caso 1.] Se~$w$ existe e é vermelho, podemos apenas trocar as cores de~$y$,~$w$ e~$z$ para arrumar a violação de~$x$ (Figura~\ref{fig:rb_ins_caso1}). Todos os caminhos até links nulos que passam por~$z$ tem que passar por~$y$ ou~$w$, e como agora~$z$ é vermelho e~$y$ e~$w$ são pretos, o número de nós pretos nestes caminhos continuam os mesmos, e então a propriedade~3 se mantém.
+
+	O nó~$x$ não viola mais nenhuma propriedade, mas o nó~$z$ se tornou vermelho e pode ter o pai vermelho ou ser a raiz, logo a próxima iteração deve ter~$x' = z$.
+
+\item[Caso 2.] Caso contrário ($w$ não existe ou é preto), se~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquedo de~$z$ e~$x$ é filho esquerdo de~$y$), então realizamos uma rotação de~$z$ em direção à~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
+
+	Os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó preto~$z$ nesta parte do caminho, os caminhos que passam por~$w$ passam por~$z$ e~$w$ (se existir). Após a transformação, os caminhos até que passam por~$x$ ou~$\alpha$ passam apenas pelo nó preto~$y$, e os caminhos que passam por~$w$ apenas por este (se existir) e~$y$. Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
+
+\item[Caso 3.] Se~$x$ e~$y$ são filhos de lados diferentes, a rotação feita no Caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim o~Caso~2 pode ser aplicado~(se trocamos~$x$ por~$y$).
+
+\end{description}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{scope}
+	\Tree [.\node[b]{$z$}; [.\node[r]{$y$}; \node[r]{$x$}; \node[n]{$\alpha$}; ] [.\node[r]{$w$}; \node[n]{$\beta$}; \node[n]{$\gamma$}; ] ]
+\end{scope}
+\begin{scope}[xshift=8cm]
+	\Tree [.\node[r]{$z$}; [.\node[b]{$y$}; \node[r]{$x$}; \node[n]{$\alpha$}; ] [.\node[b]{$w$}; \node[n]{$\beta$}; \node[n]{$\gamma$}; ] ]
+\end{scope}
+
+\draw[->] (2.5cm, -1cm) -- (5.5cm, -1cm);
+
+\end{tikzpicture}
+\caption{Aplicação do Caso~1. Não importa se~$x$ é filho direito ou esquerdo.} \label{fig:rb_ins_caso1}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{scope}
+	\Tree [.\node[b]{$z$}; [.\node[r]{$y$}; \node[r]{$x$}; \node[n]{$\alpha$}; ] [.\node[b]{$w$}; ] ]
+\end{scope}
+\begin{scope}[xshift=8cm]
+	\Tree [.\node[b]{$y$}; [.\node[r]{$x$}; ] [.\node[r]{$z$}; \node[n]{$\alpha$}; \node[b]{$w$}; ] ]
+\end{scope}
+
+\draw[->] (2.5cm, -1cm) -- (5.5cm, -1cm);
+
+\end{tikzpicture}
+\caption{Aplicação do Caso~2, assumindo que~$x$ é filho esquerdo. Os nós~$x$ e~$w$, se existir, podem ter filhos.} \label{fig:rb_ins_caso2}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{scope}
+	\Tree [.\node[b]{$z$}; [.\node[r]{$y$}; \node[n]{$\alpha$}; [.\node[r]{$x$}; \node[n]{$\beta$}; \node[n]{$\gamma$}; ] ] [.\node[b]{$w$}; ] ]
+\end{scope}
+\begin{scope}[xshift=8cm]
+	\Tree [.\node[b]{$z$}; [.\node[r]{$x$}; [.\node[r]{$y$}; \node[n]{$\alpha$}; \node[n]{$\beta$}; ] \node[n]{$\gamma$}; ] [.\node[b]{$w$}; ] ]
+\end{scope}
+
+\draw[->] (2.5cm, -1cm) -- (5.5cm, -1cm);
+
+\end{tikzpicture}
+\caption{Aplicação do Caso~3, assumindo que~$x$ é filho direito. O nó~$w$, se existir, pode ter filhos.} \label{fig:rb_ins_caso3}
+\end{figure}
+
+Se o Caso~1 é executado, o laço pode acabar, ou o nó~$x$ diminui de altura, se o Caso~2 ou~3 são executados, o laço acaba. Como rotações podem ser feitas em tempo constante (são apenas algumas mudanças de ponteiros), a inserção em uma árvore rubro-negra efêmera de~$n$ nós consome tempo~$\Oh(\lg n)$.
+
+\subsection{Implementação e persistência}
 
 TODO
+
 
 \end{document}
