@@ -43,8 +43,39 @@ Note que, apesar de estarmos tratando apenas de estruturas ligadas, a versão pe
 Em geral, estamos interessados em implementações on-line das estruturas persistentes, ou seja, uma operação deve ser completada para se ter acesso à próxima, porém, vamos considerar o caso off-line, em que todas as~$m+a$ operações são conhecidas de antemão. Obteremos uma implementação totalmente persistente que não faz nenhuma suposição adicional sobre a estrutura de dados, não aumenta assintoticamente o tempo consumido pelas operações, e gasta apenas~$\Oh(1)$ de espaço adicional por passo de modificação, que é o melhor que pode-se esperar.
 
 Inicialmente, constrói-se a árvore de versões. O vértice~$v_i$ representa a versão~$i$. Neste deve-se armazenar, além da lista de adjacência~($v_k$ tal que~$i \rightarrow k$), a operação de modificação que criou a versão~$i$ (seus parâmetros), e uma lista das operações de acesso que são feitas na versão~$i$. Isso pode ser feito em tempo~$\Oh(m+a)$, ou seja, em tempo proporcional ao número de operações.
+A Figura~\ref{fig:vertree_ex} mostra a árvore de versões do exemplo de pilha do Capítulo~\ref{cap:pilha}.
 
-% Explicar como seria para o exemplo 2.1?
+\tikzset{
+nodes = {draw, minimum size = 7mm},
+edge from parent path = {(\tikzparentnode) -- (\tikzchildnode)},
+sibling distance=20pt,
+n/.style = {draw=none},
+gr/.style = {color=gray},
+edge from parent/.append style={-, shorten >= 0, shorten <= 0}
+}
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+\Tree
+[.\node(v0){\Call{Stack}{\null}};
+	[.\node(v1){\Call{Push}{5}};
+		[.\node(v2){\Call{Push}{7}};
+			\node(v3){\Call{Push}{6}};
+			[.\node(v4){\Call{Pop}{\null}};
+				\node(v5){\Call{Push}{9}};
+			]
+		]
+	]
+	\node(v6){\Call{Push}{5}};
+]
+
+	\node[gr, above of = v3, xshift=-2.5em, yshift=0.5em](v3t){\Call{Top}{\null}};
+	\draw[gr, <-, shorten >= 2pt, shorten <= 2pt] (v3t) -- (v3);
+	\node[gr, above of = v4, xshift=2.5em, yshift=0.5em](v4t){\Call{Top}{\null}};
+	\draw[gr, <-, shorten >= 2pt, shorten <= 2pt] (v4t) -- (v4);
+	\end{tikzpicture}
+	\caption{Árvore de versões do Exemplo~\ref{ex:pilha}, com argumentos para fazer cada operação de modificação indicados. Os nós cinzas indicam as operações de acesso.} \label{fig:vertree_ex}
+\end{figure}
 
 Queremos realizar uma busca em profundidade (DFS) nesta árvore, seguindo a seguinte ideia:
 \begin{enumerate}
@@ -56,7 +87,7 @@ Queremos realizar uma busca em profundidade (DFS) nesta árvore, seguindo a segu
 
 Dessa forma, no passo~3, podemos acessar os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a eles terminar, a versão da será a versão~$i$, e no passo~4 de~$v_i$ basta reverter as mudanças feitas nessa versão.
 
-Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um objeto, guardamos uma tripla~$(\V{obj}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do objeto~$\V{val}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma.
+Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um objeto, guardamos uma tripla~$(\V{obj}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do objeto~$\V{obj}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma.
 
 Como não impusemos restrições nas operações de mudança, elas podem modificar um mesmo campo muitas vezes, logo é necessário que o valor original seja restaurado, e não um valor intermediário. Para isso, desfazemos as mudanças na ordem inversa que foram feitas, usando uma pilha.
 
@@ -103,29 +134,73 @@ Então, é possível transformar qualquer estrutura ligada em totalmente persist
 
 \section{Implementação funcional} \label{sec:implfuncional}
 
-%% TÁ ZUADO, tem que arrumar as definições e pá
-
 A técnica que usamos nas estruturas apresentadas até agora é tornar a implementação funcional, ou seja, nunca modificar nenhum campo de um nó já criado.
 
-Se for possível implementar a estrutura desta forma, ela se torna totalmente persistente. Pois, se temos os nós de entrada da versão~$i$, e nenhum nó foi modificado, os nós que podem ser acessados a partir desses são exatamente os mesmos de quando a versão~$i$ foi criada, independente de versões criadas posteriormente. Logo, apenas armazenando os nós de entrada (e não apagando nenhum nó), tornamos nossa estrutura totalmente persistente.
+Se for possível implementar a estrutura desta forma, ela se torna totalmente persistente. De fato, se temos os nós de entrada da versão~$i$, e nenhum nó foi modificado, os nós que podem ser acessados a partir desses são exatamente os mesmos de quando a versão~$i$ foi criada, independente de versões criadas posteriormente. Logo, apenas armazenando os nós de entrada (e não apagando nenhum nó), tornamos nossa estrutura totalmente persistente.
 
-Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha}, nunca é necessário alterar nenhum nó. Quando a estrutura não funciona dessa forma, é possível tentar ``forçar'' isso. Durante operações de modificação podemos, ao adicionar um nó ao conjunto de acesso, adicionar na verdade uma cópia desse nó, já que ela pode vir a ser modificada por um passo de modificação.
+Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha}, onde nunca é necessário alterar nenhum nó. Quando a estrutura não funciona dessa forma, é possível tentar ``forçar'' isso, copiando os nós que forem ser modificados (e seus ancestrais). A estrutura recursiva de deque do Capítulo~\ref{cap:deque2} faz isso, copiando todos os nós acessados durante um~\textsc{Push} ou~\textsc{Pop}.
 
-A estrutura recursiva de deque do Capítulo~\ref{cap:deque2} faz isso, copiando todos os nós acessados durante um~\textsc{Push} ou~\textsc{Pop}. Isso sempre deixa a implementação funcional, já que não modificamos nenhum nó; porém, isso pode deixar a implementação inválida, já que pode ser possível alcançar a versão antiga de um nó que já foi copiado. Este foi o problema encontrado na implementação da deque de Kaplan e Tarjan, já que na primeira ideia de implementação, era possível acessar a versão antiga de um nó, como discutido na Seção~\ref{sec:implfunc}.
+Para fazer isso em uma estrutura qualquer, queremos garantir que, sempre que adicionamos um nó~$u$ ao conjunto de acessos, todos seus ancestrais já estão neste conjunto. Ao adicionar esse nó, na verdade adicionamos uma cópia~$u'$ dele, e para todo nó~$v$ no conjunto de acessos que tem um ponteiro para~$u$, trocamos este ponteiro por~$u'$.
 
-Esta técnica, de copiar todos os nós adicionados ao conjunto de acesso, funciona apenas se não existem nós atingíveis que não estão no conjunto de acesso e tem ponteiro para algum elemento cuja cópia está no conjunto de acesso. Se existe algum nó~$u$ desse tipo, então existe um caminho para~$u$, ou seja, uma sequência de passos de acesso que adicionam~$u$ ao conjunto de acesso, pois ele é atingível; e com mais um passo de acesso é possível adicionar a versão antiga do nó ao conjunto de acesso, que pode ter informação desatualizada.
+Note que nós no conjunto de acessos podem ser modificados, mas o importante é que nenhum criado em uma versão anterior é modificado, logo todas essas versões continuam funcionando.
 
-Se os nós de estrutura formam uma árvore, como no caso da pilha e da deque recursiva, ou mesmo árvores binárias, então esse método pode ser aplicado. Na Seção~\ref{sec:implfunc}, a estrutura foi modificada para ser uma árvore, e dessa forma essa técnica poder ser aplicada.
+\tikzset{
+nodes={circle, minimum size=8mm},
+n/.style = {draw=none},
+b/.style = {fill=gray!40},
+be/.style = {color=gray},
+edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt}
+}
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+	\end{tikzpicture}
+	\begin{tikzpicture}
+		\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+		\node[above of = a, b](al){$a'$};
+		\draw[->, be] (al) -- (b);
+		\draw[->, be] (al) -- (c);
+	\end{tikzpicture}
+	\begin{tikzpicture}
+		\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+		\node[above of = a, b](al){$a'$};
+		\node[above of = b, b](bl){$b'$};
+		\draw[->, be] (al) -- (bl);
+		\draw[->, be] (al) -- (c);
+		\draw[->, be] (bl) to[out=230,in=90] (d);
+	\end{tikzpicture}
+	\begin{tikzpicture}
+		\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[b](f){$f$}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+		\node[above of = a, b](al){$a'$};
+		\node[above of = b, b](bl){$b'$};
+		\draw[->, be] (al) -- (bl);
+		\draw[->, be] (al) -- (c);
+		\draw[->, be] (bl) to[out=230,in=90] (d);
+		\draw[->, be] (bl) to[out=320,in=90] (f);
+	\end{tikzpicture}
+	\caption{Adição de um nó~$f$ à direita de~$b$ com uma implementação totalmente funcional. Novos nós criados em cinza.} \label{fig:totfunc_ex}
+\end{figure}
 
-Se a estrutura segue essas restrições, esse método torna estrutura totalmente persistente com overhead de consumo de tempo de~$\Oh(M+A)$ e espaço~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar o nó mesmo que este não vá ser modificado.
+A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir de~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, essa implementação não seria possível.
+
+Supomos que, ao adicionar um nó ao conjunto de acessos, todos seus ancestrais já estavam neste conjunto, portanto não existe caminho de um nó não copiado para um nó copiado, logo todos os nós antingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, continuam iguais na nova versão. Logo a estrutura ligada funciona e é totalmente persistente. Note que como na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado.
+
+Sem essa suposição, poderia ser possível alcançar a versão antiga de um nó que já foi copiado. Este foi o problema encontrado na implementação da deque de Kaplan e Tarjan no Capítulo~\ref{cap:deque3}, já que na primeira ideia de implementação, era possível acessar a versão antiga de um nó, como discutido na Seção~\ref{sec:implfunc}.
+
+Note que, se os ponteiros da estrutura formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, cada nó tem exatamente um caminho até ele, logo a suposição sobre adicionar um nó ao conjunto de acessos é sempre satisfeita, não importa a ordem na qual são feitas as adições. A estrutura discutida no Capítulo~\ref{cap:deque2} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a estrutura é modificada para se tornar uma árvore direcionada.
+
+Assumindo que, ao adicionar um nó ao conjunto de acesso, as mudanças de ponteiros possam ser feitas em tempo constante (trivial em uma floresta direcionada), se a estrutura segue as restrições discutidas, esse método torna a estrutura totalmente persistente com overhead de consumo de tempo de~$\Oh(M+A)$ e espaço~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar o nó mesmo que este não vá ser modificado.
+
+
 
 \section{Fat node}
 
 É possível alcançar persistência parcial em uma estrutura ligada genérica aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
 
-Modifica-se cada nó da estrutura para que cada campo seja substituido por um vetor de pares, que guarda pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação modificou aquele campo para armazenar o valor~$v$. Ao invés de modificar um campo de um objeto, adicionasse um par no vetor correspondente, indicando a versão atual e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado (considerando apenas os índices).
+Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor de pares, que guarda pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou aquele campo para o valor~$v$. Em vez de modificar um campo de um objeto, adiciona-se um par no vetor correspondente, indicando a versão atual e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado (considerando apenas os índices).
 
-Para realizar um acesso do campo~$c$ na versão~$i$, é necessário procurar no vetor associado à~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Diferente das outras técnicas, esta também aumenta o tempo de um passo de acesso.
+Para realizar um acesso ao campo~$c$ na versão~$i$, é necessário procurar no vetor associado a~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Diferente das outras técnicas, esta também aumenta o tempo de um passo de acesso.
 
 Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura parcialmente persistente, com overhead de consumo de tempo de~$\Oh((M+A) \lg{M})$ e espaço~$\Oh(M)$.
 
