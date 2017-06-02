@@ -184,11 +184,11 @@ edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt}
 
 A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir de~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, essa implementação não seria possível.
 
-Supomos que, ao adicionar um nó ao conjunto de acessos, todos seus ancestrais já estavam neste conjunto, portanto não existe caminho de um nó não copiado para um nó copiado, logo todos os nós antingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, continuam iguais na nova versão. Logo a estrutura ligada funciona e é totalmente persistente. Note que como na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado.
+Supomos que, ao adicionar um nó ao conjunto de acessos, todos seus ancestrais já estavam neste conjunto, portanto não existe caminho de um nó não copiado para um nó que tem uma cópia no conjunto de acessos. Assim, todos os nós antingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, são exatamente os nós que seriam atingíveis se tivéssemos copiado a estrutura inteira. Logo, a estrutura ligada funciona e é totalmente persistente. Note que na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado (os nós~$a$ e~$b$).
 
-Sem essa suposição, poderia ser possível alcançar a versão antiga de um nó que já foi copiado. Este foi o problema encontrado na implementação da deque de Kaplan e Tarjan no Capítulo~\ref{cap:deque3}, já que na primeira ideia de implementação, era possível acessar a versão antiga de um nó, como discutido na Seção~\ref{sec:implfunc}.
+Sem essa suposição, poderia ser possível alcançar a versão antiga de um nó que já foi copiado. Este foi o problema encontrado na primeira ideia de implementação da deque de Kaplan e Tarjan, como discutido na Seção~\ref{sec:implfunc}.
 
-Note que, se os ponteiros da estrutura formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, cada nó tem exatamente um caminho até ele, logo a suposição sobre adicionar um nó ao conjunto de acessos é sempre satisfeita, não importa a ordem na qual são feitas as adições. A estrutura discutida no Capítulo~\ref{cap:deque2} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a estrutura é modificada para se tornar uma árvore direcionada.
+Note que, se os ponteiros da estrutura formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, cada nó tem exatamente um caminho até ele, logo a suposição sobre adicionar um nó ao conjunto de acessos é sempre satisfeita, não importa a ordem na qual são feitas as adições. A estrutura discutida no Capítulo~\ref{cap:deque2} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a estrutura deste capítulo é modificada para se tornar uma árvore direcionada.
 
 Assumindo que, ao adicionar um nó ao conjunto de acesso, as mudanças de ponteiros possam ser feitas em tempo constante (trivial em uma floresta direcionada), se a estrutura segue as restrições discutidas, esse método torna a estrutura totalmente persistente com overhead de consumo de tempo de~$\Oh(M+A)$ e espaço~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar o nó mesmo que este não vá ser modificado.
 
@@ -200,27 +200,33 @@ Assumindo que, ao adicionar um nó ao conjunto de acesso, as mudanças de pontei
 
 Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor de pares, que guarda pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou aquele campo para o valor~$v$. Em vez de modificar um campo de um objeto, adiciona-se um par no vetor correspondente, indicando a versão atual e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado (considerando apenas os índices).
 
-Para realizar um acesso ao campo~$c$ na versão~$i$, é necessário procurar no vetor associado a~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Diferente das outras técnicas, esta também aumenta o tempo de um passo de acesso.
+Para realizar um acesso ao campo~$c$ na versão~$i$, é necessário procurar no vetor associado a~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Isso pode ser feito com busca binária em tempo logarítmico no tamanho do vetor. Diferente das outras técnicas, esta também aumenta o tempo de um passo de acesso.
 
 Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura parcialmente persistente, com overhead de consumo de tempo de~$\Oh((M+A) \lg{M})$ e espaço~$\Oh(M)$.
 
 \section{Node copying} \label{sec:nodecopying}
 
-No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método de~\deff{Node copying} diminui esse tempo armazenando apenas um número constante de versões em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado em~\cite{DriscollSST1989}.
+No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método de~\deff{Node copying} também consegue persitência parcial, mas diminui esse tempo, armazenando apenas um número constante de modificações em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado por Driscoll et al.~\cite{DriscollSST1989}.
 
-Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada tem grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de campos que tem ponteiros que apontam para~$u$, entre todos os nós da estrutura, é no máximo~$\V{in}$.
+Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada têm grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de campos que tem ponteiros que apontam para~$u$, entre todos os nós da estrutura, é no máximo~$\V{in}$.
 
-Para representar um nó da estrutura efêmera, usaremos um nó persistente, que é um nó efêmero modificado, que pode armazenar até~$\V{in}$ modificações em seus campos. Quando um passo de modificação muda um campo do nó efêmero~$u_e$, criamos uma cópia~$u'$ do nó persistente~$u$, armazenando a versão atual de cada campo. Ao final da operação de modificação, é necessário atualizar cada nó~$v$ que tem ponteiros para nós copiados. Para fazer isso, se~$v$ não estiver cheio, armazenamos estas modificações em seus campos. Se está, o nó~$v$ é copiado, e recursivamente é necessário atualizar os nós que apontam para~$v$.
+\newcommand{\changes}{\V{changes}}
+\newcommand{\parents}{\V{parents}}
+\newcommand{\ts}{\mathcal{T}}
+\newcommand{\cp}{\V{copy}}
+\newcommand{\version}{\V{version}}
 
-%%% MUDAR VARIAVEIS E FAZER ACCESS PARA MODIFICACAO QUE OLHA A COPIA
+Cada nó deve armazenar, além de seus campos usuais, um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos seus campos, ou seja, se este vetor tem a tripla~${(\V{version}, \V{field}, \V{value})}$ então na versão~$\V{version}$ o campo~$\V{field}$ foi modificado para o valor~$\V{value}$. Esse vetor é inicializado vazio, e armazena as mudanças feitas ao nó depois de sua criação.
 
-Um nó efêmero~$u_e$ é então representado por uma lista~$u_1, \ldots, u_k$ de nós persistentes. Se cada nó tem um campo~$\V{timestamp}$ que indica a versão em que foi criado, então o nó~$u_i$ representa~$u_e$ no intervalo de versões~$[u_i.\V{timestamp}, u_{i+1}.\V{timestamp}]$ para todo~$1 \leq i < k$, e o nó~$u_k$ representa~$u_e$ da versão~$u_k.\V{timestamp}$ até a versão atual. Este nó é chamado de nó~\deff{ativo}, pois representa~$u_e$ na versão atual da estrutura, e portanto, como estamos tratando de persistência parcial, é o único nó da lista que precisamos considerar ao fazer operações de modificação.
+O método de Node copying, como o de implementação funcional, copia um nó~$u$ sempre que este é modificado em um passo de modificação. Após isso, é necessário modificar os ponteiros que apontam para~$u$. Para evitar ter que copiar todos os ancestrais de~$u$, guardamos estas modificações de ponteiros em seus campos~$\changes$, se estes tiverem espaço.
 
-Cada nó~$u_i$ tem um campo~$\V{copy}$ que aponta para o próximo nó da lista, ou é~\keyword{null} se~$u_i$ é ativo~(${i=k}$). Para armazenar as mudanças, o nó~$u_i$ tem um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos campos de~$u_i$, ou seja, se este vetor tem a tripla~$(\V{version}, \V{field}, \V{value})$ então na versão~$\V{version}$ o campo~$\V{field}$ de~$u_i$ foi modificado para o valor~$\V{value}$.
+Se algum dos nós que apontam para~$u$ não tiver espaço livre em seu campo~$\changes$, uma cópia deste nó deve ser feita, armazenando a versão mais nova de cada campo (e deixando o vetor~$\changes$ vazio), e os nós que apontam para este devem ser modificados, o que pode gerar mais cópias.
 
-\subsection{Acesso e modificação}
+Adicionamos um campo~$\ts$ que é o índice da versão em que o nó foi criado, e um camp~$\cp$ que é um ponteiro para a cópia desse nó, ou~\keyword{null} se não existir. Dessa forma, cada nó~$u$ representa o nó correspondente da estrutura no intervalo de versões~${[u.\ts, u.\cp.\ts - 1]}$ se este tiver cópia, caso contrário o nó representa a versão atual do nó correspondente na estrutura, e é chamado de~\emph{nó ativo}. Como estamos tratando de persistência parcial, apenas nós ativos são modificados.
 
-O acesso a um campo de um nó em uma dada versão pode ser feita da seguinte maneira. Note que estamos assumindo que as modificações estão armazenadas no vetor~$\V{changes}$ na ordem em que foram feitas.
+\subsection{Acesso}
+
+O acesso a um campo de um nó em uma dada versão pode ser feito da seguinte maneira. Note que estamos assumindo que as modificações estão armazenadas no vetor~$\V{changes}$ na ordem em que foram feitas.
 
 \vspace{1em}
 \hrule
@@ -241,34 +247,55 @@ O acesso a um campo de um nó em uma dada versão pode ser feita da seguinte man
 \hrule
 \vspace{1em}
 
-Em uma mesma operação de modificação~$i$, vamos garantir que no máximo uma cópia de cada vértice seja feita, dessa forma, quando um passo de modificação mudar um campo do vértice~$u$, se~$u.\V{copy}$ existir, essa é a cópia de~$u$ e vale~$u.\V{copy}.\V{timestamp} = i$.
-Para poder atualizar os ponteiros para um nó~$u$, armazenamos também um vetor~$\V{parents}$, de~$\V{in}$ posições, que armazena quais nós ativos apontam para~$u$. Se~$u$ não é ativo, esse vetor tem apenas~\keyword{null}s. Dizemos que~$\V{parents}$ armazena~\deff{ponteiros de volta}.
+Para retornar o valor do campo na versão~$\version$, aplicamos todas as modificações realizadas a este campo em versões que são no máximo~$\version$. Assumindo que armazenamos vetores com os nós de entrada de cada versão, com a função~\textsc{Access} é possível realizar uma operação de acesso em qualquer versão da estrutura com overhead de tempo constante por passo de acesso.
 
-Quando um campo é modificado ou um nó é criado, é necessário atualizar o vetor~$\V{parents}$ dos nós relacionados. A função~\Call{ChangeParent}{$u, a, b$} modifica o vetor~$u.\V{parents}$, trocando uma ocorrência de~$a$ por~$b$. O código abaixo modifica um campo de um nó, e deve ser chamada em um passo de modificação da~$\V{version}$-ésima operação de modificação.
+\subsection{Modificação}
 
-\vspace{1em}
-\hrule
+Em uma operação de modificação, modificar um nó do conjunto de acessos pode levar a cópia de outros nós também no conjunto de acessos, para evitar que isso nos traga problemas, vamos garantir que no máximo uma cópia de cada vértice seja feita. Dessa forma, quando um passo de modificação da estrutura tentar mudar um campo do vértice~$u$, ou~$u$ é ativo ou~$u.\cp$ existe e é ativo.
+
+A função~\Call{Access}{$u, \V{field}$} acessa o campo~$\V{field}$ em sua versão mais atual, ou seja, aplica todas as modificações, e se~$u$ não for ativo, acessa o campo de~$u.\cp$.
+
+\begin{algorithm}
 \begin{algorithmic}[1]
 
-\Require $u$ é ativo ou era ativo no começo da operação de modificação.
-\Function{Modify}{$u, \V{field}, \V{value}, \V{version}$}
-	\If{$u.\V{copy} \neq \Null$}
-		\State $u = u.\V{copy}$
-	\EndIf
-	\If{$u.\V{version} < \V{version}$}
-		\State $u.\V{copy} = \Call{Copy}{u, \V{version}}$ \label{line:modify:copy}
-		\State $u = u.\V{copy}$
-	\EndIf
-	\If{$\V{field}$ é campo de ponteiro}
-		\State \Call{ChangeField}{$u, \V{field}, \V{value}$}
+\Require $u$ é ativo ou sua cópia foi criada nessa versão.
+\Function{Access}{$u, \V{field}$}
+	\If{$u.\cp \neq \Null$}
+		\State \Return $u.\cp.\V{field}$ \Comment{$u.\cp$ foi criado nesta versão e tem o vetor~$\changes$ vazio.}
 	\Else
-		\State $u.\V{field} = \V{value}$
+		\State $\V{value} = u.\V{field}$
+		\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
+			\If{$\V{field} = \V{field}'$}
+				\State $\V{value} = \V{value}'$
+			\EndIf
+		\EndFor
+		\State \Return $\V{value}$
 	\EndIf
 \EndFunction
 
-\Require $u$ é um nó criado nesta versão. \Comment{Não é necessário usar \textsc{Access}}
+\end{algorithmic}
+\end{algorithm}
+
+
+Para poder atualizar os ponteiros que apontam para um nó~$u$, armazenamos em~$u$ um vetor~$\V{parents}$, de~$\V{in}$ posições, que armazena quais nós ativos apontam para~$u$. Se~$u$ não é ativo, esse vetor tem apenas~\keyword{null}s. Dizemos que~$\V{parents}$ armazena~\deff{ponteiros de volta}.
+
+Quando um campo de ponteiro de um nó~$x$ é alterado de~$y$ para~$z$, é necessário atualizar o vetor~$\V{parents}$ de~$y$ e~$z$, removendo~$x$ do vetor de~$y$ e adicionando-o ao vetor de~$z$. A função~\mbox{\Call{ChangeParent}{$u, a, b$}} modifica o vetor~$u.\V{parents}$, trocando uma ocorrência de~$a$ por~$b$. A função~\mbox{\Call{ChangePointer}{$u, \V{field}, \V{value}$}} muda o ponteiro~$u.\V{field}$ para~$\V{value}$, fazendo as modificações necessárias aos campos~$\parents$; essa função assume que o nó~$u$ foi criado nesta versão, portanto podemos mudar diretamente seus campos, sem ser necessário adicionar mudanças ao vetor~$\changes$.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+
+\Function{ChangeParent}{$u, a, b$}
+	\For{$i = 1 \To \V{in}$}
+		\If{$u.\V{parents}[i] = a$}
+			\State $u.\V{parents}[i] = b$
+			\State \Break
+		\EndIf
+	\EndFor
+\EndFunction
+
+\Require $u$ é um nó criado nesta versão.
 \Require $\V{field}$ é um campo de ponteiro.
-\Function{ChangeField}{$u, \V{field}, \V{value}$}
+\Function{ChangePointer}{$u, \V{field}, \V{value}$}
 	\If{$u.\V{field} \neq \Null$}
 		\State \Call{ChangeParent}{$u.\V{field}, u, \Null$}
 	\EndIf
@@ -278,32 +305,49 @@ Quando um campo é modificado ou um nó é criado, é necessário atualizar o ve
 	\EndIf
 \EndFunction
 
-\Function{ChangeParent}{$u, a, b$}
-	\For{$i = 1 \To \V{in}$}
-		\If{$u.\V{parents}[i] = a$}
-			\State $u.\V{parents}[i] = b$
-			\State \Return
-		\EndIf
-	\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\newcommand{\cur}{\V{current}}
+
+A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ está atualizado pois, ao trocar~$a$ por~$b$, se~$a \neq \Null$, então~$a$ apontava para~$u$, logo estava em~$\parents$; se~$a = \Null$, então, como~$\V{in}$ é o grau de entrada máximo de um nó, pelo menos uma posição do vetor tem o valor~$\Null$.
+
+Seja~$\cur$ a versão atual da estrutura, ou seja, o índice da operação de modificação que está sendo aplicada.
+A função~\Call{Modify}{$u, \V{field}, \V{value}$} modifica o campo~$\V{field}$ de~$u$, e deve ser chamada em passos de modificação da operação com índice~$\cur$. A função cria uma cópia do nó~$u$, se esta não existe e~$u$ não foi criado nessa versão (usando a função~\textsc{Copy}), e depois modifica o campo~$\V{field}$ diretamente.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+
+\Require $u$ é ativo ou sua cópia foi criada na versão atual~($\cur$).
+\Function{Modify}{$u, \V{field}, \V{value}$}
+	\If{$u.\cp \neq \Null$}
+		\State $u = u.\cp$
+	\ElsIf{$u.\V{version} < \cur$}
+		\State $u.\cp = \Call{Copy}{u}$ \label{line:modify:copy}
+		\State $u = u.\cp$
+	\EndIf
+	\If{$\V{field}$ é campo de ponteiro}
+		\State \Call{ChangeField}{$u, \V{field}, \V{value}$}
+	\Else
+		\State $u.\V{field} = \V{value}$
+	\EndIf
 \EndFunction
 
 \end{algorithmic}
-\hrule
-\vspace{1em}
+\end{algorithm}
 
-A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ está atualizado pois, ao trocar~$a$ por~$b$, se~$a \neq \Null$, então~$a$ apontava para~$u$, logo estava em parents; se~$a = \Null$, então, como~$\V{in}$ é o grau de entrada máximo de um nó, pelo menos uma posição do vetor tem o valor~$\Null$.
+%% EDITAR A PARTIR DAQUI
 
 Se~$u$ não foi criado nessa versão e não tem cópia, a função~\Call{Modify}{$u, \V{field}, \V{value}, \V{version}$} copia~$u$, utilizando~\Call{Copy}{$u, \V{version}$}, que copia o nó~$u$ e retorna a cópia, modificando apropriadamente os vetores~$\V{parent}$ e os nós que apontam para~$u$. Após isso, o campo~$\V{field}$ é alterdo utilizando a função~\textsc{ChangeField}, que apenas modifica o valor em um nó criado na versão atual, arrumando os vetores de volta usando~\textsc{ChangeParent}. Se o campo não é um ponteiro, não é necessário chamar~\textsc{ChangeField}.
 A função~\textsc{Copy} é da seguinte forma.
 
-\vspace{1em}
-\hrule
+\begin{algorithm}
 \begin{algorithmic}[1]
 
 \Function{Copy}{$u, \V{version}$}
 	\State $u' = \Call{RawCopy}{u}$
 	\State $u'.\V{changes} = \{\}$
-	\State $u'.\V{timestamp} = \V{version}$
+	\State $u'.\ts = \V{version}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
 		\State $u'.\V{field}' = \V{value}'$
 	\EndFor
@@ -319,22 +363,21 @@ A função~\textsc{Copy} é da seguinte forma.
 	\For{$i = 1 \To |u'.\V{parents}|$} \label{line:copy:parents}
 		\State $v = u'.\V{parents}[i]$
 		\State $\V{field} = $ campo de~$v$ com valor~$u$.
-		\If{$v.\V{timestamp} = \V{version}$} \Comment{$\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
+		\If{$v.\ts = \V{version}$} \Comment{$\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
 			\State $v.\V{field} = u'$
 		\ElsIf{$|v.\V{changes}| < \V{in}$}
 			\State $v.\V{changes}.\Call{Add}{(\V{version}, \V{field}, u')}$
 		\Else
-			\State $v.\V{copy} = \Call{Copy}{v, \V{version}}$ \label{line:copy:copy}
-			\State $v.\V{copy}.\V{field} = u'$
-			\State $u'.\V{parents}[i] = v.\V{copy}$
+			\State $v.\cp = \Call{Copy}{v, \V{version}}$ \label{line:copy:copy}
+			\State $v.\cp.\V{field} = u'$
+			\State $u'.\V{parents}[i] = v.\cp$
 		\EndIf
 	\EndFor
 	\State \Return $u'$
 \EndFunction
 
 \end{algorithmic}
-\hrule
-\vspace{1em}
+\end{algorithm}
 
 Assumimos que a função~\Call{RawCopy}{$u$} faz e retorna um novo nó com todos os campos iguais os de~$u$.
 A função~\textsc{Copy} então ``aplica'' todas as modificações em~$\V{changes}$ ao nó~$u'$, e modifica todos os ponteiros de volta dos nós que ele aponta. Depois disso, resta modificar os nós que apontam para~$u$, para fazê-los apontar para~$u'$. Esse passo pode fazer necessária uma cópia de tal nó, usando a própria função~\textsc{Copy}. Como cada nó é copiado no máximo uma vez por versão, a função sempre termina.
