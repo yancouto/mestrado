@@ -179,7 +179,7 @@ edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt}
 		\draw[->, be] (bl) to[out=230,in=90] (d);
 		\draw[->, be] (bl) to[out=320,in=90] (f);
 	\end{tikzpicture}
-	\caption{Adição de um nó~$f$ à direita de~$b$ com uma implementação totalmente funcional. Novos nós criados em cinza.} \label{fig:totfunc_ex}
+	\caption{Adição de um nó~$f$ à direita de~$b$ com uma implementação totalmente funcional. Em cinza, os nós criados ou copiados durante a adição.} \label{fig:totfunc_ex}
 \end{figure}
 
 A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir de~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, essa implementação não seria possível.
@@ -226,10 +226,10 @@ Adicionamos um campo~$\ts$ que é o índice da versão em que o nó foi criado, 
 
 \subsection{Acesso}
 
-O acesso a um campo de um nó em uma dada versão pode ser feito da seguinte maneira. Note que estamos assumindo que as modificações estão armazenadas no vetor~$\V{changes}$ na ordem em que foram feitas.
+O acesso a um campo de um nó em uma dada versão pode ser feito como no Código~\ref{lst:acc_acc}. Note que estamos assumindo que as modificações estão armazenadas no vetor~$\V{changes}$ na ordem em que foram feitas.
 
-\vspace{1em}
-\hrule
+\begin{algorithm}
+\caption{Acesso à um campo durante uma operação de acesso.} \label{lst:acc_acc}
 \begin{algorithmic}[1]
 
 \Require $u$ representa a versão~$\V{version}$
@@ -244,18 +244,18 @@ O acesso a um campo de um nó em uma dada versão pode ser feito da seguinte man
 \EndFunction
 
 \end{algorithmic}
-\hrule
-\vspace{1em}
+\end{algorithm}
 
 Para retornar o valor do campo na versão~$\version$, aplicamos todas as modificações realizadas a este campo em versões que são no máximo~$\version$. Assumindo que armazenamos vetores com os nós de entrada de cada versão, com a função~\textsc{Access} é possível realizar uma operação de acesso em qualquer versão da estrutura com overhead de tempo constante por passo de acesso.
 
 \subsection{Modificação}
 
-Em uma operação de modificação, modificar um nó do conjunto de acessos pode levar a cópia de outros nós também no conjunto de acessos, para evitar que isso nos traga problemas, vamos garantir que no máximo uma cópia de cada vértice seja feita. Dessa forma, quando um passo de modificação da estrutura tentar mudar um campo do vértice~$u$, ou~$u$ é ativo ou~$u.\cp$ existe e é ativo.
+Em uma operação de modificação, modificar um nó do conjunto de acessos pode levar a cópia de outros nós que já estão no conjunto de acessos, para evitar que isso nos traga problemas, vamos garantir que no máximo uma cópia de cada vértice seja feita. Dessa forma, quando um passo de modificação da estrutura tentar acessar mudar um campo do vértice~$u$, ou~$u$ é ativo ou~$u.\cp$ existe e foi criado nesta versão.
 
-A função~\Call{Access}{$u, \V{field}$} acessa o campo~$\V{field}$ em sua versão mais atual, ou seja, aplica todas as modificações, e se~$u$ não for ativo, acessa o campo de~$u.\cp$.
+A função~\Call{Access}{$u, \V{field}$} do Código~\ref{lst:acc_mod} funciona de forma parecida com a função~\Call{Access}{$u, \V{field}, \version$} do Código~\ref{lst:acc_acc}, mas sempre acessa a versão mais recente do campo. Além disso, como assumimos que no máximo uma cópia é feita, se~$u$ tem cópia, esta foi criada durante esta versão e tem a versão mais recente do campo. Esta função não é usada em nenhuma das funções apresentadas no resto da seção, mas é importante apresentá-la pois ela deve ser usada pelos~\emph{passos de acesso} na operação de modificação da estrutura de dados.
 
 \begin{algorithm}
+\caption{Acesso à um campo durante uma operação de modificação.} \label{lst:acc_mod}
 \begin{algorithmic}[1]
 
 \Require $u$ é ativo ou sua cópia foi criada nessa versão.
@@ -276,12 +276,12 @@ A função~\Call{Access}{$u, \V{field}$} acessa o campo~$\V{field}$ em sua vers�
 \end{algorithmic}
 \end{algorithm}
 
+Para poder atualizar os ponteiros de nós ativos que apontam para um nó~$u$, armazenamos em~$u$ um vetor~$\V{parents}$, de~$\V{in}$ posições, que armazena quais nós ativos apontam para~$u$. Se~$u$ não é ativo, esse vetor tem apenas~\keyword{null}s. Dizemos que~$\V{parents}$ armazena~\deff{ponteiros de volta}.
 
-Para poder atualizar os ponteiros que apontam para um nó~$u$, armazenamos em~$u$ um vetor~$\V{parents}$, de~$\V{in}$ posições, que armazena quais nós ativos apontam para~$u$. Se~$u$ não é ativo, esse vetor tem apenas~\keyword{null}s. Dizemos que~$\V{parents}$ armazena~\deff{ponteiros de volta}.
-
-Quando um campo de ponteiro de um nó~$x$ é alterado de~$y$ para~$z$, é necessário atualizar o vetor~$\V{parents}$ de~$y$ e~$z$, removendo~$x$ do vetor de~$y$ e adicionando-o ao vetor de~$z$. A função~\mbox{\Call{ChangeParent}{$u, a, b$}} modifica o vetor~$u.\V{parents}$, trocando uma ocorrência de~$a$ por~$b$. A função~\mbox{\Call{ChangePointer}{$u, \V{field}, \V{value}$}} muda o ponteiro~$u.\V{field}$ para~$\V{value}$, fazendo as modificações necessárias aos campos~$\parents$; essa função assume que o nó~$u$ foi criado nesta versão, portanto podemos mudar diretamente seus campos, sem ser necessário adicionar mudanças ao vetor~$\changes$.
+Quando um campo de ponteiro de um nó~$x$ é alterado de~$y$ para~$z$, é necessário atualizar o vetor~$\V{parents}$ de~$y$ e~$z$, removendo~$x$ do vetor de~$y$ e adicionando-o ao vetor de~$z$. A função~\mbox{\Call{ChangeParent}{$u, a, b$}} modifica o vetor~$u.\V{parents}$, trocando uma ocorrência de~$a$ por~$b$. A função~\mbox{\Call{ChangePointer}{$u, \V{field}, \V{value}$}} muda o ponteiro~$u.\V{field}$ para~$\V{value}$, fazendo as modificações necessárias aos campos~$\parents$; essa função assume que o nó~$u$ foi criado nesta versão, portanto podemos mudar diretamente seus campos, sem ser necessário adicionar mudanças ao vetor~$\changes$. O Código~\ref{lst:chng_par_ptr} mostra a implementação destas duas funções.
 
 \begin{algorithm}
+\caption{Implementação de~\textsc{ChangeParent} e~\textsc{ChangePointer}.} \label{lst:chng_par_ptr}
 \begin{algorithmic}[1]
 
 \Function{ChangeParent}{$u, a, b$}
@@ -313,39 +313,46 @@ Quando um campo de ponteiro de um nó~$x$ é alterado de~$y$ para~$z$, é necess
 A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ está atualizado pois, ao trocar~$a$ por~$b$, se~$a \neq \Null$, então~$a$ apontava para~$u$, logo estava em~$\parents$; se~$a = \Null$, então, como~$\V{in}$ é o grau de entrada máximo de um nó, pelo menos uma posição do vetor tem o valor~$\Null$.
 
 Seja~$\cur$ a versão atual da estrutura, ou seja, o índice da operação de modificação que está sendo aplicada.
-A função~\Call{Modify}{$u, \V{field}, \V{value}$} modifica o campo~$\V{field}$ de~$u$, e deve ser chamada em passos de modificação da operação com índice~$\cur$. A função cria uma cópia do nó~$u$, se esta não existe e~$u$ não foi criado nessa versão (usando a função~\textsc{Copy}), e depois modifica o campo~$\V{field}$ diretamente.
+A função~\Call{Modify}{$u, \V{field}, \V{value}$} modifica o campo~$\V{field}$ de~$u$, e deve ser chamada em passos de modificação da operação com índice~$\cur$. A função cria uma cópia do nó~$u$, se esta não existe e~$u$ não foi criado nessa versão (usando a função~\textsc{Copy}), e depois modifica o campo~$\V{field}$ diretamente, utilizando~\textsc{ChangePointer} se necessário.
 
 \begin{algorithm}
+\caption{Modificação feita por um passo de modificação.} \label{lst:modify}
 \begin{algorithmic}[1]
 
 \Require $u$ é ativo ou sua cópia foi criada na versão atual~($\cur$).
 \Function{Modify}{$u, \V{field}, \V{value}$}
-	\If{$u.\cp \neq \Null$}
+	\If{$u.\cp \neq \Null$} \label{line:modify:if1}
 		\State $u = u.\cp$
-	\ElsIf{$u.\V{version} < \cur$}
+	\ElsIf{$u.\V{version} < \cur$} \label{line:modify:if2}
 		\State $u.\cp = \Call{Copy}{u}$ \label{line:modify:copy}
 		\State $u = u.\cp$
 	\EndIf
-	\If{$\V{field}$ é campo de ponteiro}
-		\State \Call{ChangeField}{$u, \V{field}, \V{value}$}
+	\If{$\V{field}$ é campo de ponteiro} \label{line:modify:chngb}
+		\State \Call{ChangePointer}{$u, \V{field}, \V{value}$}
 	\Else
 		\State $u.\V{field} = \V{value}$
-	\EndIf
+		\EndIf \label{line:modify:chnge}
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
 
-%% EDITAR A PARTIR DAQUI
+O Código~\ref{lst:modify} mostra a implementação da função~\textsc{Modify}. O nó~$u$ é um nó do conjunto de acessos e, como discutido anteriormente,
+\begin{itemize}
+	\item $u$ tem uma cópia --- O~\keyword{if} da linha~\nref{line:modify:if1} troca~$u$ por esta cópia; ou
+	\item $u$ não tem cópia e não foi criado nesta versão --- O~\keyword{if} da linha~\nref{line:modify:if2} cria uma cópia deste nó e troca~$u$ por está cópia; ou
+	\item $u$ foi criado nessa versão --- Os~\keyword{if}s iniciais não mudam~$u$.
+\end{itemize}
 
-Se~$u$ não foi criado nessa versão e não tem cópia, a função~\Call{Modify}{$u, \V{field}, \V{value}, \V{version}$} copia~$u$, utilizando~\Call{Copy}{$u, \V{version}$}, que copia o nó~$u$ e retorna a cópia, modificando apropriadamente os vetores~$\V{parent}$ e os nós que apontam para~$u$. Após isso, o campo~$\V{field}$ é alterdo utilizando a função~\textsc{ChangeField}, que apenas modifica o valor em um nó criado na versão atual, arrumando os vetores de volta usando~\textsc{ChangeParent}. Se o campo não é um ponteiro, não é necessário chamar~\textsc{ChangeField}.
-A função~\textsc{Copy} é da seguinte forma.
+Em qualquer dos casos, após os~\keyword{if}s iniciais,~$u$ é um nó que foi criado nesta versão, e então as linhas~\nref{line:modify:chngb}-\nref{line:modify:chnge} mudam o campo~$\V{field}$.
+Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica os ponteiros em nós ativos que apontam para ele.
 
 \begin{algorithm}
+\caption{Cópia de um nó na versão~$\cur$, atualizando os ponteiros que apontam para ele.} \label{lst:nc_copy}
 \begin{algorithmic}[1]
 
 \Function{Copy}{$u, \V{version}$}
-	\State $u' = \Call{RawCopy}{u}$
+	\State $u' = \Call{RawCopy}{u}$ \Comment{A função~\Call{RawCopy}{$u$} copia todos os campos de~$u$.}
 	\State $u'.\V{changes} = \{\}$
 	\State $u'.\ts = \V{version}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
@@ -354,16 +361,16 @@ A função~\textsc{Copy} é da seguinte forma.
 	\If{$u$ é nó de acesso}
 		\State Trocar~$u$ por~$u'$ na posição de vetor correspondente.
 	\EndIf
-	\For{$p \in$ campos de ponteiros}
-		\If{$u'.p \neq \Null$}
-			\State \Call{ChangeParent}{$u'.p, u, u'$}
+	\For{$\V{pointer} \in$ campos de ponteiros}
+	\If{$u'.\V{pointer} \neq \Null$}
+	\State \Call{ChangeParent}{$u'.\V{pointer}, u, u'$}
 		\EndIf
 	\EndFor
 	\State $u.\V{parents} = $ vetor apenas com~\keyword{null}s
 	\For{$i = 1 \To |u'.\V{parents}|$} \label{line:copy:parents}
 		\State $v = u'.\V{parents}[i]$
-		\State $\V{field} = $ campo de~$v$ com valor~$u$.
-		\If{$v.\ts = \V{version}$} \Comment{$\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
+		\State $\V{field} = $ campo de~$v$ tal que~$v.\V{field} = u$.
+		\If{$v.\ts = \V{version}$} \Comment{$u'.\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
 			\State $v.\V{field} = u'$
 		\ElsIf{$|v.\V{changes}| < \V{in}$}
 			\State $v.\V{changes}.\Call{Add}{(\V{version}, \V{field}, u')}$
@@ -378,6 +385,8 @@ A função~\textsc{Copy} é da seguinte forma.
 
 \end{algorithmic}
 \end{algorithm}
+
+%%% EXPLICAR BEM MELHOR A FUNCAO COPY
 
 Assumimos que a função~\Call{RawCopy}{$u$} faz e retorna um novo nó com todos os campos iguais os de~$u$.
 A função~\textsc{Copy} então ``aplica'' todas as modificações em~$\V{changes}$ ao nó~$u'$, e modifica todos os ponteiros de volta dos nós que ele aponta. Depois disso, resta modificar os nós que apontam para~$u$, para fazê-los apontar para~$u'$. Esse passo pode fazer necessária uma cópia de tal nó, usando a própria função~\textsc{Copy}. Como cada nó é copiado no máximo uma vez por versão, a função sempre termina.
@@ -412,8 +421,5 @@ A relação (1) vale pois~$y \leq C_i \cdot \V{in} - x$, (2) vale pois~$x \geq C
 Isso prova que o espaço amortizado gasto pela estrutura é~${\Oh(\sum\limits_{i=1}^m{M_i}) = \Oh(M)}$. Além disso, gasta-se tempo constante para criar cada nó, e cada chamada de~\textsc{Copy} cria um novo nó, logo o consumo de tempo dos passos de modificação é limitado pela criação de nós, e os passos de acesso funcionam em tempo~$\Oh(1)$ usando a função~\textsc{Access}, logo o tempo amortizado consumido por esse método é~$\Oh(M+A)$.
 
 Concluindo, este método transforma qualquer estrutura ligada com grau de entrada constante em uma estrutura parcialmente persistente, sem aumentar o consumo de tempo assintóticamente, apenas deixando esse tempo amortizado (se já não era). Variações desta técnica também permitem deixar a estrutura totalmente persistente~\cite{DriscollSST1989}, porém, são bem mais complicadas e usam EDs adicionais.
-
-% MUDAR O ACCESS E PÁ
-
 
 \end{document}
