@@ -10,7 +10,7 @@ Com uma implementação baseada na de Cormen et. al~\cite{CormenRedBlack}, a cad
 
 A implementação de Sedgewick e Wayne~\cite{SedgewickRedBlack}, apesar de ser considerada mais simples, não serve para os nossos propósitos, pois, ao considerar apenas árvores rubro-negras esquerdistas, os algoritmos de inserção e remoção podem realizar~$\Theta(\lg n)$ rotações, logo não é possível manter o consumo de espaço~$\Oh(m)$.
 
-Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garante esse espaço, e é totalmente persistente. Esse método é discutido na Seção~\ref{sec:implfuncional}, e também usado nos capítulos~\ref{cap:pilha},~\ref{cap:deque1},~\ref{cap:deque2} e~\ref{cap:deque3}.
+Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garante esse espaço, e é totalmente persistente. Esse método é discutido na Seção~\ref{sec:implfuncional}, e também usado nos capítulos~\ref{cap:pilha},~\ref{cap:deque1},~\ref{cap:deque2} e~\ref{cap:deque3}. Basta, em operações de modificação, copiar todo o caminho percorrido na árvore, a partir da raiz.
 
 \section{Definições}
 
@@ -44,12 +44,12 @@ Uma árvore rubro-negra segue as seguintes propriedades rubro-negras:
 \item Para todo nó, todos os caminhos até links nulos de sua subárvore têm o mesmo número de nós pretos.
 \end{enumerate}
 
-Considerando apenas os nós pretos, a árvore é totalmente balanceada (propriedade 3). Como um nó vermelho não tem filhos vermelhos (propriedade 2), é possível ``juntar'' os nós vermelhos aos seus pais pretos (a raiz não é vermelha pela propriedade 1), e assim cada nó preto fica associado até~3 valores (e pode ter até 4 filhos). Logo, um simples limitante superior para a altura de uma árvore rubro-negra de~$n$ nós é~$3\floor{\lg(n)}$, pois esta árvore comprimida é totalemente balanceada. Logo, se mantivermos essas propriedades a cada inserção ou remoção, e o consumo de tempo destas for proporcional à altura da árvore, então o consumo de tempo será~$\Oh(\lg n)$ para todas as operações.
+Considerando apenas os nós pretos, a árvore é totalmente balanceada (propriedade 3). Como um nó vermelho não tem filhos vermelhos (propriedade 2), é possível ``juntar'' os nós vermelhos aos seus pais pretos (a raiz não é vermelha pela propriedade 1), e assim cada nó preto fica associado até~3 valores (e pode ter até 4 filhos). Logo, um simples limitante superior para a altura de uma árvore rubro-negra de~$n$ nós é~$3\floor{\lg(n)}$, pois esta árvore comprimida é totalmente balanceada. Se mantivermos as propriedades rubro-negras a cada inserção ou remoção, e o consumo de tempo destas operações for proporcional à altura da árvore, então o consumo de tempo será~$\Oh(\lg n)$ para todas as operações.
 
 \section{Implementação da persistência}
 
 \newcommand{\ts}{\mathcal{T}}
-\newcommand{\ccopy}{\V{copy}}
+\newcommand{\cp}{\V{copy}}
 \newcommand{\child}{\V{child}}
 \newcommand{\parent}{\V{parent}}
 \newcommand{\red}{\V{red}}
@@ -60,14 +60,17 @@ Considerando apenas os nós pretos, a árvore é totalmente balanceada (propried
 \newcommand{\side}{\V{side}}
 \newcommand{\roots}{\V{roots}}
 \newcommand{\val}{\V{value}}
+\newcommand{\cur}{\V{current}}
 
 
-Em uma árvore rubro-negra efêmera, todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, no nó persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra. O ponteiro de volta é armazenado no campo~$\parent$, e é exatamente o ponteiro que aponta para o pai de um nó, o que será conveniente durante a implementação das operações. Note que, de acordo com a implementação da Seção~\ref{sec:nodecopying}, o campo~$\parent$ é nulo para nós que não são ativos, logo não pode ser utilizado para realizar as operações de acesso.
+Em uma árvore rubro-negra efêmera (não-persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó.
 
-Para evitar a necessidade de replicar código muito parecido, vamos armazenar os filhos como um vetor~$\child$ de~2 posições,~$u.\child[0]$ é o filho esquerdo de~$u$, e~$u.\child[1]$ é seu filho direito. Os campos de um nó serão:
+O ponteiro de volta é armazenado no campo~$\parent$, e é exatamente o ponteiro que aponta para o pai de um nó, o que será conveniente durante a implementação das operações. Note que, de acordo com a implementação da Seção~\ref{sec:nodecopying}, o campo~$\parent$ é nulo para nós que não são ativos, logo não pode ser utilizado para realizar as operações de acesso, apenas de modificação.
+
+Para evitar a necessidade de replicar código muito parecido, vamos armazenar os filhos como um vetor~$\child$ de~2 posições,~$u.\child[0]$ é o filho esquerdo de~$u$, e~$u.\child[1]$ é seu filho direito. Dessa forma, casos simétricos podem ser tratados com o mesmo código. Os campos de um nó serão:
 \begin{itemize}
 \item $\ts$ --- Tempo de criação do nó.
-\item $\ccopy$ --- Próximo nó persistente (se este não é ativo).
+\item $\cp$ --- Cópia do nó (se ele não é ativo).
 \item $\child$ --- Vetor de filhos.
 \item $\parent$ --- Ponteiro de volta.
 \item $\red$ --- Booleano que indica se o nó é vermelho.
@@ -75,16 +78,17 @@ Para evitar a necessidade de replicar código muito parecido, vamos armazenar os
 \item $\val$ --- O valor armazenado pelo nó
 \end{itemize}
 
-Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois ele pode ser tanto um filho esquerdo quanto direito do nó, e se~$\extra$ for nulo, não há como saber qual filho este é comparando seu valor com o do nó. Para indicar se o ponteiro extra foi utilizado, usaremos que~$\ts = -1$ quando não existe tal ponteiro.
+Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois ele pode ser tanto um filho esquerdo quanto direito do nó, e se~$\extra$ for nulo, não há como saber qual filho este é comparando seu valor com o do nó. Para indicar se o ponteiro extra foi utilizado, usaremos que~$\eTs = -1$ quando não existe tal ponteiro.
 
 \section{Operações de acesso}
 
 Para acessar o campo de um nó na versão~$\version$, ou na versão ativa, usamos versões modificadas das funções~\textsc{Access}.
 
 \begin{algorithm}
+\caption{Acesso aos campos de um nó.}
 \begin{algorithmic}[1]
 
-\Require $u$ deve ser um nó persistente associado à versão~$\version$.
+\Require $u$ deve ser um nó associado à versão~$\version$.
 \Function{Child}{$u, \side, \version$}
 	\If{$u.\eTs \neq -1 \And u.\eSide = \side \And \version \geq u.\eTs$}
 		\State \Return $u.\extra$
@@ -92,15 +96,9 @@ Para acessar o campo de um nó na versão~$\version$, ou na versão ativa, usamo
 	\State \Return $u.\child[\side]$
 \EndFunction
 
-\Require $u$ deve ser ativo ou sua cópia deve ser ativa.
+\Require $u$ deve ser ativo ou sua cópia deve ter sido criada na versão atual.
 \Function{Child}{$u, \side$}
-	\If{$u.\ccopy \neq \Null$}
-		\State \Return $u.\ccopy.\child[\side]$
-	\ElsIf{$u.\eTs \neq -1 \And u.\eSide = \side$}
-		\State \Return $u.\extra$
-	\Else
-		\State \Return $u.\child[\side]$
-	\EndIf
+\State \Return \Call{Child}{$\Call{Active}{u}, \side, \cur$} \Comment{\textsc{Active} funciona exatamente como descrito no Código~\ref{lst:acc_mod}.}
 \EndFunction
 
 \end{algorithmic}
@@ -130,37 +128,36 @@ O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc
 
 \section{Modificação de um campo}
 
-Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação. Usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra.
+Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação, que serão apresentadas nas próximas seções. No código, usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra, nunca o valor dos nós.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
 
-\Function{Modify}{$u, \side, v, \version$}
-	\If{$u.\ccopy \neq \Null$}
-		\State $u = u.\ccopy$
-	\EndIf
-	\If{$u.\ts < \version$}
-		\State $u.\ccopy = \Call{Copy}{u, \version}$
-		\State $u = u.\ccopy$
+\Function{Modify}{$u, \side, v$}
+	\State $u = \Call{Active}{u}$
+	\If{$u.\ts < \cur$}
+		\State $u.\cp = \Call{Copy}{u}$
+		\State $u = u.\cp$
 	\EndIf
 	\If{$u.\child[\side] \neq \Null$}
 		\State $u.\child[\side].\parent = \Null$
 	\EndIf
-	\State $u.\child[\side] = v$
-	\If{$v \neq \Null$}
-		\State $v.\parent = u$
+	\State $u.\child[\side] = \Call{Active}{v}$
+	\If{$u.\child[\side] \neq \Null$}
+		\State $u.\child[\side].\parent = u$
 	\EndIf
 \EndFunction
 
-\Function{Copy}{$u, \version$}
+% Precisa revisar depois do commit
+\Function{Copy}{$u$}
 	\State $u' = \Call{RawCopy}{u}$
 	\If{$u.\eTs \neq -1$}
 		\State $u'.\child[u.\eSide] = u.\extra$
 		\State $u'.\eTs = -1$ \Comment{Limpando o campo extra}
 	\EndIf
-	\State $u'.\ts = \version$
-	\If{$\roots[\version] = u$}
-		\State $\roots[\version] = u'$
+	\State $u'.\ts = \cur$
+	\If{$\roots[\cur] = u$}
+		\State $\roots[\cur] = u'$
 	\EndIf
 	\For{$\side \in \{0, 1\}$}
 		\If{$u'.\child[\side] \neq \Null$}
@@ -171,16 +168,16 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 	\If{$u'.\parent \neq \Null$}
 		\State $v = u'.\parent$
 		\State $\side = [\Call{Child}{v, 1} = u]$ \label{line:copyrb:side}
-		\If{$v.\ts = \version$}
+		\If{$v.\ts = \cur$}
 			\State $v.\child[\side] = u'$
 		\ElsIf{$v.\eTs = -1$}
-			\State $v.\eTs = \version$
+			\State $v.\eTs = \cur$
 			\State $v.\extra = u'$
 			\State $v.\eSide = \side$
 		\Else
-			\State $v.\ccopy = \Call{Copy}{v, \version}$
-			\State $v.\ccopy.\child[\side] = u'$
-			\State $u'.\parent = v.\ccopy$
+			\State $v.\cp = \Call{Copy}{v}$
+			\State $v.\cp.\child[\side] = u'$
+			\State $u'.\parent = v.\cp$
 		\EndIf
 	\EndIf
 	\State \Return $u'$
@@ -191,15 +188,15 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 
 Utilizamos que cada nó tem apenas um campo extra e ponteiro de volta para diminuir o código, e o vetor de filhos para evitar duplicação de código. Com estas funções prontas, é possível manter a persistência da estrutura, e nas próximas seções vamos discutir como implementar as operações de inserir e remover um valor de uma árvore rubro-negra.
 
-Note que na linha~\nref{line:copyrb:side} devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois a segunda versão não funciona quando a ABB pode armazenar valores repetidos, pois~$v$ pode ter~2 filhos com o mesmo valor.
+Note que na linha~\nref{line:copyrb:side} devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois o segunda predicado não funciona quando a ABB pode armazenar valores repetidos, já que~$v$ pode ter~2 filhos com o mesmo valor.
 
 \section{Inserção em ABB}
 
-Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB (efêmera e não rubro-negra). Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente á árvore continua sendo uma ABB válida.
+Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB (efêmera e não rubro-negra). Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente a árvore continua sendo uma ABB válida.
 
-Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituimos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda.
+Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituimos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda, pela forma como percorremos a árvore.
 
-Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda tem valores menores ou iguais e os nós da subárvore direita tem valores maiores ou iguais.
+Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda tem valores menores ou iguais e os nós da subárvore direita tem valores maiores ou iguais ao valor do nó.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -236,7 +233,7 @@ Para arrumar a possível violação da propriedade, vamos fazer um laço com as 
 
 Numa iteração deste laço, vamos ou acabar com todas as violações, ou mudar~$x$ para um nó de altura menor. Dessa forma ``subimos'' a violação, e conseguimos acabar com todas as violações em tempo~$\Oh(\lg n)$, pois a árvore é balanceada.
 
-Se, no começo da iteração, a raiz é~$x$, então para arrumar esta violação basta pintar~$x$ de preto. Caso contrário vamos recolorir ou rotacionar vértices, sempre mantendo a propriedade~3, para diminuir a altura do vértice que viola as propriedades.
+Se, no começo da iteração, a raiz é~$x$, então para arrumar esta violação basta pintar~$x$ de preto. Caso contrário, vamos recolorir ou rotacionar vértices, sempre mantendo a propriedade~3, para diminuir a altura do vértice que viola as propriedades.
 
 \subsection{Rotações}
 
@@ -264,7 +261,7 @@ A Figura~\ref{fig:rot_ex} mostra uma rotação genérica. Note que, nos dois lad
 
 \subsection{Subindo a violação}
 
-Quando~$x$ não é a raiz no começo da iteração, o pai de~$x$, denotamos~$y$, é vermelho, logo não é a raiz (pois a propriedade~1 não é quebrada), e por isso também tem um pai~$z$ (o avô de~$x$). Como~$x$ é o único nó que viola alguma propriedade, seu avô~$z$ com certeza é preto. Seja~$w$ o tio de~$x$ (o filho de~$z$ que não é~$y$).
+Se a árvore ainda tem violações no começo da iteração do laço, se $x$ não é a raiz, seja~$y$ o pai de~$x$. Temos que~$y$ é vermelho, logo não é a raiz (pois a propriedade~1 não é quebrada), e por isso também tem um pai~$z$ (o avô de~$x$). Como~$x$ é o único nó que viola alguma propriedade, seu avô~$z$ com certeza é preto. Seja~$w$ o tio de~$x$ (o filho de~$z$ que não é~$y$).
 
 
 \begin{description}
@@ -274,9 +271,9 @@ Quando~$x$ não é a raiz no começo da iteração, o pai de~$x$, denotamos~$y$,
 
 \item[Caso 2.] Caso contrário ($w$ não existe ou é preto), se~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquedo de~$z$ e~$x$ é filho esquerdo de~$y$), então realizamos uma rotação de~$z$ em direção à~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
 
-	Os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó preto~$z$ nesta parte do caminho, os caminhos que passam por~$w$ passam por~$z$ e~$w$ (se existir). Após a transformação, os caminhos até que passam por~$x$ ou~$\alpha$ passam apenas pelo nó preto~$y$, e os caminhos que passam por~$w$ apenas por este (se existir) e~$y$. Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
+	Os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó preto~$z$ nesta parte do caminho, antes da transformação, os caminhos que passam por~$w$ passam por~$z$ e~$w$ (se existir). Após a transformação, os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó preto~$y$, e os caminhos que passam por~$w$ apenas por este (se existir) e~$y$. Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
 
-\item[Caso 3.] Se~$x$ e~$y$ são filhos de lados diferentes, a rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim o~caso~2 pode ser aplicado~(se trocamos~$x$ por~$y$).
+\item[Caso 3.] Se~$x$ e~$y$ são filhos de lados diferentes, a rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim transformamos este caso no~caso~2~(se trocamos~$x$ por~$y$).
 
 \end{description}
 
@@ -309,7 +306,7 @@ Quando~$x$ não é a raiz no começo da iteração, o pai de~$x$, denotamos~$y$,
 \draw[->] (2.5cm, -1cm) -- (5.5cm, -1cm);
 
 \end{tikzpicture}
-\caption{Aplicação do caso~2, assumindo que~$x$ é filho esquerdo. Os nós~$x$ e~$w$, se existir, podem ter filhos.} \label{fig:rb_ins_caso2}
+\caption{Aplicação do caso~2, assumindo que~$x$ é filho esquerdo. Os nós~$x$ e~$w$ (se existir) podem ter filhos.} \label{fig:rb_ins_caso2}
 \end{figure}
 
 \begin{figure}
@@ -337,26 +334,26 @@ A maior parte das modificações envolvidas em uma inserção são mudanças de 
 \begin{algorithm}
 \begin{algorithmic}[1]
 
-\Function{Insert}{$\val, \version$}
-	\State $\roots[\version] = \roots[\version - 1]$
+\Function{Insert}{$\val$}
+	\State $\roots[\cur] = \roots[\cur - 1]$
 	\State $x = \New \Call{Node}{\val}$ \Comment{Nó vermelho com valor $\val$ e outros campos vazios.} \label{line:insrb:insb}
-	\State $x.\ts = \version$
-	\If{$\roots[\version] = \Null$}
-		\State $\roots[\version] = x$
+	\State $x.\ts = \cur$
+	\If{$\roots[\cur] = \Null$}
+		\State $\roots[\cur] = x$
 	\Else
-		\State $u = \roots[version]$
+		\State $u = \roots[\cur]$
 		\While{$u \neq \Null$} \Comment{$v$ é o pai de~$u$.} \label{line:insrb:whilefind}
 			\State $v = u$
-			\State $u = \Call{Child}{u, [\val > u.\val], \version}$
+			\State $u = \Call{Child}{u, [\val > u.\val]}$
 		\EndWhile
-		\State \Call{Modify}{$v, [\val > v.\val], x, \version$}
+		\State \Call{Modify}{$v, [\val > v.\val], x$}
 	\EndIf \label{line:insrb:inse}
 	\LineComment{Arrumando a possível violação causada pelo nó~$x$.}
 	\While{$x.\red \And x.\parent \neq \Null \And x.\parent.\red$} \label{line:insrb:loopb}
 		\State $y = x.\parent$ \label{line:insrb:xyzwb}
 		\State $z = y.\parent$
-		\State $\V{sideX} = [x = \Call{Child}{y, 1, \version}]$
-		\State $\V{sideY} = [y = \Call{Child}{z, 1, \version}]$ \label{line:insrb:xyzwe}
+		\State $\V{sideX} = [x = \Call{Child}{y, 1}]$
+		\State $\V{sideY} = [y = \Call{Child}{z, 1}]$ \label{line:insrb:xyzwe}
 		\State $w = \Call{Child}{z, \Not\ \V{sideY}}$
 		\If{$w \neq \Null \And w.\red$} \Comment{Caso 1.} \label{line:insrb:c1b}
 			\State $z.\red = \True$
@@ -365,51 +362,47 @@ A maior parte das modificações envolvidas em uma inserção são mudanças de 
 			\State $x = z$ \label{line:insrb:c1e}
 		\Else
 			\If{$\V{sideX} \neq \V{sideY}$} \Comment{Caso 3.} \label{line:insrb:c3b}
-				\State \Call{Rotate}{$y, \V{sideX}, \version$}
+				\State \Call{Rotate}{$y, \V{sideX}$}
 				\State $x, y = y, x$ \Comment{Trocando~$x$ e~$y$.} \label{line:insrv:c3e}
 			\EndIf
-			\State \Call{Rotate}{$z, \V{sideY}, \version$} \Comment{Caso 2.} \label{line:insrb:c2b}
-			\If{$z.\ccopy \neq \Null$} \label{line:insrb:if1}
-				\State $z = z.\ccopy$
-			\EndIf
-			\State $z.\red = \True$
-			\If{$y.\ccopy \neq \Null$} \label{line:insrb:if2}
-				\State $y = y.\ccopy$
-			\EndIf
-			\State $y.\red = \False$
+			\State \Call{Rotate}{$z, \V{sideY}$} \Comment{Caso 2.} \label{line:insrb:c2b}
+			\State $\Call{Active}{z}.\red = \True$ \label{line:insrb:act1}
+			\State $\Call{Active}{y}.\red = \False$ \label{line:insrb:act2}
 			\State \Break \label{line:insrb:c2e}
 		\EndIf
 	\EndWhile
-	\State $\roots[\version].\red = \False$ \Comment{Caso~$x$ seja a raiz, e vermelho.} \label{line:insrb:loope}
+	\State $\roots[\cur].\red = \False$ \Comment{Caso~$x$ seja a raiz, e vermelho.} \label{line:insrb:loope}
 \EndFunction
 \end{algorithmic}
 \caption{Inserção em árvore rubro-negra parcialmente persistente.} \label{lst:ins_rb}
 \end{algorithm}
 
-O Código~\ref{lst:ins_rb} mostra então a implementação da inserção, como discutida, dado que a função~\textsc{Rotate} funciona corretamente. As linhas~\nref{line:insrb:insb}-\nref{line:insrb:inse} inserem o nó na árvore como em uma ABB normal, mas usando as funções~\textsc{Child} e~\textsc{Modify} para manter a persistência. As linhas~\nref{line:insrb:loopb}-\nref{line:insrb:loope} fazem o laço discutido nesta seção.
+O Código~\ref{lst:ins_rb} mostra então a implementação da inserção, como discutida, dado que a função~\mbox{\textsc{Rotate}} funciona corretamente. As linhas~\nref{line:insrb:insb}-\nref{line:insrb:inse} inserem o nó na árvore como em uma ABB normal, mas usando as funções~\textsc{Child} e~\textsc{Modify} para manter a persistência. As linhas~\nref{line:insrb:loopb}-\nref{line:insrb:loope} fazem o laço discutido nesta seção.
 
-No começo da primeira iteração do laço, as propriedades valem pois~$x$ é um nó vermelho que recém-inserido. As linhas~\nref{line:insrb:xyzwb}-\nref{line:insrb:xyzwe} determinam os nós~$x$,~$y$,~$z$ e~$w$, usados nos casos. O caso~1 é tratado nas linhas~\nref{line:insrb:c1b}-\nref{line:insrb:c1e}, trocando as cores de~$z$,~$y$ e~$w$ e fazendo o~$x$ da próxima iteração ser~$z$, pois é o único nó que possivelmente viola alguma propriedade.
+No começo da primeira iteração do laço, as propriedades valem pois~$x$ é um nó vermelho que recém-inserido. As linhas~\nref{line:insrb:xyzwb}-\nref{line:insrb:xyzwe} determinam os nós~$y$,~$z$ e~$w$, usados nos casos. O caso~1 é tratado nas linhas~\nref{line:insrb:c1b}-\nref{line:insrb:c1e}, trocando as cores de~$z$,~$y$ e~$w$ e fazendo o~$x$ da próxima iteração ser~$z$, pois é o único nó que possivelmente viola alguma propriedade.
 
-O caso~3 é transformado no caso~2 nas linhas~\nref{line:insrb:c3b}-\nref{line:insrv:c3e}, fazendo uma rotação de~$y$ na direção de~$x$, e trocando esses~2 nós. As linhas~\nref{line:insrb:c2b}-\nref{line:insrb:c2e} então tratam o caso~2, fazendo uma rotação de~$z$ em direção à~$y$ e trocando a cor destes, como na Figura~\ref{fig:rb_ins_caso2}. Os~\keyword{if}s das linhas~\nref{line:insrb:if1} e~\nref{line:insrb:if2} tratam o caso quando as rotações causaram cópias e~$y$ ou~$z$ não são mais ativos, pois para modificar o campo efêmero~$\red$ devemos modificar o nó ativo. Nestes dois casos o~\keyword{break} termina o laço.
+O caso~3 é transformado no caso~2 nas linhas~\nref{line:insrb:c3b}-\nref{line:insrv:c3e}, fazendo uma rotação de~$y$ na direção de~$x$, e trocando esses~2 nós. As linhas~\nref{line:insrb:c2b}-\nref{line:insrb:c2e} então tratam o caso~2, fazendo uma rotação de~$z$ em direção à~$y$ e trocando a cor destes, como na Figura~\ref{fig:rb_ins_caso2}. As chamadas a~\textsc{Active} nas linhas~\nref{line:insrb:act1} e~\nref{line:insrb:act2} tratam o caso quando as rotações causaram cópias, e por isso~$y$ ou~$z$ não são mais ativos, pois para modificar o campo efêmero~$\red$ devemos modificar o nó ativo. Nestes dois casos o~\keyword{break} termina o laço.
 
 Por último, a linha~\nref{line:insrb:loope} pinta a raiz de preto, já que o laço não trata esse caso e termina quando~$u$ não tem pai.
 
+%% O(lgn) + O(1) amortizado
 A função consome tempo amortizado~$\Oh(\lg n)$ pois a altura da árvore é~$\Oh(\lg n)$, ambos os lações das linhas~\nref{line:insrb:whilefind} e~\nref{line:insrb:loopb} realizam um número de iterações proporcional a altura, e a função~\textsc{Rotate} e~\textsc{Modify} consomem tempo (e espaço) amortizado constante. Como essas funções só são chamadas um número constante de vezes, o consumo de espaço é amortizado~$\Oh(1)$.
 
-O Código~\ref{lst:rotrb} mostra a implementação da função~\textsc{Rotate}, que usa apenas um número constante de chamadas a~\textsc{Modify}. Note que é necessário, entre quaisquer duas chamadas, manter que cada vértice tem no máximo um outro vértice que aponta para ele, logo é preciso ter mais cuidado que com a implementação em uma ABB efêmera.
+O Código~\ref{lst:rotrb} mostra a implementação da função~\textsc{Rotate}, que usa apenas um número constante de chamadas a~\textsc{Modify}. Note que é necessário, entre quaisquer duas chamadas, manter que cada vértice tem no máximo um outro vértice que aponta para ele, logo é preciso ter mais cuidado que com a implementação em uma ABB efêmera. Apesar das funções~\textsc{Child} e~\textsc{Modify} funcionarem se receberem nós que já foram copiados neste operação, na função~\textsc{Rotate} é necessário acessar o campo~$\parent$ de~$u$, por isso na linha~\nref{line:rotb:active} trocamos~$u$ por sua cópia, se existir.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Require $u$ deve ter um filho~$\side$ na versão~$\version$.
-\Function{Rotate}{$u, \side, \version$}
-	\State $v = \Call{Child}{u, \side, \version}$
+\Require $u$ deve ter um filho~$\side$ na versão~$\cur$.
+\Function{Rotate}{$u, \side$}
+	\State $u = \Call{Active}{u}$ \label{line:rotrb:active}
+	\State $v = \Call{Child}{u, \side}$
 	\If{$u.\parent \neq \Null$}
-		\State \Call{Modify}{$u.\parent, [\Call{Child}{u.\parent, 1, \version} = u], v, \version$}
+		\State \Call{Modify}{$u.\parent, [\Call{Child}{u.\parent, 1} = u], v$}
 	\EndIf
-	\State $\beta = \Call{Child}{v, \Not\ \side, \version}$
-	\State \Call{Modify}{$v, \Not\ \side, \version$}
+	\State $\beta = \Call{Child}{v, \Not\ \side}$
+	\State \Call{Modify}{$v, \Not\ \side, \Null$}
 	\State \Call{Modify}{$u, \side, \beta$}
-	\State \Call{Modify}{$v, \Not\ \side, u, \version$}
+	\State \Call{Modify}{$v, \Not\ \side, u$}
 \EndFunction
 \end{algorithmic}
 \caption{Rotação em uma árvore rubro-negra parcialmente persistente.} \label{lst:rotrb}

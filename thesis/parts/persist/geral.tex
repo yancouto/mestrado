@@ -251,8 +251,10 @@ Para retornar o valor do campo na versão~$\version$, aplicamos todas as modific
 \subsection{Modificação}
 
 Em uma operação de modificação, modificar um nó do conjunto de acessos pode levar a cópia de outros nós que já estão no conjunto de acessos, para evitar que isso nos traga problemas, vamos garantir que no máximo uma cópia de cada vértice seja feita. Dessa forma, quando um passo de modificação da estrutura tentar acessar mudar um campo do vértice~$u$, ou~$u$ é ativo ou~$u.\cp$ existe e foi criado nesta versão.
+\newcommand{\cur}{\V{current}}
 
-A função~\Call{Access}{$u, \V{field}$} do Código~\ref{lst:acc_mod} funciona de forma parecida com a função~\Call{Access}{$u, \V{field}, \version$} do Código~\ref{lst:acc_acc}, mas sempre acessa a versão mais recente do campo. Além disso, como assumimos que no máximo uma cópia é feita, se~$u$ tem cópia, esta foi criada durante esta versão e tem a versão mais recente do campo. Esta função não é usada em nenhuma das funções apresentadas no resto da seção, mas é importante apresentá-la pois ela deve ser usada pelos~\emph{passos de acesso} na operação de modificação da estrutura de dados.
+Seja~$\cur$ a versão atual da estrutura, ou seja, o índice da operação de modificação que está sendo aplicada.
+A função~\Call{Access}{$u, \V{field}$} do Código~\ref{lst:acc_mod} funciona de forma parecida com a função~\Call{Access}{$u, \V{field}, \version$} do Código~\ref{lst:acc_acc}, mas sempre acessa a versão mais recente~($\cur$) do campo. Esta função não é usada em nenhuma das funções apresentadas no resto da seção, mas é importante apresentá-la pois ela deve ser usada pelos~\emph{passos de acesso} na operação de modificação da estrutura de dados. A função~\Call{Active}{$u$} é usada como função auxiliar em muitas funções apresentadas nesta seção, e retorna a versão ativa do nó~$u$ (ou seja,~$u$ ou~$u.\cp$).
 
 \begin{algorithm}
 \caption{Acesso à um campo durante uma operação de modificação.} \label{lst:acc_mod}
@@ -260,16 +262,15 @@ A função~\Call{Access}{$u, \V{field}$} do Código~\ref{lst:acc_mod} funciona d
 
 \Require $u$ é ativo ou sua cópia foi criada nessa versão.
 \Function{Access}{$u, \V{field}$}
-	\If{$u.\cp \neq \Null$}
-		\State \Return $u.\cp.\V{field}$ \Comment{$u.\cp$ foi criado nesta versão e tem o vetor~$\changes$ vazio.}
+	\State \Return \Call{Access}{$\Call{Active}{u}, \V{field}, \cur$}
+\EndFunction
+
+\Require $u$ é ativo ou sua cópia foi criada nessa versão.
+\Function{Active}{$u$}
+	\If{$u = \Null \Or u.\cp = \Null$}
+		\State \Return $u$
 	\Else
-		\State $\V{value} = u.\V{field}$
-		\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
-			\If{$\V{field} = \V{field}'$}
-				\State $\V{value} = \V{value}'$
-			\EndIf
-		\EndFor
-		\State \Return $\V{value}$
+		\State \Return $u.\cp$
 	\EndIf
 \EndFunction
 
@@ -299,20 +300,17 @@ Quando um campo de ponteiro de um nó~$x$ é alterado de~$y$ para~$z$, é necess
 	\If{$u.\V{field} \neq \Null$}
 		\State \Call{ChangeParent}{$u.\V{field}, u, \Null$}
 	\EndIf
-	\State $u.\V{field} = \V{value}$
-	\If{$\V{value} \neq \Null$}
-		\State \Call{ChangeParent}{$\V{value}, \Null, u$}
+	\State $u.\V{field} = \Call{Active}{\V{value}}$ \Comment{$\V{value}$ pode já ter sido copiado.}
+	\If{$u.\V{value} \neq \Null$}
+		\State \Call{ChangeParent}{$u.\V{value}, \Null, u$}
 	\EndIf
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
 
-\newcommand{\cur}{\V{current}}
-
 A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ está atualizado pois, ao trocar~$a$ por~$b$, se~$a \neq \Null$, então~$a$ apontava para~$u$, logo estava em~$\parents$; se~$a = \Null$, então, como~$\V{in}$ é o grau de entrada máximo de um nó, pelo menos uma posição do vetor tem o valor~$\Null$.
 
-Seja~$\cur$ a versão atual da estrutura, ou seja, o índice da operação de modificação que está sendo aplicada.
 A função~\Call{Modify}{$u, \V{field}, \V{value}$} modifica o campo~$\V{field}$ de~$u$, e deve ser chamada em passos de modificação da operação com índice~$\cur$. A função cria uma cópia do nó~$u$, se esta não existe e~$u$ não foi criado nessa versão (usando a função~\textsc{Copy}), e depois modifica o campo~$\V{field}$ diretamente, utilizando~\textsc{ChangePointer} se necessário.
 
 \begin{algorithm}
@@ -321,9 +319,8 @@ A função~\Call{Modify}{$u, \V{field}, \V{value}$} modifica o campo~$\V{field}$
 
 \Require $u$ é ativo ou sua cópia foi criada na versão atual~($\cur$).
 \Function{Modify}{$u, \V{field}, \V{value}$}
-	\If{$u.\cp \neq \Null$} \label{line:modify:if1}
-		\State $u = u.\cp$
-	\ElsIf{$u.\V{version} < \cur$} \label{line:modify:if2}
+	\State $u = \Call{Active}{u}$ \label{line:modify:active}
+	\If{$u.\V{version} < \cur$} \label{line:modify:if2}
 		\State $u.\cp = \Call{Copy}{u}$ \label{line:modify:copy}
 		\State $u = u.\cp$
 	\EndIf
@@ -339,12 +336,12 @@ A função~\Call{Modify}{$u, \V{field}, \V{value}$} modifica o campo~$\V{field}$
 
 O Código~\ref{lst:modify} mostra a implementação da função~\textsc{Modify}. O nó~$u$ é um nó do conjunto de acessos e, como discutido anteriormente,
 \begin{itemize}
-	\item $u$ tem uma cópia --- O~\keyword{if} da linha~\nref{line:modify:if1} troca~$u$ por esta cópia; ou
+	\item $u$ tem uma cópia --- A chama a~\textsc{Active} na linha~\nref{line:modify:active} troca~$u$ por esta cópia; ou
 	\item $u$ não tem cópia e não foi criado nesta versão --- O~\keyword{if} da linha~\nref{line:modify:if2} cria uma cópia deste nó e troca~$u$ por está cópia; ou
-	\item $u$ foi criado nessa versão --- Os~\keyword{if}s iniciais não mudam~$u$.
+	\item $u$ foi criado nessa versão --- $u$ não é modificado.
 \end{itemize}
 
-Em qualquer dos casos, após os~\keyword{if}s iniciais,~$u$ é um nó que foi criado nesta versão, e então as linhas~\nref{line:modify:chngb}-\nref{line:modify:chnge} mudam o campo~$\V{field}$.
+Após qualquer um destes casos,~$u$ é um nó que foi criado nesta versão, e então as linhas~\nref{line:modify:chngb}-\nref{line:modify:chnge} mudam o campo~$\V{field}$.
 Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica os ponteiros em nós ativos que apontam para ele.
 
 \begin{algorithm}
