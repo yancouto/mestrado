@@ -51,8 +51,8 @@ template<class T> struct RedBlackTree {
 	// Destrutor, libera toda a memória alocada.
 	~RedBlackTree();
 
-	// Ignora a versão 0
-	inline int versionCount() { return roots.size() - 1; }
+	// Retorna a versão atual da árvore.
+	inline int current() { return roots.size() - 1; }
 
 	/* Procura pelo objeto val na ABB criada com tempo time, e retorna um ponteiro constante para
 	 * o objeto, se for encontrado, e nullptr caso contrário.
@@ -61,7 +61,7 @@ template<class T> struct RedBlackTree {
 
 	/* Insere o objeto val na ABB em sua versão mais atual.
 	 * Tempo: O(lg(tamanho da ABB)) */
-	void insert(const T& val);
+	void Insert(const T& val);
 
 	/* Remove o objeto val na ABB em sua versão mais atual, e retorna um ponteiro constante para
 	 * o objeto, se ele tiver sido removido, e nullptr caso contrário.
@@ -70,8 +70,16 @@ template<class T> struct RedBlackTree {
 
 // private: TODO make it private in the future
 
+	// Retorna a versão ativa do nó u, que é este ou sua cópia, se existir.
+	Node<T>* Active(Node<T> *u);
+
 	// Retorna o filho side de u, considerando o filho adicional, se possível.
-	Node<T>* Child(Node<T> *u, bool side, int version=INT_MAX);
+	// Para ser usado em operações de acesso.
+	Node<T>* Child(Node<T> *u, bool side, int version);
+
+	// Retorna o filho side de u mais recente.
+	// Para ser usado em operações de modificação.
+	Node<T>* Child(Node<T> *u, bool side);
 
 	/* Muda o filho side de u para v, possivelmente propagando essa mudança, e retorna o ponteiro
 	 * para o nó que atualmente representa u. rb é a árvore à qual este nó pertence.
@@ -80,7 +88,11 @@ template<class T> struct RedBlackTree {
 
 	/* Copia um nó e retorna sua cópia (assume que o nó é ativo no momento da chamada)
 	 * Se necessário, propaga a cópia */
-	Node<T>* Copy(Node<T> *u, int version);
+	Node<T>* Copy(Node<T> *u);
+
+	/* Rotaciona em torno de u de forma que o filho side de u toma o lugar de u.
+	 * Assume que tal filho existe. */
+	void Rotate(Node<T> *u, bool side);
 };
 
 // ||=============================================================================||
@@ -95,41 +107,45 @@ template<class T> inline bool isRed(Node<T> *n) {
 	else return n->red;
 }
 
+template<class T> Node<T>* RedBlackTree<T>::Active(Node<T> *u) {
+	if(u == nullptr || u->copy == nullptr) return u;
+	else return u->copy;
+}
+
 template<class T> Node<T>* RedBlackTree<T>::Child(Node<T> *u, bool side, int version) {
 	if(u->extraTimestamp != -1 && u->extraSide == side && version >= u->extraTimestamp)
 		return u->extra;
 	return u->child[side];
 }
 
+template<class T> Node<T>* RedBlackTree<T>::Child(Node<T> *u, bool side) {
+	return Child(Active(u), side, current());
+}
+
 template<class T> Node<T>* RedBlackTree<T>::Modify(Node<T> *u, bool side, Node<T> *v) {
-	int version = versionCount();
-	assert(u->copy == nullptr);
-	if(u->copy != nullptr)
-		u = u->copy;
-	if(u->timestamp < version) {
-		u->copy = Copy(u, version);
+	u = Active(u);
+	if(u->timestamp < current()) {
+		u->copy = Copy(u);
 		u = u->copy;
 	}
 	if(u->child[side] != nullptr)
 		u->child[side]->parent = nullptr;
-	u->child[side] = v;
-	if(v != nullptr)
-		v->parent = u;
-	assert(!Child(u, 0) || !Child(u, 0)->copy);
-	assert(!Child(u, 1) || !Child(u, 1)->copy);
+	u->child[side] = Active(v);
+	if(u->child[side] != nullptr)
+		u->child[side]->parent = u;
 	return u;
 }
 
-template<class T> Node<T>* RedBlackTree<T>::Copy(Node<T> *u, int version) {
+template<class T> Node<T>* RedBlackTree<T>::Copy(Node<T> *u) {
 	Node<T> *u_ = new Node<T>(*u);
 	//std::cerr << "copying  " << u << " to " << u_ << std::endl;
 	if(u->extraTimestamp != -1) {
 		u_->child[u->extraSide] = u->extra;
 		u_->extraTimestamp = -1;
 	}
-	u_->timestamp = version;
-	if(roots[version] == u)
-		roots[version] = u_;
+	u_->timestamp = current();
+	if(roots[current()] == u)
+		roots[current()] = u_;
 	for(int side = 0; side <= 1; side++)
 		if(u_->child[side] != nullptr)
 			u_->child[side]->parent = u_;
@@ -138,15 +154,15 @@ template<class T> Node<T>* RedBlackTree<T>::Copy(Node<T> *u, int version) {
 		Node<T> *v = u_->parent;
 		assert(!v->copy);
 		bool side = (Child(v, 1) == u);
-		if(v->timestamp == version)
+		if(v->timestamp == current())
 			v->child[side] = u_;
 		else if(v->copy != nullptr) assert(false);
 		else if(v->extraTimestamp == -1) {
-			v->extraTimestamp = version;
+			v->extraTimestamp = current();
 			v->extra = u_;
 			v->extraSide = side;
 		} else {
-			v->copy = Copy(v, version);
+			v->copy = Copy(v);
 			v->copy->child[side] = u_;
 			u_->parent = v->copy;
 		}
@@ -158,71 +174,58 @@ template<class T> const T* RedBlackTree<T>::Find(int time, const T& val) {
 	Node<T> *u = roots[time];
 	while(u != nullptr && (u->value < val || val < u->value))
 		u = Child(u, u->value < val, time);
-	return u? &u->value : nullptr;
+	if(u == nullptr) return nullptr;
+	else return &u->value;
 }
 
-namespace helper { // funções auxiliares
-/* Rotaciona em torno de x de forma que o filho side de x toma o lugar de x.
- * Assume que tal filho existe. Retorna o nó x, ou sua cópia, se foi necessário copiar. */
-template<class T> Node<T>* rotate(Node<T> *x, bool side, RedBlackTree<T> &rb) {
-	//std::cerr << "rotate " << x << "  " << side << std::endl;
-	Node<T> *y = rb.Child(x, side);
-	assert(y != nullptr);
-	Node<T> *b = rb.Child(y, !side);
-	if(b != nullptr) y = rb.Modify(y, !side, nullptr);
-	x = rb.Modify(x->newestVersion(), side, b);
-	if(x->parent != nullptr) rb.Modify(x->parent, rb.Child(x->parent, 1) == x, y);
+template<class T> void RedBlackTree<T>::Rotate(Node<T> *u, bool side) {
+	Node<T> *v = Child(u, side);
+	Node<T> *b = Child(v, !side);
+	Modify(v, !side, nullptr);
+	Modify(u, side, b);
+	u = Active(u);
+	if(u->parent != nullptr)
+		Modify(u->parent, (Child(u->parent, 1) == u), v);
+	else roots[current()] = Active(v);
+	Modify(v, !side, u);
+}
+
+template<class T> void RedBlackTree<T>::Insert(const T& value) {
+	roots.push_back(roots.back());
+	Node<T> *x = new Node<T>(value, current());
+	if(roots[current()] == nullptr)
+		roots[current()] = x;
 	else {
-		y->parent = nullptr;
-		assert(x == rb.roots.back());
-		rb.roots.back() = y;
+		Node<T> *u = roots[current()], *v;
+		while(u != nullptr) {
+			v = u;
+			u = Child(u, (v->value < value));
+		}
+		Modify(v, (v->value < value), x);
 	}
-	y = rb.Modify(y, !side, x);
-	return x;
-}
-
-// Arruma violações rubronegras
-template<class T> void fixUp(Node<T> *z, RedBlackTree<T> &rb) {
-	while(z->parent != nullptr && z->parent->parent != nullptr && isRed(z->parent)) {
-		Node<T> *y = z->parent->parent;
-		if(isRed(rb.Child(y, 0)) && isRed(rb.Child(y, 1))) { // caso 1
-			y->red = true;
-			rb.Child(y, 0)->red = false;
-			rb.Child(y, 1)->red = false;
-			z = y;
-		} else {
-			bool side1 = (rb.Child(y, 1) == z->parent);
-			bool side2 = (rb.Child(z->parent, 1) == z);
-			if(side1 != side2) z = rotate(z->parent, side2, rb); // caso 2 -> caso 3
-			z = rotate(z->parent->parent, side1, rb);
+	while(x->red && x->parent != nullptr && x->parent->red) {
+		Node<T> *y = x->parent;
+		Node<T> *z = y->parent;
+		bool sideX = (x == Child(y, 1));
+		bool sideY = (y == Child(z, 1));
+		Node<T> *w = Child(z, !sideY);
+		if(w != nullptr && w->red) {
 			z->red = true;
-			z->parent->red = false;
+			y->red = false;
+			w->red = false;
+			x = z;
+		} else {
+			if(sideX != sideY) {
+				Rotate(y, sideX);
+				std::swap(x, y);
+			}
+			Rotate(z, sideY);
+			Active(z)->red = true;
+			Active(y)->red = false;
+			break;
 		}
 	}
-}
-}
-
-template<class T> void RedBlackTree<T>::insert(const T& val) {
-	//std::cerr << "======== INSERT " << val << std::endl;
-	int time = versionCount() + 1;
-	if(roots.back() == nullptr) {
-		Node<T> *r = new Node<T>(val, time);
-		r->red = false;
-		//std::cerr << "add " << r << std::endl;
-		roots.push_back(r);
-		return;
-	}
-	roots.push_back(roots.back());
-	Node<T> *u = roots.back(), *v = nullptr;
-	while(u != nullptr) {
-		v = u;
-		//std::cerr << u << " to " << Child(u, u->value < val) << std::endl;
-		u = Child(u, u->value < val);
-	}
-	v = Modify(v, v->value < val, u = new Node<T>(val, time));
-	helper::fixUp(u, *this);
-	//std::cerr << "roots.back() = " << u << " prev " << roots[roots.size() - 2] << std::endl;
-	roots.back()->red = false; // Arrumando a regra 1
+	roots[current()]->red = false;
 }
 
 namespace helper {
@@ -241,7 +244,8 @@ template<class T> void transplant(Node<T> *u, Node<T> *v, RedBlackTree<T> &rb) {
 template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
 	while(!isRed(rb.Child(z, side))) {
 		if(isRed(rb.Child(z, !side))) { // caso 1
-			z = rotate(z, !side, rb);
+			rb.Rotate(z, !side);
+			z = rb.Active(z);
 			std::swap(z->red, z->parent->red);
 			assert(rb.Child(z, !side));
 		}
@@ -258,11 +262,13 @@ template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
 		} else {
 			if(!isRed(rb.Child(w, !side))) { // caso 3
 				assert(isRed(rb.Child(w, side)));
-				w = rotate(w, side, rb);
+				rb.Rotate(w, side);
+				w = rb.Active(w);
 				std::swap(w->red, w->parent->red);
 				w = w->parent;
 			}
-			z = rotate(z->newestVersion(), !side, rb);
+			rb.Rotate(z->newestVersion(), !side);
+			z = rb.Active(z);
 			std::swap(z->red, z->parent->red);
 			rb.Child(z->parent, !side)->red = false;
 			return;

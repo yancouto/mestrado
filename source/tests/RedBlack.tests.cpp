@@ -52,8 +52,8 @@ template<class T> void check(RedBlackTree<T> &rb) {
 
 TEST(RBSimple, SimpleDuplicate) {
 	RedBlackTree<int> rb;
-	rb.insert(1); check(rb);
-	rb.insert(1); check(rb);
+	rb.Insert(1); check(rb);
+	rb.Insert(1); check(rb);
 	Node<int> *u = rb.roots.back();
 	EXPECT_TRUE((rb.Child(u, 0) != nullptr) ^ (rb.Child(u, 1) != nullptr)) << "Exatamente um"
 	             << " filho";
@@ -61,24 +61,24 @@ TEST(RBSimple, SimpleDuplicate) {
 
 TEST(RBSimple, Case3) {
 	RedBlackTree<int> rb;
-	rb.insert(1); check(rb);
-	rb.insert(3); check(rb);
-	rb.insert(2); check(rb);
+	rb.Insert(1); check(rb);
+	rb.Insert(3); check(rb);
+	rb.Insert(2); check(rb);
 }
 
 TEST(RBSimple, Insert) {
 	RedBlackTree<int> rb1;
 	for(int i = 0; i < 10; i++)
-		rb1.insert(i);
+		rb1.Insert(i);
 	check(rb1);
 	for(int i = 9; i >= 0; i--)
-		EXPECT_FALSE(rb1.Find(rb1.versionCount(), i) == nullptr);
+		EXPECT_FALSE(rb1.Find(rb1.current(), i) == nullptr);
 }
 
 TEST(RBSimple, KeepsRedBlack) {
 	RedBlackTree<int> rb;
 	for(int i = 0; i < 1000; i++) {
-		rb.insert(rnd(1, 800));
+		rb.Insert(rnd(1, 800));
 		check(rb);
 	}
 }
@@ -87,13 +87,13 @@ TEST(RBSimple, Strings) {
 	using std::string;
 	RedBlackTree<string> rb;
 	for(string s : {"oi", "tchau", "teste", "aaa", "aa"}) {
-		rb.insert(s);
+		rb.Insert(s);
 		check(rb);
 	}
 	for(string s : {"tchau", "aaa", "teste", "aa", "oi"})
-		EXPECT_TRUE(rb.Find(rb.versionCount(), s) != nullptr);
+		EXPECT_TRUE(rb.Find(rb.current(), s) != nullptr);
 	for(string s : {"a", "aaaa", "oi!", "lalala", "tcha", "chau"})
-		EXPECT_FALSE(rb.Find(rb.versionCount(), s) != nullptr);
+		EXPECT_FALSE(rb.Find(rb.current(), s) != nullptr);
 }
 
 // Coloca os valores em um vetor ordenado
@@ -108,7 +108,7 @@ void traverse(Node<int> *u, std::vector<int> &v, RedBlackTree<int> &rb) {
 void testSort(std::vector<int> &v) {
 	RedBlackTree<int> rb;
 	for(int x : v)
-		rb.insert(x);
+		rb.Insert(x);
 	check(rb);
 	std::sort(v.begin(), v.end()); // STL sort
 	std::vector<int> ans;
@@ -153,7 +153,7 @@ void testPersistence(const std::vector<int> &v) {
 	int n = v.size();
 	RedBlackTree<int> rb;
 	for(int i = 0; i < n; i++)
-		rb.insert(v[i]);
+		rb.Insert(v[i]);
 	for(int q = 0; q < 2 * n; q++) {
 		int x = rnd(0, n - 1);
 		int y = rnd(0, n - 1);
@@ -200,7 +200,7 @@ void testPersRem(const std::vector<int> &v, int k) {
 	int n = v.size();
 	RedBlackTree<int> rb;
 	for(int i = 0; i < n; i++) {
-		rb.insert(v[i]);
+		rb.Insert(v[i]);
 		if(i >= k) rb.erase(v[i - k]);
 	}
 	for(int q = 0; q < 2 * n; q++) {
@@ -230,13 +230,13 @@ TEST(RBPersistence, WithRemove) {
 TEST(RBRemove, Simpler) {
 	RedBlackTree<int> rb;
 	EXPECT_FALSE(rb.erase(10) != nullptr); check(rb);
-	rb.insert(12); check(rb);
+	rb.Insert(12); check(rb);
 	EXPECT_TRUE(rb.erase(12) != nullptr); check(rb);
 	EXPECT_FALSE(rb.erase(12) != nullptr); check(rb);
-	rb.insert(1); check(rb);
-	rb.insert(2); check(rb);
-	rb.insert(3); check(rb);
-	rb.insert(4); check(rb);
+	rb.Insert(1); check(rb);
+	rb.Insert(2); check(rb);
+	rb.Insert(3); check(rb);
+	rb.Insert(4); check(rb);
 	EXPECT_TRUE(rb.erase(2) != nullptr); check(rb);
 	EXPECT_TRUE(rb.erase(1) != nullptr); check(rb);
 }
@@ -244,40 +244,40 @@ TEST(RBRemove, Simpler) {
 TEST(RBRemove, Simple) {
 	RedBlackTree<int> rb;
 	for(int x : {1, 5, 7, 10})
-		rb.insert(x);
+		rb.Insert(x);
 	for(int x : {5, 10}) {
 		EXPECT_TRUE(rb.erase(x) != nullptr) << "should contain";
 		check(rb);
 	}
 	for(int x : {1, 7, 1, 1})
-		EXPECT_TRUE(rb.Find(rb.versionCount(), x) != nullptr) << "should find";
+		EXPECT_TRUE(rb.Find(rb.current(), x) != nullptr) << "should find";
 	for(int x : {10, -1, 5, 12})
-		EXPECT_FALSE(rb.Find(rb.versionCount(), x) != nullptr) << "should not find";
+		EXPECT_FALSE(rb.Find(rb.current(), x) != nullptr) << "should not find";
 }
 
 TEST(RBRemove, Odds) {
 	RedBlackTree<long long> rb;
 	for(int i = 0; i <= 100; i++)
-		rb.insert(i);
+		rb.Insert(i);
 	check(rb);
 	for(int i = 1; i <= 100; i += 2)
 		EXPECT_TRUE(rb.erase(i) != nullptr) << "should remove";
 	check(rb);
 	for(int i = 100; i >= 0; i--)
-		EXPECT_EQ(rb.Find(rb.versionCount(), i) != nullptr, (i % 2) == 0);
+		EXPECT_EQ(rb.Find(rb.current(), i) != nullptr, (i % 2) == 0);
 }
 
 TEST(RBRemove, Invalid) {
 	RedBlackTree<char> rb;
 	for(int c = 'a'; c <= 'z'; c++)
-		rb.insert(c);
+		rb.Insert(c);
 	for(int c : {'a', 'z', 'c', 'a', 'a', '?'})
 		rb.erase(c);
 	EXPECT_TRUE(rb.erase('b') != nullptr);
 	EXPECT_FALSE(rb.erase('=') != nullptr);
 	check(rb);
 	for(int c = 'a' - 12; c <= 'z' + 7; c++)
-		EXPECT_EQ(rb.Find(rb.versionCount(), c) != nullptr, c > 'c' && c < 'z');
+		EXPECT_EQ(rb.Find(rb.current(), c) != nullptr, c > 'c' && c < 'z');
 }
 
 TEST(RBRemove, Repeated) {
@@ -286,7 +286,7 @@ TEST(RBRemove, Repeated) {
 	for(int i = 0; i < 50000; i++) {
 		int x = rnd(0, 2);
 		ct[x]++;
-		rb.insert(x);
+		rb.Insert(x);
 	}
 	int p[3] = {0, 1, 2};
 	while(ct[0] + ct[1] + ct[2] > 0) {
@@ -303,7 +303,7 @@ TEST(RBRemove, Repeated) {
 TEST(RBRemove, Breaks) {
 	RedBlackTree<int> rb;
 	for(int x : {3, 5, 1, 4, 2, 6}) {
-		rb.insert(x);
+		rb.Insert(x);
 		check(rb);
 	}
 	for(int x : {4, 5, 6}) {
@@ -327,13 +327,13 @@ void doLarge(bool isOrdered) {
 			v.pop_back();
 		} else if(p >= 85 && v.size() > 0) {
 			int j = rnd(0, v.size() - 1);
-			EXPECT_TRUE(rb.Find(rb.versionCount(), v[j]) != nullptr);
+			EXPECT_TRUE(rb.Find(rb.current(), v[j]) != nullptr);
 			int x = rand();
-			EXPECT_EQ(rb.Find(rb.versionCount(), x) != nullptr, s.find(x) != s.end());
+			EXPECT_EQ(rb.Find(rb.current(), x) != nullptr, s.find(x) != s.end());
 		} else {
 			if(isOrdered) v.push_back(i);
 			else v.push_back(rand() * rand() + rand());
-			rb.insert(v.back());
+			rb.Insert(v.back());
 			s.insert(v.back());
 		}
 		if((i % 100000) == 0) check(rb);

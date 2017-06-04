@@ -249,7 +249,7 @@ Rotações são modificações locais de nós de uma ABB que mantém as propried
 \Tree [.$v$ [.$u$ \node[n]{$\alpha$}; \node[n]{$\beta$}; ] \node[n]{$\gamma$}; ]
 \end{scope}
 
-%\draw (0cm, 0cm) grid (6cm, 3cm);
+%\draw (0cm, 9cm) grid (6cm, 3cm);
 \draw[->] (2cm, 0cm) -- node [n, yshift=1em] {\Call{Rotate}{$u, 1$}}  (4cm, 0cm);
 \draw[->] (4cm, -3em) -- node [n, yshift=1em] {\Call{Rotate}{$v, 0$}}  (2cm, -3em);
 
@@ -394,14 +394,16 @@ O Código~\ref{lst:rotrb} mostra a implementação da função~\textsc{Rotate}, 
 \begin{algorithmic}[1]
 \Require $u$ deve ter um filho~$\side$ na versão~$\cur$.
 \Function{Rotate}{$u, \side$}
-	\State $u = \Call{Active}{u}$ \label{line:rotrb:active}
 	\State $v = \Call{Child}{u, \side}$
-	\If{$u.\parent \neq \Null$}
-		\State \Call{Modify}{$u.\parent, [\Call{Child}{u.\parent, 1} = u], v$}
-	\EndIf
 	\State $\beta = \Call{Child}{v, \Not\ \side}$
 	\State \Call{Modify}{$v, \Not\ \side, \Null$}
 	\State \Call{Modify}{$u, \side, \beta$}
+	\State $u = \Call{Active}{u}$ \label{line:rotrb:active}
+	\If{$u.\parent \neq \Null$}
+		\State \Call{Modify}{$u.\parent, [\Call{Child}{u.\parent, 1} = u], v$}
+	\Else
+		\State $\roots[\cur] = v$ \Comment{Se~$x$ não tiver pai este é a raiz.}
+	\EndIf
 	\State \Call{Modify}{$v, \Not\ \side, u$}
 \EndFunction
 \end{algorithmic}
