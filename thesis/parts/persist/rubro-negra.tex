@@ -148,14 +148,13 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 	\EndIf
 \EndFunction
 
-% Precisa revisar depois do commit
 \Function{Copy}{$u$}
 	\State $u' = \Call{RawCopy}{u}$
+	\State $u'.\ts = \cur$
 	\If{$u.\eTs \neq -1$}
 		\State $u'.\child[u.\eSide] = u.\extra$
 		\State $u'.\eTs = -1$ \Comment{Limpando o campo extra}
 	\EndIf
-	\State $u'.\ts = \cur$
 	\If{$\roots[\cur] = u$}
 		\State $\roots[\cur] = u'$
 	\EndIf

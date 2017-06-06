@@ -140,7 +140,7 @@ Se for possível implementar a estrutura desta forma, ela se torna totalmente pe
 
 Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha}, onde nunca é necessário alterar nenhum nó. Quando a estrutura não funciona dessa forma, é possível tentar ``forçar'' isso, copiando os nós que forem ser modificados (e seus ancestrais). A estrutura recursiva de deque do Capítulo~\ref{cap:deque2} faz isso, copiando todos os nós acessados durante um~\textsc{Push} ou~\textsc{Pop}.
 
-Para fazer isso em uma estrutura qualquer, queremos garantir que, sempre que adicionamos um nó~$u$ ao conjunto de acessos, todos seus ancestrais já estão neste conjunto. Ao adicionar esse nó, na verdade adicionamos uma cópia~$u'$ dele, e para todo nó~$v$ no conjunto de acessos que tem um ponteiro para~$u$, trocamos este ponteiro por~$u'$.
+Para fazer isso em uma estrutura qualquer, supomos que, sempre que adicionamos um nó~$u$ ao conjunto de acessos, todos seus ancestrais já estão neste conjunto. Ao adicionar esse nó, na verdade adicionamos uma cópia~$u'$ dele, e para todo nó~$v$ no conjunto de acessos que tem um ponteiro para~$u$, trocamos este ponteiro por~$u'$.
 
 Note que nós no conjunto de acessos podem ser modificados, mas o importante é que nenhum criado em uma versão anterior é modificado, logo todas essas versões continuam funcionando.
 
@@ -182,13 +182,13 @@ edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt}
 	\caption{Adição de um nó~$f$ à direita de~$b$ com uma implementação totalmente funcional. Em cinza, os nós criados ou copiados durante a adição.} \label{fig:totfunc_ex}
 \end{figure}
 
-A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir de~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, essa implementação não seria possível.
+A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir de~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, uma implementação dessa forma não seria possível.
 
-Supomos que, ao adicionar um nó ao conjunto de acessos, todos seus ancestrais já estavam neste conjunto, portanto não existe caminho de um nó não copiado para um nó que tem uma cópia no conjunto de acessos. Assim, todos os nós antingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, são exatamente os nós que seriam atingíveis se tivéssemos copiado a estrutura inteira. Logo, a estrutura ligada funciona e é totalmente persistente. Note que na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado (os nós~$a$ e~$b$).
+Supusemos que, ao adicionar um nó ao conjunto de acessos, todos seus ancestrais já estavam neste conjunto (na verdade, suas cópias), portanto não existe caminho de um nó não copiado para um nó que tem uma cópia no conjunto de acessos. Assim, todos os nós antingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, são exatamente os nós que seriam atingíveis se tivéssemos copiado a estrutura inteira. Logo, a estrutura ligada funciona e é totalmente persistente. Note que na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado (os nós~$a$ e~$b$).
 
 Sem essa suposição, poderia ser possível alcançar a versão antiga de um nó que já foi copiado. Este foi o problema encontrado na primeira ideia de implementação da deque de Kaplan e Tarjan, como discutido na Seção~\ref{sec:implfunc}.
 
-Note que, se os ponteiros da estrutura formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, cada nó tem exatamente um caminho até ele, logo a suposição sobre adicionar um nó ao conjunto de acessos é sempre satisfeita, não importa a ordem na qual são feitas as adições. A estrutura discutida no Capítulo~\ref{cap:deque2} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a estrutura deste capítulo é modificada para se tornar uma árvore direcionada.
+Note que, se os ponteiros da estrutura formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, cada nó tem exatamente um caminho até ele, logo a suposição sobre adicionar um nó ao conjunto de acessos é sempre satisfeita, não importa a ordem na qual são feitas as adições ao conjunto de acessos. A estrutura discutida no Capítulo~\ref{cap:deque2} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a estrutura deste capítulo é modificada para se tornar uma árvore direcionada.
 
 Assumindo que, ao adicionar um nó ao conjunto de acesso, as mudanças de ponteiros possam ser feitas em tempo constante (trivial em uma floresta direcionada), se a estrutura segue as restrições discutidas, esse método torna a estrutura totalmente persistente com overhead de consumo de tempo de~$\Oh(M+A)$ e espaço~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar o nó mesmo que este não vá ser modificado.
 
@@ -196,7 +196,7 @@ Assumindo que, ao adicionar um nó ao conjunto de acesso, as mudanças de pontei
 
 \section{Fat node}
 
-É possível alcançar persistência parcial em uma estrutura ligada genérica aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
+É possível tornar uma estrutura ligada parcialmente persistente aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
 
 Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor de pares, que guarda pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou aquele campo para o valor~$v$. Em vez de modificar um campo de um objeto, adiciona-se um par no vetor correspondente, indicando a versão atual e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado (considerando apenas os índices).
 
@@ -348,31 +348,31 @@ Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica 
 \caption{Cópia de um nó na versão~$\cur$, atualizando os ponteiros que apontam para ele.} \label{lst:nc_copy}
 \begin{algorithmic}[1]
 
-\Function{Copy}{$u, \V{version}$}
+\Function{Copy}{$u$}
 	\State $u' = \Call{RawCopy}{u}$ \Comment{A função~\Call{RawCopy}{$u$} copia todos os campos de~$u$.}
-	\State $u'.\V{changes} = \{\}$
-	\State $u'.\ts = \V{version}$
+	\State $u'.\V{changes} = \{\}$ \label{line:copy:chngb}
+	\State $u'.\ts = \cur$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
 		\State $u'.\V{field}' = \V{value}'$
-	\EndFor
-	\If{$u$ é nó de acesso}
+	\EndFor \label{line:copy:chnge}
+	\If{$u$ é nó de acesso} \label{line:copy:if1}
 		\State Trocar~$u$ por~$u'$ na posição de vetor correspondente.
 	\EndIf
-	\For{$\V{pointer} \in$ campos de ponteiros}
-	\If{$u'.\V{pointer} \neq \Null$}
-	\State \Call{ChangeParent}{$u'.\V{pointer}, u, u'$}
+	\For{$\V{pointer} \in$ campos de ponteiros} \label{line:copy:for1}
+		\If{$u'.\V{pointer} \neq \Null$}
+			\State \Call{ChangeParent}{$u'.\V{pointer}, u, u'$}
 		\EndIf
 	\EndFor
 	\State $u.\V{parents} = $ vetor apenas com~\keyword{null}s
 	\For{$i = 1 \To |u'.\V{parents}|$} \label{line:copy:parents}
 		\State $v = u'.\V{parents}[i]$
 		\State $\V{field} = $ campo de~$v$ tal que~$v.\V{field} = u$.
-		\If{$v.\ts = \V{version}$} \Comment{$u'.\V{parents}$ não precisa ser atualizado pois foi copiado de~$u$.}
+		\If{$v.\ts = \cur$}
 			\State $v.\V{field} = u'$
 		\ElsIf{$|v.\V{changes}| < \V{in}$}
-			\State $v.\V{changes}.\Call{Add}{(\V{version}, \V{field}, u')}$
+			\State $v.\V{changes}.\Call{Add}{(\cur, \V{field}, u')}$
 		\Else
-			\State $v.\cp = \Call{Copy}{v, \V{version}}$ \label{line:copy:copy}
+			\State $v.\cp = \Call{Copy}{v}$ \label{line:copy:copy}
 			\State $v.\cp.\V{field} = u'$
 			\State $u'.\V{parents}[i] = v.\cp$
 		\EndIf
@@ -385,12 +385,18 @@ Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica 
 
 %%% EXPLICAR BEM MELHOR A FUNCAO COPY
 
-Assumimos que a função~\Call{RawCopy}{$u$} faz e retorna um novo nó com todos os campos iguais os de~$u$.
-A função~\textsc{Copy} então ``aplica'' todas as modificações em~$\V{changes}$ ao nó~$u'$, e modifica todos os ponteiros de volta dos nós que ele aponta. Depois disso, resta modificar os nós que apontam para~$u$, para fazê-los apontar para~$u'$. Esse passo pode fazer necessária uma cópia de tal nó, usando a própria função~\textsc{Copy}. Como cada nó é copiado no máximo uma vez por versão, a função sempre termina.
+Assumimos que a função~\Call{RawCopy}{$u$} faz e retorna um novo nó com todos os campos iguais os de~$u$. As linhas~\nref{line:copy:chngb}-\nref{line:copy:chngb} então modificam~$u'$ para este representar a versão mais atual de~$u$, aplicando todas as modificações de~$u.\changes$ e atualizando o campo~$\ts$. O~\keyword{if} da linha~\nref{line:copy:if1} lida com o caso em que~$u$ era um nó de entrada, já que neste caso~$u'$ passa a ser o nó de entrada para a versão~$\changes$. O~\keyword{for} da linha~\nref{line:copy:for1} então muda os ponteiros de volta dos nós que~$u$ aponta para, já que agora~$u'$ é o nó ativo que aponta para eles. Por último, o~\keyword{for} da linha~\nref{line:copy:parents} modifica os ponteiros de nós ativos que apontavam para~$u$, fazendo-os apontar para~$u'$. Seja~$v$ um nó ativo tal que~$\Call{Access}{v, \V{field}} = u$, queremos que~$\Call{Access}{v, \V{field}} = u'$. Isso se reduz a três casos:
+\begin{enumerate}
+\item $v$ foi criado nessa versão --- Basta modificar diretamente o campo~$\V{field}$ em~$v$.
+\item $v$ tem espaço livre em~$v.\changes$ --- Adicionamos a modificação ao vetor~$\changes$, ou seja, adicionamos a tripla~$(\V{field}, \cur, u')$.
+\item $v$ não tem espaço livre em~$v.\changes$ --- Criamos uma cópia de~$v$, usando recursivamente a função~\textsc{Copy}, modificamos o campo~$\V{field}$ desta cópia, e atualizamos o vetor~$\parents$ de~$u'$ (que ainda aponta para~$v$ e não~$v.\cp$).
+\end{enumerate}
+
+Como cada nó é copiado no máximo uma vez por versão, a função sempre termina.
 
 \subsection{Análise de espaço e tempo}
 
-A ideia do método é copiar os nós quando fazemos modificações, mas guardam-se algumas versões no mesmo nó para diminuir o número de cópias necessárias. É claro que, aumentando o tamanho do vetor~$\V{changes}$, o número de cópias diminui. Vamos mostrar que ter tamanho~$\V{in}$ é o bastante para que o método consuma espaço amortizado~$\Oh(1)$ por passo de modificação.
+A ideia do método é copiar os nós quando fazemos modificações em passos de modificação, mas guardam-se algumas modificações no mesmo nó para diminuir o número de cópias necessárias. É claro que, aumentando o tamanho do vetor~$\V{changes}$, o número de cópias diminui. Vamos mostrar que ter tamanho~$\V{in}$ é o bastante para que o método consuma espaço amortizado~$\Oh(1)$ por passo de modificação.
 
 Utilizaremos o método do potencial, isso é, seja~$E_i$ o estado da estrutura (persistente) na~$i$-ésima versão, ou seja, depois da~$i$-ésima operação de modificação. Vamos associar um valor não negativo~$\Phi(E_i)$ a cada uma das versões da estrutura, tal que~$\Phi(E_0) = 0$. Seja~$O_i$ o número de nós criados pelo método descrito na~$i$-ésima operação de modificação, então
 $$ \sum\limits_{i=1}^{m}{O_i + \Phi(E_i) - \Phi(E_{i-1})} = \left(\sum\limits_{i=1}^m{O_i}\right) + \Phi(E_m) - \Phi(E_0) \geq \sum\limits_{i=1}^m{O_i} $$
