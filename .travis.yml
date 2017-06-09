@@ -1,9 +1,9 @@
 sudo: required
 dist: trusty
 branches:
-	only:
-		- master
+    only:
+        - master
 before_install:
 - sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
 script:
-	- make -C thesis
+- make -C thesis
