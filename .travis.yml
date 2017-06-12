@@ -7,3 +7,4 @@ before_install:
 - sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
 script:
 - make -C thesis
+- make test_all -C source

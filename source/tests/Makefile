@@ -77,7 +77,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 TESTS = $(basename $(wildcard **/*.cpp *.cpp))
 
-.PHONY: clean .gitignore
+.PHONY: clean .gitignore test_all
 clean:
 	rm -f all_tests $(TESTS) gtest.a gtest_main.a **/*.o *.o
 
