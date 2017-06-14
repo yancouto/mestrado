@@ -66,7 +66,7 @@ template<class T> struct RedBlackTree {
 	/* Remove o objeto val na ABB em sua versão mais atual, e retorna um ponteiro constante para
 	 * o objeto, se ele tiver sido removido, e nullptr caso contrário.
 	 * Tempo: O(lg(tamanho da ABB)) */
-	const T* erase(const T& val);
+	const T* Remove(const T& val);
 
 // private: TODO make it private in the future
 
@@ -93,6 +93,12 @@ template<class T> struct RedBlackTree {
 	/* Rotaciona em torno de u de forma que o filho side de u toma o lugar de u.
 	 * Assume que tal filho existe. */
 	void Rotate(Node<T> *u, bool side);
+
+	/* Substitui u por x, que pode ser nulo. */
+	void Transplant(Node<T> *u, Node<T> *x);
+
+	/* Retorna o menor elemento da subárvore de u, no tempo atual */
+	Node<T>* MinElement(Node<T> *u);
 };
 
 // ||=============================================================================||
@@ -229,19 +235,8 @@ template<class T> void RedBlackTree<T>::Insert(const T& value) {
 }
 
 namespace helper {
-/* Substitui u por v, assume que v não é descendente de u. v pode ser nulo.
- * Muda apenas os pais dos vxs, nem u nem v são invalidados pelo procedimento */
-template<class T> void transplant(Node<T> *u, Node<T> *v, RedBlackTree<T> &rb) {
-	if(v != nullptr && v->parent != nullptr) {
-		rb.Modify(v->parent, rb.Child(v->parent, 1) == v, nullptr);
-		v->parent = nullptr;
-	}
-	assert(u->copy == nullptr);
-	if(u->parent != nullptr) rb.Modify(u->parent, u == rb.Child(u->parent, 1), v);
-	else rb.roots.back() = v;
-	u->parent = nullptr;
-}
 template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
+	z = rb.Active(z);
 	while(!isRed(rb.Child(z, side))) {
 		if(isRed(rb.Child(z, !side))) { // caso 1
 			rb.Rotate(z, !side);
@@ -278,48 +273,57 @@ template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
 }
 }
 
-template<class T> const T* RedBlackTree<T>::erase(const T& val) {
+template<class T> void RedBlackTree<T>::Transplant(Node<T> *u, Node<T> *x) {
+	x = Active(x);
+	if(x != nullptr && x->parent != nullptr)
+		Modify(x->parent, (Child(x->parent, 1) == x), nullptr);
+	u = Active(u);
+	Node<T> *v = u->parent;
+	if(v != nullptr)
+		Modify(v, (Child(v, 1) == u), x);
+	else
+		roots[current()] = x;
+	if(x != nullptr)
+		x->red = u->red;
+}
+
+template<class T> Node<T>* RedBlackTree<T>::MinElement(Node<T> *u) {
+	while(Child(u, 0) != nullptr)
+		u = Child(u, 0);
+	return u;
+}
+
+template<class T> const T* RedBlackTree<T>::Remove(const T& val) {
+	roots.push_back(roots.back());
 	Node<T> *u = roots.back();
 	while(u != nullptr && (u->value < val || val < u->value))
 		u = Child(u, u->value < val);
 	if(u == nullptr) return nullptr;
 	const T* ret = &u->value;
-	roots.push_back(roots.back());
+	Node<T> *v = u->parent;
 	if(Child(u, 1) == nullptr) {
-		Node<T> *l = Child(u, 0);
-		if(l != nullptr) u = Modify(u, 0, nullptr);
-		Node<T> *p = u->parent;
-		bool side = (p && Child(p, 1) == u);
-		helper::transplant(u, l, *this);
-		if(!isRed(u) && p != nullptr)
-			helper::deleteFixUp(p->newestVersion(), side, *this);
-	} else if(Child(Child(u, 1), 0) == nullptr) {
-		Node<T> *r = Child(u, 1);
-		u = Modify(u, 1, nullptr);
-		helper::transplant(u, r, *this);
-		r = Modify(r, 0, Child(u, 0));
-		bool was_black = !isRed(r);
-		r->red = u->red;
-		if(was_black)
-			helper::deleteFixUp(r, 1, *this);
+		bool needFix = (v != nullptr && !u->red && Child(u, 0) == nullptr);
+		Transplant(u, Child(u, 0));
+		if(needFix)
+			helper::deleteFixUp(v, (Child(v, 1) == nullptr), *this);
 	} else {
-		Node<T> *y = Child(u, 1);
-		while(Child(y, 0) != nullptr)
-			y = Child(y, 0);
-		Node<T> *yr = Child(y, 1), *yp = y->parent;
-		if(yr != nullptr) y = Modify(y, 1, nullptr);
-		helper::transplant(y, yr, *this); // nó y está isolado
-
-		u = u->newestVersion();
-		helper::transplant(u, y, *this);
-		y = Modify(y, 1, Child(u, 1));
-		y = Modify(y, 0, Child(u, 0));
-		bool was_black = !isRed(y);
-		y->red = u->red;
-		yp = yp->newestVersion();
-		if(was_black) helper::deleteFixUp(yp, Child(yp, 1) == yr, *this);
+		Node<T> *x = MinElement(Child(u, 1));
+		Node<T> *y;
+		if(x == Child(u, 1)) y = x;
+		else y = x->parent;
+		bool needFix = (!x->red && Child(x, 1) == nullptr);
+		Transplant(x, Child(x, 1));
+		Transplant(u, x);
+		for(int side = 0; side <= 1; side++) {
+			Node<T> *child = Child(u, side);
+			Modify(u, side, nullptr);
+			Modify(x, side, child);
+		}
+		if(needFix)
+			helper::deleteFixUp(y, (Child(y, 1) == nullptr), *this);
 	}
-	if(roots.back() != nullptr) roots.back()->red = false;
+	if(roots[current()] != nullptr)
+		roots[current()]->red = false;
 	return ret;
 }
 

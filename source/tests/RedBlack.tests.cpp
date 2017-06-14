@@ -56,7 +56,7 @@ TEST(RBSimple, SimpleDuplicate) {
 	rb.Insert(1); check(rb);
 	Node<int> *u = rb.roots.back();
 	EXPECT_TRUE((rb.Child(u, 0) != nullptr) ^ (rb.Child(u, 1) != nullptr)) << "Exatamente um"
-	             << " filho";
+		<< " filho";
 }
 
 TEST(RBSimple, Case3) {
@@ -201,7 +201,7 @@ void testPersRem(const std::vector<int> &v, int k) {
 	RedBlackTree<int> rb;
 	for(int i = 0; i < n; i++) {
 		rb.Insert(v[i]);
-		if(i >= k) rb.erase(v[i - k]);
+		if(i >= k) rb.Remove(v[i - k]);
 	}
 	for(int q = 0; q < 2 * n; q++) {
 		int x = rnd(0, n - 1 + std::max(n - k, 0));
@@ -229,16 +229,16 @@ TEST(RBPersistence, WithRemove) {
 
 TEST(RBRemove, Simpler) {
 	RedBlackTree<int> rb;
-	EXPECT_FALSE(rb.erase(10) != nullptr); check(rb);
+	EXPECT_FALSE(rb.Remove(10) != nullptr); check(rb);
 	rb.Insert(12); check(rb);
-	EXPECT_TRUE(rb.erase(12) != nullptr); check(rb);
-	EXPECT_FALSE(rb.erase(12) != nullptr); check(rb);
+	EXPECT_TRUE(rb.Remove(12) != nullptr); check(rb);
+	EXPECT_FALSE(rb.Remove(12) != nullptr); check(rb);
 	rb.Insert(1); check(rb);
 	rb.Insert(2); check(rb);
 	rb.Insert(3); check(rb);
 	rb.Insert(4); check(rb);
-	EXPECT_TRUE(rb.erase(2) != nullptr); check(rb);
-	EXPECT_TRUE(rb.erase(1) != nullptr); check(rb);
+	EXPECT_TRUE(rb.Remove(2) != nullptr); check(rb);
+	EXPECT_TRUE(rb.Remove(1) != nullptr); check(rb);
 }
 
 TEST(RBRemove, Simple) {
@@ -246,7 +246,7 @@ TEST(RBRemove, Simple) {
 	for(int x : {1, 5, 7, 10})
 		rb.Insert(x);
 	for(int x : {5, 10}) {
-		EXPECT_TRUE(rb.erase(x) != nullptr) << "should contain";
+		EXPECT_TRUE(rb.Remove(x) != nullptr) << "should contain";
 		check(rb);
 	}
 	for(int x : {1, 7, 1, 1})
@@ -261,7 +261,7 @@ TEST(RBRemove, Odds) {
 		rb.Insert(i);
 	check(rb);
 	for(int i = 1; i <= 100; i += 2)
-		EXPECT_TRUE(rb.erase(i) != nullptr) << "should remove";
+		EXPECT_TRUE(rb.Remove(i) != nullptr) << "should remove";
 	check(rb);
 	for(int i = 100; i >= 0; i--)
 		EXPECT_EQ(rb.Find(rb.current(), i) != nullptr, (i % 2) == 0);
@@ -272,9 +272,9 @@ TEST(RBRemove, Invalid) {
 	for(int c = 'a'; c <= 'z'; c++)
 		rb.Insert(c);
 	for(int c : {'a', 'z', 'c', 'a', 'a', '?'})
-		rb.erase(c);
-	EXPECT_TRUE(rb.erase('b') != nullptr);
-	EXPECT_FALSE(rb.erase('=') != nullptr);
+		rb.Remove(c);
+	EXPECT_TRUE(rb.Remove('b') != nullptr);
+	EXPECT_FALSE(rb.Remove('=') != nullptr);
 	check(rb);
 	for(int c = 'a' - 12; c <= 'z' + 7; c++)
 		EXPECT_EQ(rb.Find(rb.current(), c) != nullptr, c > 'c' && c < 'z');
@@ -295,7 +295,7 @@ TEST(RBRemove, Repeated) {
 		while(ct[p[i]] == 0) i++;
 		int x = p[i];
 		ct[x]--;
-		ASSERT_TRUE(rb.erase(x) != nullptr);
+		ASSERT_TRUE(rb.Remove(x) != nullptr);
 		if(((ct[0] + ct[1] + ct[2]) % 2500) == 0) check(rb);
 	}
 }
@@ -307,7 +307,7 @@ TEST(RBRemove, Breaks) {
 		check(rb);
 	}
 	for(int x : {4, 5, 6}) {
-		EXPECT_TRUE(rb.erase(x) != nullptr);
+		EXPECT_TRUE(rb.Remove(x) != nullptr);
 		check(rb);
 	}
 }
@@ -322,7 +322,7 @@ void doLarge(bool isOrdered) {
 			int j = rnd(0, v.size() - 1);
 			if(isOrdered) j = v.size() - 1;
 			std::swap(v[j], v.back());
-			EXPECT_TRUE(rb.erase(v.back()) != nullptr);
+			EXPECT_TRUE(rb.Remove(v.back()) != nullptr);
 			s.erase(s.find(v.back()));
 			v.pop_back();
 		} else if(p >= 85 && v.size() > 0) {
