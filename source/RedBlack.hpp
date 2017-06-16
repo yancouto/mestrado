@@ -99,6 +99,10 @@ template<class T> struct RedBlackTree {
 
 	/* Retorna o menor elemento da subárvore de u, no tempo atual */
 	Node<T>* MinElement(Node<T> *u);
+
+	/* Arruma violações da regra 3 causadas por faltar um nó preto nos caminhos até links nulos
+	 * que passam por y na direção side */
+	void AddBlack(Node<T> *y, bool side);
 };
 
 // ||=============================================================================||
@@ -234,45 +238,6 @@ template<class T> void RedBlackTree<T>::Insert(const T& value) {
 	roots[current()]->red = false;
 }
 
-namespace helper {
-template<class T> void deleteFixUp(Node<T> *z, bool side, RedBlackTree<T> &rb) {
-	z = rb.Active(z);
-	while(!isRed(rb.Child(z, side))) {
-		if(isRed(rb.Child(z, !side))) { // caso 1
-			rb.Rotate(z, !side);
-			z = rb.Active(z);
-			std::swap(z->red, z->parent->red);
-			assert(rb.Child(z, !side));
-		}
-		Node<T> *w = rb.Child(z, !side);
-		assert(w);
-		assert(!isRed(w));
-		if(!isRed(rb.Child(w, 0)) && !isRed(rb.Child(w, 1))) { // caso 2
-			w->red = true;
-			if(z->parent == nullptr) return;
-			else {
-				side = (z == rb.Child(z->parent, 1));
-				z = z->parent;
-			}
-		} else {
-			if(!isRed(rb.Child(w, !side))) { // caso 3
-				assert(isRed(rb.Child(w, side)));
-				rb.Rotate(w, side);
-				w = rb.Active(w);
-				std::swap(w->red, w->parent->red);
-				w = w->parent;
-			}
-			rb.Rotate(z->newestVersion(), !side);
-			z = rb.Active(z);
-			std::swap(z->red, z->parent->red);
-			rb.Child(z->parent, !side)->red = false;
-			return;
-		}
-	}
-	rb.Child(z, side)->red = false;
-}
-}
-
 template<class T> void RedBlackTree<T>::Transplant(Node<T> *u, Node<T> *x) {
 	x = Active(x);
 	if(x != nullptr && x->parent != nullptr)
@@ -305,7 +270,7 @@ template<class T> const T* RedBlackTree<T>::Remove(const T& val) {
 		bool needFix = (v != nullptr && !u->red && Child(u, 0) == nullptr);
 		Transplant(u, Child(u, 0));
 		if(needFix)
-			helper::deleteFixUp(v, (Child(v, 1) == nullptr), *this);
+			AddBlack(v, (Child(v, 1) == nullptr));
 	} else {
 		Node<T> *x = MinElement(Child(u, 1));
 		Node<T> *y;
@@ -320,11 +285,48 @@ template<class T> const T* RedBlackTree<T>::Remove(const T& val) {
 			Modify(x, side, child);
 		}
 		if(needFix)
-			helper::deleteFixUp(y, (Child(y, 1) == nullptr), *this);
+			AddBlack(y, (Child(y, 1) == nullptr));
 	}
 	if(roots[current()] != nullptr)
 		roots[current()]->red = false;
 	return ret;
+}
+
+template<class T> void RedBlackTree<T>::AddBlack(Node<T> *y, bool side) {
+	y = Active(y); // Versão mais atual de y
+	while(y != nullptr) {
+		Node<T> *z = Child(y, !side);
+		if(z->red) { // Arrumando caso 4 para caso 1, 2 ou 3.
+			std::swap(y->red, z->red);
+			Rotate(y, !side);
+			y = Active(y);
+			z = Child(y, !side);
+		}
+		Node<T> *z_x = Child(z, side);
+		Node<T> *z_z = Child(z, !side);
+		if((z_x == nullptr || !z_x->red) && (z_z == nullptr || !z_z->red)) { // Caso 1.
+			z->red = true;
+			if(y == roots[current()] || y->red) {
+				y->red = false;
+				break;
+			} else {
+				side = (Child(y->parent, 1) == y);
+				y = y->parent;
+			}
+		} else {
+			if(z_x != nullptr && z_x->red) { // Arrumando caso 3 para caso 2.
+				std::swap(z->red, z_x->red);
+				Rotate(z, side);
+				y = Active(y);
+				z = Child(y, !side);
+				z_z = Child(z, !side);
+			}
+			std::swap(y->red, z->red); // Caso 2.
+			z_z->red = false;
+			Rotate(y, !side);
+			break;
+		}
+	}
 }
 
 template<class T> RedBlackTree<T>::~RedBlackTree() {
