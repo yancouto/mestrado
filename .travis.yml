@@ -1,10 +1,20 @@
 sudo: required
 dist: trusty
 branches:
-    only:
-        - master
+    only: master
+addons:
+    apt:
+        packages: doxygen
 before_install:
 - sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
 script:
 - make -C thesis
 - make test_all -C source
+- doxygen
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: docs
+    on:
+        branch: master

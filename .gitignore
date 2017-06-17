@@ -8,4 +8,4 @@
 **/*.bbl
 **/*.pdf
 **/*.blg
-source/tests/*_tests
+docs/
