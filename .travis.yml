@@ -11,6 +11,7 @@ script:
 - make -C thesis
 - make test_all -C source
 - doxygen
+- mv thesis/main.pdf docs/html/thesis.pdf
 deploy:
     provider: pages
     skip_cleanup: true
