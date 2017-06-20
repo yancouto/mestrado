@@ -1,4 +1,4 @@
-#include "../RedBlack.hpp"
+#include "../RedBlackTree.hpp"
 #include "gtest/gtest.h"
 
 #include <vector>
@@ -24,7 +24,7 @@ template<class T> void debug(Node<T> *root, RedBlackTree<T> &rb) {
 	std::cerr << std::endl;
 }
 
-template<class T> int rec(Node<T> *u, T *min, T *max, RedBlackTree<T> &rb) {
+template<class T> int rec(Node<T> *u, const T *min, const T *max, RedBlackTree<T> &rb) {
 	if(u == nullptr) return 0;
 	EXPECT_TRUE(u->copy == nullptr) << "Nó ativo não deve ter cópia";
 	if(min) EXPECT_FALSE(u->value < *min) << "Não é uma ABB";

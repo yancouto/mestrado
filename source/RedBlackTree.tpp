@@ -1,109 +1,22 @@
-#ifndef REDBLACK_HPP_
-#define REDBLACK_HPP_
+// Esse arquivo é importado apenas por RedBlackTree.hpp e não deve ser importado manualmente.
 
-#include <vector>
 #include <climits>
 #include <iostream>
 #include <unordered_set>
 #include <cassert>
 
-/* Implementação de uma árvore rubro-negra parcialmente persistente utilizando o método de Node
- * copying. A estrutura não usará ponteiros de pai persistents, então cada nó (que não é a raiz)
- * tem 1 ponteiro para ele, e assim é necessário apenas 1 campo extra.
- */
-
- template<class T> struct RedBlackTree;
-
-/* Estrutura que representa um nó da ABB que armazena objetos do tipo T. */
-template<class T> struct Node {
-	// Tempo em que o nó foi criado
-	int timestamp;
-	// Filho esquerdo (0) e direito (1)
-	Node *child[2];
-	/* Filho adicional, seu tempo de criação e lado. Os outros valores são ignorados se
-	 * extraTimestamp for -1 */
-	Node *extra; int extraTimestamp; bool extraSide;
-	// Cor do nó. Este campo não é persistente (só é válido para nós atuais)
-	bool red;
-	// Valor armazenado no nó
-	T value;
-	// Pai do nó (só é válido para nós atuais)
-	Node *parent;
-
-	// Aponta para a próxima cópia (versão mais nova) deste nó, se ele não é atual.
-	Node *copy;
-
-	Node(const T& val, int time) : timestamp(time), extraTimestamp(-1), red(true), value(val),
-	  parent(nullptr), copy(nullptr) { child[0] = child[1] = extra =  nullptr; }
-
-	// Returna a cópia desse nó, se ela foi criada nessa versão.
-	inline Node* newestVersion() { return copy == nullptr? this : copy; }
-};
+template<class T>
+Node<T>::Node(const T& val, int time) : timestamp(time), extraTimestamp(-1), red(true), value(val),
+  parent(nullptr), copy(nullptr) { child[0] = child[1] = extra =  nullptr; }
 
 /* Arvore rubro negra que armazena objetos do tipo T.
  * T deve ser comparável (possuir operator <) */
-template<class T> struct RedBlackTree {
-	// Versão 0 é a árvore vazia
-	std::vector<Node<T>*> roots;
+template<class T>
+RedBlackTree<T>::RedBlackTree() { roots.push_back(nullptr); }
 
-	RedBlackTree() { roots.push_back(nullptr); }
-
-	// Destrutor, libera toda a memória alocada.
-	~RedBlackTree();
-
-	// Retorna a versão atual da árvore.
-	inline int current() { return roots.size() - 1; }
-
-	/* Procura pelo objeto val na ABB criada com tempo time, e retorna um ponteiro constante para
-	 * o objeto, se for encontrado, e nullptr caso contrário.
-	 * Restrições: 0 <= time < version_count() */
-	const T* Find(int time, const T& val);
-
-	/* Insere o objeto val na ABB em sua versão mais atual.
-	 * Tempo: O(lg(tamanho da ABB)) */
-	void Insert(const T& val);
-
-	/* Remove o objeto val na ABB em sua versão mais atual, e retorna um ponteiro constante para
-	 * o objeto, se ele tiver sido removido, e nullptr caso contrário.
-	 * Tempo: O(lg(tamanho da ABB)) */
-	const T* Remove(const T& val);
-
-// private: TODO make it private in the future
-
-	// Retorna a versão ativa do nó u, que é este ou sua cópia, se existir.
-	Node<T>* Active(Node<T> *u);
-
-	// Retorna o filho side de u, considerando o filho adicional, se possível.
-	// Para ser usado em operações de acesso.
-	Node<T>* Child(Node<T> *u, bool side, int version);
-
-	// Retorna o filho side de u mais recente.
-	// Para ser usado em operações de modificação.
-	Node<T>* Child(Node<T> *u, bool side);
-
-	/* Muda o filho side de u para v, possivelmente propagando essa mudança, e retorna o ponteiro
-	 * para o nó que atualmente representa u. rb é a árvore à qual este nó pertence.
-	 * É necessário informar side pois v pode ser nullptr ou ter valor igual à de outros nós. */
-	Node<T>* Modify(Node<T> *u, bool side, Node<T> *v);
-
-	/* Copia um nó e retorna sua cópia (assume que o nó é ativo no momento da chamada)
-	 * Se necessário, propaga a cópia */
-	Node<T>* Copy(Node<T> *u);
-
-	/* Rotaciona em torno de u de forma que o filho side de u toma o lugar de u.
-	 * Assume que tal filho existe. */
-	void Rotate(Node<T> *u, bool side);
-
-	/* Substitui u por x, que pode ser nulo. */
-	void Transplant(Node<T> *u, Node<T> *x);
-
-	/* Retorna o menor elemento da subárvore de u, no tempo atual */
-	Node<T>* MinElement(Node<T> *u);
-
-	/* Arruma violações da regra 3 causadas por faltar um nó preto nos caminhos até links nulos
-	 * que passam por y na direção side */
-	void AddBlack(Node<T> *y, bool side);
-};
+// Retorna a versão atual da árvore.
+template<class T>
+inline int RedBlackTree<T>::current() { return roots.size() - 1; }
 
 // ||=============================================================================||
 // ||=============================================================================||
@@ -132,7 +45,7 @@ template<class T> Node<T>* RedBlackTree<T>::Child(Node<T> *u, bool side) {
 	return Child(Active(u), side, current());
 }
 
-template<class T> Node<T>* RedBlackTree<T>::Modify(Node<T> *u, bool side, Node<T> *v) {
+template<class T> void RedBlackTree<T>::Modify(Node<T> *u, bool side, Node<T> *v) {
 	u = Active(u);
 	if(u->timestamp < current()) {
 		u->copy = Copy(u);
@@ -143,7 +56,6 @@ template<class T> Node<T>* RedBlackTree<T>::Modify(Node<T> *u, bool side, Node<T
 	u->child[side] = Active(v);
 	if(u->child[side] != nullptr)
 		u->child[side]->parent = u;
-	return u;
 }
 
 template<class T> Node<T>* RedBlackTree<T>::Copy(Node<T> *u) {
@@ -342,5 +254,3 @@ template<class T> RedBlackTree<T>::~RedBlackTree() {
 		delete u;
 	}
 }
-
-#endif

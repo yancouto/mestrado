@@ -16,11 +16,12 @@
 ### Dissertação:
 Os arquivos `.tex` necessários para criar o pdf da dissertação estão na pasta `thesis`. Para
 compilá-los basta usar `make` nesta pasta (e ter pdflatex e as bibliotecas necessárias :D). Uma
-versão atualizada do `.pdf` fica [neste link](https://www.ime.usp.br/~yancouto/stuff/tese.pdf).
+versão atualizada do `.pdf` fica [neste link](https://yancouto.github.io/mestrado/thesis.pdf).
 
 ### Implementações:
-As implementações feitas estão na pasta `source`. Para testá-las, basta rodar o comando `make`
-nessa pasta.
+As implementações feitas estão na pasta `source`. A documentação para as estruturas implementadas
+fica [neste link](https://yancouto.github.io/mestrado/). Para testar as implementações, basta
+rodar o comando `make` nessa pasta.
 
 Os testes são feitos usando [googletest](https://github.com/google/googletest/).
 Pode ser necessário rodar `git submodule update --init --recursive` quando se clona o repositório
