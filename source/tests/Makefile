@@ -84,7 +84,7 @@ clean:
 .SECONDEXPANSION:
 PERCENT=%
 
-$(addsuffix .o, $(TESTS)) : %.o : %.cpp ../$$(basename %).hpp
+$(addsuffix .o, $(TESTS)) : %.o : %.cpp ../$$(basename %).hpp ../$$(basename %).tpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -c -o $@
 
 # Testes individuais

@@ -8,10 +8,8 @@
 
 #include <vector>
 
-/// Nó da árvore rubro-negra parcialmente persistente.
-/**
- * O nó armazena um valor do tipo T.
- * @see RedBlackTree mais info
+/** Nó da ARN parcialmente persistente.
+ * @see RedBlackTree Para mais informação sobre a ARN.
  */
 template<class T> class Node {
 	public:
@@ -20,6 +18,7 @@ template<class T> class Node {
 	 * Campos existentes em um nó de uma ARN não-persistente.
 	 */
 	///@{
+
 	/** Nós filhos do nó.
 	 * 0 é o nó esquerdo e 1 o direito.
 	 */
@@ -43,6 +42,7 @@ template<class T> class Node {
 	 * Campos usados para manter o nó persistente.
 	 */
 	///@{
+
 	/** Tempo de criação do nó.
 	 * Índice da operação de modificação na qual o nó foi criado.
 	 */
@@ -99,9 +99,10 @@ template<class T> class Node {
 	///@}
 
 	/** Construtor padrão.
-	 * Inicializa o nó com #value = \p val e #timestamp = \p time.
+	 * @param val Valor para o nó.
+	 * @param version Versão de criação.
 	 */
-	Node(const T& val, int time);
+	Node(const T& val, int version);
 };
 
 /** Árvore rubro-negra (ARN) parcialmente persistente.
@@ -128,25 +129,25 @@ template<class T> class RedBlackTree {
 	 */
 	///@{
 	/** Busca por um valor em dada versão da ARN.
-	 * @param time Versão da árvore na qual o valor deve ser buscado.
 	 * @param val Valor a ser buscado.
+	 * @param version Versão da árvore na qual o valor deve ser buscado.
 	 * @returns Um ponteiro para o valor de **algum** nó com valor \p val na árvore, ou nulo
 	 * se tal nó não existir.
 	 */
-	const T* Find(int time, const T& val);
+	const T* Find(const T& x, int version);
 
 	/** Inserção de valor na ARN.
 	 * Cria um novo nó com valor \p val e adiciona este nó à versão mais recente da árvore.
-	 * @param val Valor a ser adicionado.
+	 * @param value Valor a ser adicionado.
 	 */
-	 void Insert(const T& val);
+	 void Insert(const T& value);
 
 	/** Remoção de valor na ARN.
 	 * Busca por **algum** nó com valor igual \p val e remove este nó da versão mais recente
 	 * da árvore. Retorna um ponteiro para o valor do nó removido, ou nulo se não existe tal nó.
-	 * @param val Valor a ser removido.
+	 * @param value Valor a ser removido.
 	 */
-	 const T* Remove(const T& val);
+	 const T* Remove(const T& value);
 
 	/** Versão atual da ARN.
 	 * @returns Quantas operações de modificação já foram realizadas na estrutura.

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <set>
 
+template<class T> bool isRed(Node<T> *u) { return u && u->red; }
+
 inline int rnd(int l, int r) {
 	double p = rand() / (double(RAND_MAX) + 1);
 	return l + (r - l + 1) * p;
@@ -29,8 +31,8 @@ template<class T> int rec(Node<T> *u, const T *min, const T *max, RedBlackTree<T
 	EXPECT_TRUE(u->copy == nullptr) << "Nó ativo não deve ter cópia";
 	if(min) EXPECT_FALSE(u->value < *min) << "Não é uma ABB";
 	if(max) EXPECT_FALSE(*max < u->value) << "Não é uma ABB";
-	//if(rb.Child(u, 0)) EXPECT_EQ(u, rb.Child(u, 0)->parent) << "Links de pai errados";
-	//if(rb.Child(u, 1)) EXPECT_EQ(u, rb.Child(u, 1)->parent) << "Links de pai errados";
+	if(rb.Child(u, 0)) EXPECT_EQ(u, rb.Child(u, 0)->parent) << "Links de pai errados";
+	if(rb.Child(u, 1)) EXPECT_EQ(u, rb.Child(u, 1)->parent) << "Links de pai errados";
 	int bh1 = rec(rb.Child(u, 0), min, &u->value, rb);
 	int bh2 = rec(rb.Child(u, 1), &u->value, max, rb);
 	EXPECT_EQ(bh1, bh2) << "Alturas pretas devem ser iguais";
@@ -72,7 +74,7 @@ TEST(RBSimple, Insert) {
 		rb1.Insert(i);
 	check(rb1);
 	for(int i = 9; i >= 0; i--)
-		EXPECT_FALSE(rb1.Find(rb1.current(), i) == nullptr);
+		EXPECT_FALSE(rb1.Find(i, rb1.current()) == nullptr);
 }
 
 TEST(RBSimple, KeepsRedBlack) {
@@ -91,9 +93,9 @@ TEST(RBSimple, Strings) {
 		check(rb);
 	}
 	for(string s : {"tchau", "aaa", "teste", "aa", "oi"})
-		EXPECT_TRUE(rb.Find(rb.current(), s) != nullptr);
+		EXPECT_TRUE(rb.Find(s, rb.current()) != nullptr);
 	for(string s : {"a", "aaaa", "oi!", "lalala", "tcha", "chau"})
-		EXPECT_FALSE(rb.Find(rb.current(), s) != nullptr);
+		EXPECT_FALSE(rb.Find(s, rb.current()) != nullptr);
 }
 
 // Coloca os valores em um vetor ordenado
@@ -157,7 +159,7 @@ void testPersistence(const std::vector<int> &v) {
 	for(int q = 0; q < 2 * n; q++) {
 		int x = rnd(0, n - 1);
 		int y = rnd(0, n - 1);
-		const int *z = rb.Find(x + 1, v[y]);
+		const int *z = rb.Find(v[y], x + 1);
 		if(z != nullptr) EXPECT_EQ(*z, v[y]);
 		EXPECT_EQ(z != nullptr, y <= x);
 	}
@@ -165,7 +167,7 @@ void testPersistence(const std::vector<int> &v) {
 		for(int q = -2; q <= 2; q++) {
 			if(q + i < 0 || q + i >= n) continue;
 			int x = i, y = q + i;
-			const int *z = rb.Find(x + 1, v[y]);
+			const int *z = rb.Find(v[y], x + 1);
 			if(z != nullptr) EXPECT_EQ(*z, v[y]);
 			EXPECT_EQ(z != nullptr, y <= x);
 		}
@@ -206,7 +208,7 @@ void testPersRem(const std::vector<int> &v, int k) {
 	for(int q = 0; q < 2 * n; q++) {
 		int x = rnd(0, n - 1 + std::max(n - k, 0));
 		int y = rnd(0, n - 1);
-		const int *z = rb.Find(x + 1, v[y]);
+		const int *z = rb.Find(v[y], x + 1);
 		if(z != nullptr) EXPECT_EQ(*z, v[y]);
 		int mn = (std::max(x - k, 0) + 1) / 2;
 		int mx = x - mn;
@@ -250,9 +252,9 @@ TEST(RBRemove, Simple) {
 		check(rb);
 	}
 	for(int x : {1, 7, 1, 1})
-		EXPECT_TRUE(rb.Find(rb.current(), x) != nullptr) << "should find";
+		EXPECT_TRUE(rb.Find(x, rb.current()) != nullptr) << "should find";
 	for(int x : {10, -1, 5, 12})
-		EXPECT_FALSE(rb.Find(rb.current(), x) != nullptr) << "should not find";
+		EXPECT_FALSE(rb.Find(x, rb.current()) != nullptr) << "should not find";
 }
 
 TEST(RBRemove, Odds) {
@@ -264,7 +266,7 @@ TEST(RBRemove, Odds) {
 		EXPECT_TRUE(rb.Remove(i) != nullptr) << "should remove";
 	check(rb);
 	for(int i = 100; i >= 0; i--)
-		EXPECT_EQ(rb.Find(rb.current(), i) != nullptr, (i % 2) == 0);
+		EXPECT_EQ(rb.Find(i, rb.current()) != nullptr, (i % 2) == 0);
 }
 
 TEST(RBRemove, Invalid) {
@@ -277,7 +279,7 @@ TEST(RBRemove, Invalid) {
 	EXPECT_FALSE(rb.Remove('=') != nullptr);
 	check(rb);
 	for(int c = 'a' - 12; c <= 'z' + 7; c++)
-		EXPECT_EQ(rb.Find(rb.current(), c) != nullptr, c > 'c' && c < 'z');
+		EXPECT_EQ(rb.Find(c, rb.current()) != nullptr, c > 'c' && c < 'z');
 }
 
 TEST(RBRemove, Repeated) {
@@ -327,9 +329,9 @@ void doLarge(bool isOrdered) {
 			v.pop_back();
 		} else if(p >= 85 && v.size() > 0) {
 			int j = rnd(0, v.size() - 1);
-			EXPECT_TRUE(rb.Find(rb.current(), v[j]) != nullptr);
+			EXPECT_TRUE(rb.Find(v[j], rb.current()) != nullptr);
 			int x = rand();
-			EXPECT_EQ(rb.Find(rb.current(), x) != nullptr, s.find(x) != s.end());
+			EXPECT_EQ(rb.Find(x, rb.current()) != nullptr, s.find(x) != s.end());
 		} else {
 			if(isOrdered) v.push_back(i);
 			else v.push_back(rand() * rand() + rand());

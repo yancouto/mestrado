@@ -154,7 +154,7 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 	\State $u'.\ts = \cur$
 	\If{$u.\eTs \neq -1$}
 		\State $u'.\child[u.\eSide] = u.\extra$
-		\State $u'.\eTs = -1$ \Comment{Limpando o campo extra}
+		\State $u'.\eTs = -1$ \Comment{Limpando o campo extra.}
 	\EndIf
 	\If{$\roots[\cur] = u$}
 		\State $\roots[\cur] = u'$
@@ -335,6 +335,7 @@ A maior parte das modificações envolvidas em uma inserção são mudanças de 
 \begin{algorithmic}[1]
 
 \Function{Insert}{$\val$}
+	\State $\cur = \cur + 1$
 	\State $\roots[\cur] = \roots[\cur - 1]$
 	\State $x = \New \Call{Node}{\val}$ \Comment{Nó vermelho com valor $\val$ e outros campos vazios.} \label{line:insrb:insb}
 	\State $x.\ts = \cur$
@@ -352,8 +353,8 @@ A maior parte das modificações envolvidas em uma inserção são mudanças de 
 	\While{$x.\red \And x.\parent \neq \Null \And x.\parent.\red$} \label{line:insrb:loopb}
 		\State $y = x.\parent$ \label{line:insrb:xyzwb}
 		\State $z = y.\parent$
-		\State $\V{sideX} = [x = \Call{Child}{y, 1}]$
-		\State $\V{sideY} = [y = \Call{Child}{z, 1}]$ \label{line:insrb:xyzwe}
+		\State $\V{sideX} = [\Call{Child}{y, 1} = x]$
+		\State $\V{sideY} = [\Call{Child}{z, 1} = y]$ \label{line:insrb:xyzwe}
 		\State $w = \Call{Child}{z, \Not\ \V{sideY}}$
 		\If{$w \neq \Null \And w.\red$} \Comment{Caso 1.} \label{line:insrb:c1b}
 			\State $z.\red = \True$
@@ -524,6 +525,8 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da regra 3.
 
 \Require{A árvore tem um nó com valor~$\val$.}
 \Function{Remove}{$\val$}
+	\State $\cur = \cur + 1$
+	\State $\roots[\cur] = \roots[\cur - 1]$
 	\State $u = \Call{Find}{\val}$ \label{line:rmrb:find}
 	\State $v = u.\parent$
 	\If{$\Call{Child}{u, 1} = \Null$} \label{line:rmrb:if1}
