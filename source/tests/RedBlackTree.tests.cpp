@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <set>
 
+using namespace red_black_tree;
+
 template<class T> bool isRed(Node<T> *u) { return u && u->red; }
 
 inline int rnd(int l, int r) {

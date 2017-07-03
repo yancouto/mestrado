@@ -8,6 +8,8 @@
 
 #include <vector>
 
+namespace red_black_tree {
+
 /** Nó da ARN parcialmente persistente.
  * @see RedBlackTree Para mais informação sobre a ARN.
  */
@@ -277,6 +279,8 @@ template<class T> class RedBlackTree {
 	///@}
 
 };
+
+} // namespace red_black_tree
 
 #include "RedBlackTree.tpp"
 

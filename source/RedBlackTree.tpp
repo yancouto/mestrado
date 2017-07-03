@@ -3,6 +3,8 @@
 #include <unordered_set>
 #include <iostream>
 
+namespace red_black_tree {
+
 template<class T> Node<T>::Node(const T& val, int version) : child{nullptr, nullptr}, red(true),
                   value(val), timestamp(version), copy(nullptr), parent(nullptr), extra(nullptr),
                   extraTimestamp(-1) {}
@@ -240,3 +242,5 @@ template<class T> void RedBlackTree<T>::AddBlack(Node<T> *y, bool side) {
 		}
 	}
 }
+
+} // namespace red_black_tree
