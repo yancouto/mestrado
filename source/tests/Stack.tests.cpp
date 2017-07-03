@@ -48,6 +48,7 @@ TEST(STSimple, NonInt) {
 	st1 = st1.Push("omar");
 	EXPECT_EQ(st1.Top(), "omar");
 	EXPECT_EQ(st1.Pop().Top(), "oioioi");
+	EXPECT_EQ(st1.K_th(1), "oioioi");
 	Stack<double> st2 = Stack<double>();
 	st2 = st2.Push(0.1234);
 	EXPECT_LT(st2.Top(), 0.15);
@@ -72,15 +73,18 @@ TEST(STPersistence, Vector) {
 			perm.push_back(i);
 		}
 		std::random_shuffle(perm.begin(), perm.end());
-		for(int i = 0; i < 100000; i++)
+		for(int i = 0; i < 100000; i++) {
 			EXPECT_EQ(st[perm[i]].Top(), v[perm[i]]);
+			EXPECT_EQ(st.back().K_th(v.size() - 1 - perm[i]), v[perm[i]]);
+		}
 	}
 }
 
-
+namespace {
 std::vector<Stack<bool>> vbm;
 
 const int D = 16;
+}
 void rec(int d, Stack<bool> s) {
 	if(d == D)
 		vbm.push_back(s);
@@ -93,11 +97,16 @@ void rec(int d, Stack<bool> s) {
 TEST(STPersistence, Bitmasks) {
 	vbm.clear();
 	rec(0, Stack<bool>());
+	int p[D];
+	for(int i = 0; i < D; i++) p[i] = i;
 	for(int i = 0; i < (1 << D); i++) {
 		Stack<bool> st = vbm[i];
 		for(int d = 0; d < D; d++) {
 			EXPECT_EQ((i >> d) & 1, st.Top());
 			st = st.Pop();
 		}
+		std::random_shuffle(p, p + D);
+		for(int d = 0; d < D; d++)
+			EXPECT_EQ((i >> p[d]) & 1, vbm[i].K_th(p[d]));
 	}
 }

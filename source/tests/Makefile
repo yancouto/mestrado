@@ -43,7 +43,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : test_all .gitignore
+all : test_all
 
 # Builds gtest.a and gtest_main.a.
 
@@ -98,5 +98,5 @@ all_tests: $(addsuffix .o, $(TESTS)) gtest_main.a
 .gitignore:
 	@echo "${TESTS} all_tests" | sed -e 's/ /\n/g' >$@
 
-test_all: all_tests
+test_all: all_tests .gitignore
 	./all_tests

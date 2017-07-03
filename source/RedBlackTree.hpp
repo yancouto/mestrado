@@ -16,7 +16,7 @@ namespace red_black_tree {
 template<class T> class Node {
 	public:
 
-	/** @name Campos originais
+	/** @name Campos Originais
 	 * Campos existentes em um nó de uma ARN não-persistente.
 	 */
 	///@{
@@ -40,7 +40,7 @@ template<class T> class Node {
 	const T value;
 	///@}
 
-	/** @name Campos persistentes
+	/** @name Campos Persistentes
 	 * Campos usados para manter o nó persistente.
 	 */
 	///@{
@@ -121,7 +121,7 @@ template<class T> class Node {
 template<class T> class RedBlackTree {
 	public:
 
-	/** @name Biblioteca pública
+	/** @name Biblioteca Pública
 	 * Estas funções podem ser usadas mesmo sem saber a estrutura por trás, como em um
 	 * [set](http://www.cplusplus.com/reference/set/set/), que é implementado usando uma ARN
 	 * mas cujas funções não dependem disso e podem ser implementadas com outras estruturas.
@@ -157,7 +157,7 @@ template<class T> class RedBlackTree {
 	inline int current();
 	///@}
 
-	/** @name Campos, construção e acesso
+	/** @name Campos, Construção e Acesso
 	 */
 	///@{
 	/** Raízes de todas as versões.
@@ -187,7 +187,7 @@ template<class T> class RedBlackTree {
 	Node<T>* Child(Node<T> *u, bool side, int version);
 	///@}
 
-	/** @name Funções auxiliares de modificação
+	/** @name Funções Auxiliares de Modificação
 	 * As seguintes funções são auxiliares e usadas internamente durante operações de
 	 * modificação. Estas funções sempre recebem um nó `u`, e é necessário que `u` tenha sido
 	 * criado na atual operação (de acesso ou modificação) ou tenha sido ativo
