@@ -131,7 +131,7 @@ template<class T> class RedBlackTree {
 	 */
 	///@{
 	/** Busca por um valor em dada versão da ARN.
-	 * @param val Valor a ser buscado.
+	 * @param x Valor a ser buscado.
 	 * @param version Versão da árvore na qual o valor deve ser buscado.
 	 * @returns Um ponteiro para o valor de **algum** nó com valor \p val na árvore, ou nulo
 	 * se tal nó não existir.

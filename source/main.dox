@@ -1,0 +1,18 @@
+/** @mainpage Documentação do projeto de mestrado
+ * Implementei todas as estruturas de dados discutidas na minha [tese de mestrado](thesis.pdf).
+ *  As implementações foram feitas em C++, e tentam ser o mais fiel possível ao pseudocódigo
+ * apresentado na tese, destacando as diferenças quando estas existem.
+ *
+ * @section persist Implementações Persistentes
+ *
+ * @subsection pilha Pilha
+ * A [pilha](@ref stack::Stack) é a estrutura de dados mais simples, e, implementada usando lista
+ * ligada, já é automaticamente persistente.
+ *
+ * @subsection arn Árvore Rubro-Negra
+ * A [árvore rubro-negra](@ref red_black_tree::RedBlackTree) é uma árvore de busca binária
+ * balanceada. A implementação é parcialmente persistente, e é feita usando o método de Node
+ * copying @cite DriscollSST1989 . Por ser uma implementação parcialmente persistente, e como as
+ * cores dos nós servem apenas para auxiliar em seu balanceamento, estas não são armazenadas de
+ * forma persistente e conseguimos assim consumir espaço constante por operação de modificação.
+ */
