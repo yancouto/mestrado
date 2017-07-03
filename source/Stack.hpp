@@ -21,17 +21,23 @@ public:
 	 */
 	const Node *next;
 
-	/** Posição do nó.
-	 * Se seguirmos o link #next por #len vezes chegamos no nó \c null.
+	/** Profundidade do nó.
+	 * Se seguirmos o link #next por #depth vezes chegamos no nó \c null.
 	 */
-	int len;
+	int depth;
 
 	/** Nó de pulo.
-	 * Aponta para o nó \c u com `u.#len = J(#len)`, onde \c J é a operação de diminuir em 1 o
+	 * Aponta para o nó \c u com `u.#depth = J(#depth)`, onde \c J é a operação de diminuir em 1 o
 	 * digito menos significativo não-nulo na base skew-binary canônica.
 	 * @see \cite Myers83 para mais informação sobre skew-binary.
 	 */
 	const Node *jmp;
+
+	/** k-ésimo ancestral.
+	 * @param k Indice do ancestral.
+	 * @returns O k-ésimo ancestral do nó. Se `k = 0`, retorna o próprio nó.
+	 */
+	const Node* K_Ancestor(int k) const;
 
 	Node(const T& x, const Node *nx);
 };
@@ -51,7 +57,7 @@ public:
  * Um objeto Stack é apenas um ponteiro para um nó (Node) que é o topo da pilha. O objeto é
  * imutável, e continua válido mesmo após chamadas de #Push e #Pop, já que estas retornam uma
  * **cópia** modificada da estrutura. Dessa forma, é possível acessar (e modificar) versões
- * antigas da estrutura, como no código abaixo:
+ * antigas da estrutura, como no exemplo abaixo:
  *
  * @code
  * using namespace stack;
@@ -101,10 +107,10 @@ public:
 	const T& Top() const;
 
 	/** k-ésimo elemento.
-	 * @param k o elemento desejado. 0 é o topo da pilha.
+	 * @param k O elemento desejado. 0 é o topo da pilha.
 	 * @returns O valor do k-ésimo elemento da pilha.
 	 * @pre `0 &le; k < n`, onde \c n é o tamanho da pilha.
-	 * @remark `Top()` é equivalente a `K_th (0)`
+	 * @remark `Top()` é equivalente a `K_th(0)`
 	 *
 	 * @ex
 	 * @code
@@ -139,6 +145,7 @@ public:
 
 	///@}
 	
+private:
 	Stack(const Node<T> *u);
 };
 

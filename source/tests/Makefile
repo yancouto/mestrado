@@ -75,28 +75,33 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 # Tests all tests automagically
 
-TESTS = $(basename $(wildcard **/*.cpp *.cpp))
+TESTS = $(basename $(wildcard *.tests.cpp))
 
-.PHONY: clean .gitignore test_all
+.PHONY: clean .gitignore
 clean:
-	rm -f all_tests $(TESTS) gtest.a gtest_main.a **/*.o *.o
+	rm -f $(TESTS) gtest.a gtest_main.a **/*.o *.o
 
 .SECONDEXPANSION:
 PERCENT=%
 
-$(addsuffix .o, $(TESTS)) : %.o : %.cpp ../$$(basename %).hpp ../$$(basename %).tpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -c -o $@
+$(addsuffix .mf, $(TESTS)): %.mf : %.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -M >$@
+
+export CPPFLAGS
+export CXXFLAGS
+
+$(addsuffix .o, $(TESTS)) : %.o : %.mf
+	$(MAKE) -f $<
+	rm $<
 
 # Testes individuais
 $(TESTS) : % : %.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ gtest_main.a -o $@
 
-# Teste para tudo
-all_tests: $(addsuffix .o, $(TESTS)) gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ gtest_main.a -o $@
+$(addsuffix .test, $(TESTS)): %.test : %
+	./$<
 
 .gitignore:
-	@echo "${TESTS} all_tests" | sed -e 's/ /\n/g' >$@
+	@echo "${TESTS}" | sed -e 's/ /\n/g' >$@
 
-test_all: all_tests .gitignore
-	./all_tests
+test_all: $(addsuffix .test, $(TESTS)) .gitignore

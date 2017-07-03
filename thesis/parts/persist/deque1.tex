@@ -172,7 +172,7 @@ As implementações dadas são funcionais e mantêm a propriedade que os element
 
 Discutiremos como determinar o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$, já que encontrar o penúltimo é encontrar o segundo no caminho de~$\V{last}$ para~$\V{first}$, e usaremos~\textsc{Swap} para não ter que tratar esse caso separadamente. Para uma árvore com raiz, dizemos que o~\deff{ancestral comum mais profundo} de~$\V{first}$ e~$\V{last}$ é o ancestral comum de ambos com maior profundidade. Seja~$\V{mid}$ este ancestral. Então o caminho de~$\V{first}$ para~$\V{last}$ é o caminho de~$\V{first}$ para~$\V{mid}$ concatenado com o caminho de~$\V{mid}$ para~$\V{last}$.
 
-O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \ldots, \V{mid})}$; então se~$\V{first} \neq \V{mid}$ temos que~$\V{first}.\V{parent}$ é o segundo elemento do caminho. Se~$\V{first} = \V{mid}$ então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$. Este caminho tem tamanho~${\V{last}.\V{depth} - \V{first}.\V{depth}}$, e então o segundo nó deste caminho é o~${(\V{last}.\V{depth} - \V{first}.\V{depth} - 1)}$-ésimo ancestral de~$\V{last}$, considerando que o~0-ésimo ancestral de um vértice é ele mesmo, primeiro é seu pai, e assim por diante.
+O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \ldots, \V{mid})}$; então se~$\V{first} \neq \V{mid}$ temos que~$\V{first}.\V{parent}$ é o segundo elemento do caminho. Se~$\V{first} = \V{mid}$ então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$. Este caminho tem tamanho~${\V{last}.\V{depth} - \V{first}.\V{depth}}$, e então o segundo nó deste caminho é o~${(\V{last}.\V{depth} - \V{first}.\V{depth} - 1)}$-ésimo ancestral de~$\V{last}$, considerando que o~\mbox{0-ésimo} ancestral de um vértice é ele mesmo, primeiro é seu pai, e assim por diante.
 
 \begin{algorithm}
 \caption{Operações de remoção} \label{lst:deque1_ops2}
@@ -182,7 +182,7 @@ O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \
     \If{$d.\V{first} = d.\V{last}$}
         \State \Return \Call{Deque}{\null}
     \ElsIf{$\Call{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}$}
-        \State \Return $(\Call{LevelAncestor}{d.\V{last}, d.\V{first}.\V{depth} - d.\V{last}.\V{depth}}, d.\V{last})$
+        \State \Return $(\Call{LevelAncestor}{d.\V{last}, d.\V{last}.\V{depth} - d.\V{first}.\V{depth} - 1}, d.\V{last})$
     \Else
         \State \Return $(d.\V{first}.\V{parent}, d.\V{last})$
     \EndIf

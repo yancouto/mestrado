@@ -20,8 +20,8 @@ namespace queue {
  * fila, mas são métodos desta.
  *
  * Um object Queue consiste de uma pilha e um inteiro indicando o tamanho da fila. O objeto é
- * imutável, e como a implementação é funcional podemos usá-la de forma persistente, como no
- * seguinte código:
+ * imutável, e como a implementação é funcional, podemos usá-la de forma persistente, como no
+ * seguinte exemplo:
  *
  * @code
  * Queue<int> q1; // ()

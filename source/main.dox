@@ -7,7 +7,20 @@
  *
  * @subsection pilha Pilha
  * A [pilha](@ref stack::Stack) é a estrutura de dados mais simples, e, implementada usando lista
- * ligada, já é automaticamente persistente.
+ * ligada, já é automaticamente persistente. Para acessar o k-ésimo elemento usando esta
+ * implementação, porém, é necessário usar técnicas mais avançadas @cite Myers83 .
+ *
+ * @subsection fila Fila
+ * Como a implementação de pilha possui acesso ao k-ésimo elemento, é possível implementar uma
+ * fila usando apenas essa implementação e um inteiro indicando o tamanho atual da fila.
+ *
+ * @subsection deque Deque
+ * A deque é uma lista na qual é possível inserir e remover elementos das duas pontas. Damos
+ * 3 implementações para uma deque persistente. [A primeira](@ref deque1::Deque) é similar à
+ * implementação das pilhas e filas, usando a mesma técnica. [A segunda](@ref deque2::Deque)
+ * tem o mesmo consumo de tempo que a primeira, apesar de ter mais casos a ser tratados.
+ * [A terceira](@ref deque3::Deque) implementação é uma expansão da segunda, e melhora o tempo
+ * consumido por operação.
  *
  * @subsection arn Árvore Rubro-Negra
  * Uma [árvore rubro-negra](@ref red_black_tree::RedBlackTree) é uma árvore de busca binária
