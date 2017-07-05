@@ -13,8 +13,18 @@ void eq_vec(Deque<int> d, std::vector<int> v) {
 		tmp = tmp.PopFront();
 		tmp2 = tmp2.PopBack();
 	}
-	EXPECT_EQ(tmp.first, nullptr);
-	EXPECT_EQ(tmp2.first, nullptr);
+}
+
+TEST(DSimple, Simple) {
+	Deque<int> d0;
+	d0 = d0.PushBack(2);
+	d0 = d0.PushFront(3);
+	EXPECT_EQ(d0.Back(), 2);
+	EXPECT_EQ(d0.Front(), 3);
+	d0 = d0.PopBack();
+	EXPECT_EQ(d0.Front(), 3);
+	EXPECT_EQ(d0.Back(), 3);
+
 }
 
 TEST(DSimple, Example) {

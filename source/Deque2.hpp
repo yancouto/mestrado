@@ -1,33 +1,61 @@
 /** @file
- * Implementação de uma deque persistente de acordo com o capítulo 3.
+ * Implementação de uma deque persistente de acordo com o capítulo 4.
  * Veja Deque para mais informação.
  */
 
-#ifndef DEQUE1_HPP_
-#define DEQUE1_HPP_
+#ifndef DEQUE2_HPP_
+#define DEQUE2_HPP_
 
 #include "Stack.hpp"
 
-namespace deque1 {
+namespace deque2 {
 
-/** Nó da deque.
- * Como a técnica é a mesma, precisamos do mesmo nó que na Stack.
+/** Nó da deque recursiva.
+ * Um nó representa uma deque persistente e tem três campos opcionais: #preffix, #center e #suffix.
+ * A deque resultante é a deque que tem como primeiro elemento #preffix (se for não-nulo),
+ * último elemento #suffix (se for não-nulo), e demais elementos são armazenados em pares
+ * na sub-deque #center .
+ *
+ * Usamos ponteiros para void ao invés de um tipo \c T de template pois é necessário que o campo
+ * #center armazene uma deque de pares de T, e se isso fosse feito com templates, geraria um
+ * loop infinito em tempo de compilação, já que C++ tentaria instanciar todos os tipos possíveis
+ * de Deque, que seriam infinitos.
  */
-template<class T> using Node = stack::Node<T>;
+class Node {
+public:
+	/** Prefixo da deque.
+	 * Se for não-nulo, #preffix é um ponteiro para o valor do primeiro elemento da deque.
+	 */
+	const void* preffix;
+	/** Sub-deque central.
+	 * Uma deque que armazena pares de elementos de \c T , e tem os elementos "do meio" da deque.
+	 * Seu tipo é void pois 
+	 */
+	const Node *center;
+	/** Sufixo da deque.
+	 * Se for não-nulo, #suffix um ponteiro para o valor do último elemento da deque.
+	 */
+	const void* suffix;
 
-/** Deque persistente utilizando LA e LCA.
+	/** Tamanho da deque.
+	 * Número de elementos total da deque. Esse número vai ser duas vezes o número de elementos
+	 * em #center mais um para cada ponteiro não-nulo em #preffix e #suffix .
+	 */
+	int size;
+};
+
+/** Deque persistente de estrutura recursiva.
  * Uma deque é uma lista que permite adições e remoções em suas duas pontas. Implementamos aqui
- * uma deque persistente que também permite acesso ao k-ésimo elemento. Esta utiliza a mesma
- * técnica que a [pilha](@ref stack::Stack) e a [fila](@ref queue::Queue), tanto que a
- * estrutura [Node](@ref stack::Node) é compartilhada entre a pilha e esta estrutura.
+ * uma deque persistente que também permite acesso ao k-ésimo elemento. Esta utiliza uma tecnica
+ * descrita por Kaplan e Tarjan @cite KaplanT1999 .
  *
  * A deque armazena elementos do tipo `T`, e só assume que esse tipo tem um construtor de cópia.
- * Uma diferença do código discutido no Capítulo 3 da tese é que aqui as funções não recebem a
- * deque, mas são métodos desta.
+ * Uma diferença do código discutido no Capítulo 4 da tese é que aqui as funções não recebem a
+ * deque, mas são métodos desta. Além disso, as funções Pop não retornam o objeto removido, apenas
+ * a nova deque.
  *
- * Um objeto Deque consiste de apenas dois ponteiros para nós das extremidades da deque. O objeto
- * é imutável, e como a implementação é funcional, podemos usá-la de forma persistente, como no
- * seguinte exemplo:
+ * O objeto é imutável, e como a implementação é funcional, podemos usá-la de forma persistente,
+ * como no seguinte exemplo:
  *
  * @code
  * using namespace deque1;
@@ -43,15 +71,11 @@ template<class T> using Node = stack::Node<T>;
  */
 template<class T> class Deque {
 public:
-	/** Primeiro nó.
-	 * Este é o nó que indica o primeiro elemento da deque. Os elementos da deque são os nós
-	 * no caminho entre #first e #last.
+	/** Nó principal.
+	 * Este é o nó que representa a deque inteira.
+	 * @see Node para saber a razão desta classe não ter o tipo \c T .
 	 */
-	const Node<T> *first;
-	/** Ultimo nó.
-	 * @see first para mais informação.
-	 */
-	const Node<T> *last;
+	const Node *node;
 
 	/** Construtor vazio.
 	 * Constrói uma deque sem nenhum elemento.
@@ -89,14 +113,6 @@ public:
 	 */
 	///@{
 
-	/** Inverte a deque.
-	 * @returns Uma cópia da deque, mas com a ordem dos elementos invertida.
-	 * @remark Apesar de ser uma função interessante por si só, esta função é principalmente
-	 * usada para reduzir a quantidade de código para operações de Front ou Back, já que estas
-	 * são simétricas.
-	 */
-	Deque<T> Swap() const;
-
 	/** Inserção no início.
 	 * @param x Valor a ser adicionado no início da deque.
 	 * @returns Uma cópia da deque, mas com \p x como primeiro elemento.
@@ -124,11 +140,11 @@ public:
 	///@}
 
 private:
-	Deque(const Node<T> *f, const Node<T> *l);
+	Deque(const Node *u);
 };
 
-} // namespace deque1
+} // namespace deque2
 
-#include "Deque1.tpp"
+#include "Deque2.tpp"
 
-#endif // DEQUE1_HPP_
+#endif // DEQUE2_HPP_

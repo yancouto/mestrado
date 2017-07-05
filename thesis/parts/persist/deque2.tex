@@ -85,8 +85,8 @@ Observe que, para uma deque não-vazia, considerando que nenhum campo~$\V{center
     \ElsIf{$d.\V{center} = \Null$}
         \State \Return $d.\V{suffix}$
     \Else
-	    \State \Return \func{Front}{d.\V{center}}$.\V{first}$
-	\EndIf
+        \State \Return \func{Front}{d.\V{center}}$.\V{first}$
+    \EndIf
 \EndFunction
 
 \Function{Back}{$d$}
@@ -95,8 +95,8 @@ Observe que, para uma deque não-vazia, considerando que nenhum campo~$\V{center
     \ElsIf{$d.\V{center} = \Null$}
         \State \Return $d.\V{preffix}$
     \Else
-	    \State \Return \func{Back}{d.\V{center}}$.\V{second}$
-	\EndIf
+        \State \Return \func{Back}{d.\V{center}}$.\V{second}$
+    \EndIf
 \EndFunction
 
 
@@ -133,18 +133,20 @@ Assim, se apenas copiarmos todos os nós que iremos modificar, mantemos a estrut
         \State \Return \New \func{Node}{x, d.\V{center}, d.\V{suffix}}\label{line:dm:puf2_1}
     \Else
         \State \Return \New \func{Node}{\Null, \Call{PushFront}{d.\V{center}, (x, d.\V{preffix})}, d.\V{suffix}} \label{line:dm:puf3}
-	\EndIf
+    \EndIf
 \EndFunction
 
 \Function{PopFront}{$d$}
-    \If{$d.\V{preffix} \neq \Null$} \label{line:dm:pof1}
+    \If{$d.\V{preffix} \neq \Null \And d.\V{center} = \Null \And d.\V{suffix} = \Null$} \label{line:dm:pof0}
+        \State \Return $(d.\V{preffix}, \Null)$
+    \ElsIf{$d.\V{preffix} \neq \Null$} \label{line:dm:pof1}
         \State \Return $(d.\V{preffix}, \New \Call{Node}{\Null, d.\V{center}, d.\V{suffix}})$ \label{line:dm:pof1_2}
     \ElsIf{$d.\V{center} = \Null$}
         \State \Return $(d.\V{suffix}, \Call{Deque}{\null})$ \label{line:dm:pof2}
     \Else
         \State $(x, c) = \Call{PopFront}{d.\V{center}}$
         \State \Return $(x.\V{first}, \New \Call{Node}{x.second, c, d.\V{suffix}})$ \label{line:dm:pof3}
-	\EndIf
+    \EndIf
 \EndFunction
 
 \end{algorithmic}
@@ -173,7 +175,7 @@ A função~\func{PopFront}{d} funciona corretamente, retornando, sem modificar~$
 \begin{proof}
 A prova também será feita por indução no número de níveis da estrutura da deque.
 
-Se~$d.\V{preffix}$ não é nulo, basta remover e retornar este elemento. O~\keyword{if} das linhas~\nref{line:dm:pof1} e~\nref{line:dm:pof1_2} faz isso corretamente, retornando~$d.\V{preffix}$ e criando um novo nó que não tem esse campo, sem modificar~$d$.
+    Se~$d.\V{preffix}$ não é nulo, basta remover e retornar este elemento. Se~$d.\V{preffix}$ era o único nó da estrura, o resto dela é vazio e portanto deve ser representado com~\keyword{null}. Este caso é tratado na linha~\nref{line:dm:pof0}. Caso contrário, o~\keyword{if} das linhas~\nref{line:dm:pof1} e~\nref{line:dm:pof1_2} trata isso corretamente, retornando~$d.\V{preffix}$ e criando um novo nó que não tem esse campo, sem modificar~$d$.
 
 Caso contrário, se~$d.\V{center}$ é nulo, sabemos que~$d$ é uma deque com apenas um elemento, armazenado em~$d.\V{suffix}$, pois sabemos que~\func{PopFront}{d} não é chamada se~$d$ é vazia. A linha~\nref{line:dm:pof2} trata corretamente esse caso, retornando~$d.\V{suffix}$ e uma nova deque vazia.
 

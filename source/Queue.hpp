@@ -15,7 +15,7 @@ namespace queue {
  * A fila é implementada usando a [pilha persistente](@ref stack::Stack), já que esta permite
  * acesso ao k-ésimo elemento, e isto é o bastante para usá-la como uma fila.
  *
- * A fila armazena elementos do tipo `T`, e não faz nenhuma suposição sobre esse tipo.
+ * A deque armazena elementos do tipo `T`, e só assume que esse tipo tem um construtor de cópia.
  * Uma diferença do código discutido no Capítulo 2 da tese é que aqui as funções não recebem a
  * fila, mas são métodos desta.
  *
