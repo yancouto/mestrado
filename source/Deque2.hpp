@@ -6,8 +6,6 @@
 #ifndef DEQUE2_HPP_
 #define DEQUE2_HPP_
 
-#include "Stack.hpp"
-
 namespace deque2 {
 
 /** Nó da deque recursiva.
@@ -29,7 +27,6 @@ public:
 	const void* preffix;
 	/** Sub-deque central.
 	 * Uma deque que armazena pares de elementos de \c T , e tem os elementos "do meio" da deque.
-	 * Seu tipo é void pois 
 	 */
 	const Node *center;
 	/** Sufixo da deque.
@@ -58,7 +55,7 @@ public:
  * como no seguinte exemplo:
  *
  * @code
- * using namespace deque1;
+ * using namespace deque2;
  * Deque<int> d1; // ()
  * Deque<int> d2 = d1.PushFront(1); // (1)
  * Deque<int> d3 = d2.PushFront(2); // (2, 1)

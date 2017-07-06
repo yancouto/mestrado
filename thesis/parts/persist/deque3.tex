@@ -10,7 +10,7 @@ Modificaremos a implementação do Capítulo~\ref{cap:deque2} para que todas as 
 
 \subsection{Deque persistente como um contador binário}
 
-Note que, se adicionarmos elementos apenas usando~\func{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
+Note que, na estrutura do Capítulo~\ref{sec:deque2}, se adicionarmos elementos apenas usando~\func{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
 
 Esse comportamento é similar ao de um contador binário. Podemos considerar que cada nível é um dígito:~0 se~$\V{preffix}$ é nulo ou~1 se~$\V{preffix}$ é não nulo. O primeiro nível é o dígito menos significativo. Assim, adicionar um elemento usando~\func{PushFront}{d, x} é equivalente a somar~1 no contador binário, pois se encontramos um~0 colocamos~$x$ ali, senão, formamos um par de~$x$ com o elemento que ali estava (transformando essa posição em~0), e adicionamos esse par na posição seguinte~(somamos~1 na posição seguinte).
 
@@ -126,7 +126,7 @@ Após adicionar ou remover um elemento, o dígito associado ao primeiro nível p
 
 Uma operação~\textsc{Fix} no nível~$i$ com dígito~2 transforma esse dígito em~0 e aumenta em no máximo~1 o dígito do próximo nível. Pela semi-regularidade da estrutura, o nível~$i+1$ tem dígito~0 ou~1. Para cada uma das sub-deques do nível~$i$, se esta sub-deque tem pelo menos quatro elementos, removemos dois destes, formamos um par com estes e o inserimos na correspondente sub-deque do nível~$i+1$; se a sub-deque tem no máximo um elemento, removemos um par da sub-deque do nível~$i+1$, e inserimos os dois elementos do par na sub-deque. Dessa forma, ao final do~\textsc{Fix}, cada uma das sub-deques do nível~$i$ tem~2 ou~3 elementos, então o dígito do nível~$i$ é~0.
 
-Quando dizemos ``remover'' um elemento de uma sub-deque e ``inserir'' em outra, isto deve ser feito na extremidade correta. Por exemplo, remove-se elementos do final do prefixo de~$i$ para adicionar um par no início do prefixo de~$i+1$. A operação~\textsc{Fix} foi descrita de forma simples, mas na prática é necessário tratar muitos casos, como será descrito a seguir. É importante notar que~\textsc{Fix} é a mesma, não importando se a operação que a chamou foi~\textsc{Push} ou~\textsc{Pop}. Após um~\textsc{Fix} em uma estrutura semi-regular, esta se torna regular, pelos mesmos argumentos discutidos na Seção~\ref{sec:contbin}.
+Quando dizemos ``remover'' um elemento de uma sub-deque e ``inserir'' em outra, isto deve ser feito na extremidade correta. Por exemplo, remove-se elementos do \emph{final} do prefixo de~$i$ para adicionar um par no \emph{início} do prefixo de~$i+1$. A operação~\textsc{Fix} foi descrita de forma simples, mas na prática é necessário tratar muitos casos, como será descrito a seguir. É importante notar que~\textsc{Fix} é a mesma, não importando se a operação que a chamou foi~\textsc{Push} ou~\textsc{Pop}. Após um~\textsc{Fix} em uma estrutura semi-regular, esta se torna regular, pelos mesmos argumentos discutidos na Seção~\ref{sec:contbin}.
 
 \section{Pilha de pilhas, e implementações funcionais} \label{sec:implfunc}
 
@@ -158,7 +158,7 @@ drawnode1/.list={4, 7, 9}
 
 Uma ideia inicial é manter uma pilha (persistente) de nós com dígitos~2, e, como nas implementações anteriores, sempre que for necessário modificar um campo de um nó, copiar esse nó. Isso, porém, não funciona.
 
-Considere a Figura~\ref{fig:func_ex1}, onde os números indicam os dígitos correspondentes aos níveis, e os nós tracejados são os nós de acesso, ou seja, o primeiro nível e o topo da pilha de dígitos. Suponha que uma operação de~\textsc{Push} ou~\textsc{Pop} modifique o dígito do primeiro nível para~1, e então seja realizada uma operação de~\textsc{Fix} no primeiro dígito~2, no nível~4, e essa operação transforme o dígito em~0 e o dígito do nível~5 em~1.
+Considere a Figura~\ref{fig:func_ex1}, onde os números indicam os dígitos correspondentes aos níveis, e os nós tracejados são os nós de entrada, ou seja, o primeiro nível e o topo da pilha de nós com dígito 2. Suponha que uma operação de~\textsc{Push} ou~\textsc{Pop} modifique o dígito do primeiro nível para~1, e então seja realizada uma operação de~\textsc{Fix} no primeiro dígito~2, no nível~4, e essa operação transforme o dígito em~0 e o dígito do nível~5 em~1.
 
 \begin{figure}
 \centering
@@ -286,22 +286,24 @@ A representação de um nó da deque será similar à do Capítulo~\ref{cap:dequ
 
 Os campos~$\V{preffix}$ e~$\V{suffix}$, como anteriormente, guardam um prefixo e um sufixo da deque, considerando $u$ como raiz, mas agora estes campos são deques não-persistentes de tamanho até~5. Usamos que~$\{\}$ cria uma deque não-persistente vazia, e que cada deque tem funções homônimas às descritas no início do Capítulo~\ref{cap:deque2}, mas não recebem a deque e não retornam uma nova deque. Além disso, uma função~\func{Size}{} retorna o número de elementos na deque não-persistente. Por exemplo, se~$d$ é uma deque não-persistente,~$d.\func{PopBack}{}$ remove o último elemento de~$d$ e o retorna, modificando~$d$.
 
-O campo~$\V{next}$ aponta para o próximo nível com dígito diferente de~1, se existir e se~$u$ não tiver dígito~1 ou se~$u$ for o primeiro nível. O campo~$\V{child}$ aponta para o nó de nível~$i + 1$, se existir, e se este nó tem dígito~1.
+O campo~$\V{next}$ aponta para o próximo nível com dígito diferente de~1, se existir e se~$u$ não tiver dígito~1, ou se~$u$ for o primeiro nível. O campo~$\V{child}$ aponta para o nó de nível~$i + 1$, se existir, e se este nó tem dígito~1.
 
 \section{Operação~{\normalfont \textsc{Fix}} detalhada} \label{sec:fix_det}
 
 Vamos analisar mais detalhadamente os casos possíveis para a operação~\textsc{Fix}. Ao aplicar o~\textsc{Fix} em um nó de nível~$i$ com dígito~2, queremos transformar esse dígito em~0, possivelmente modificando o nível~$i+1$. Pela regularidade temos que o dígito do nível~$i+1$ não é~2. A necessidade de tratar múltiplos casos se deve ao caso degenerado.
 
-Para reduzir a descrição dos casos, vamos utilizar um procedimento~\func{FixDeques}{l,r,L,R}. Esse procedimento recebe duas sub-deques (não persistentes)~$l$ e~$r$, prefixo e sufixo do~nível~$i$ e deixa ambas com~2 ou~3 elementos, possivelmente modificando as deques~$L$ e~$R$, prefixo e sufixo do nível~$i+1$, tornando vazio ou aumentando em no máximo~1 o dígito do nível~$i+1$. Este procedimento só funciona se existem mais de~3 elementos de nível~$i$ entre todas as deques da chamada, isto é, se~${\Call{Size}{l} + \Call{Size}{r} + 2\,\Call{Size}{L} + 2\,\Call{Size}{R} > 3}$
+Para reduzir a descrição dos casos, vamos utilizar um procedimento~\func{FixDeques}{l,r,L,R}. Esse procedimento recebe duas sub-deques (não persistentes)~$l$ e~$r$, prefixo e sufixo do~nível~$i$ e deixa ambas com~2 ou~3 elementos, possivelmente modificando as sub-deques~$L$ e~$R$, prefixo e sufixo do nível~$i+1$, tornando este nível vazio ou aumentando em no máximo~1 se dígito. Este procedimento só funciona se existem mais de~3 elementos de nível~$i$ entre todas as deques da chamada, isto é, se~${\Call{Size}{l} + \Call{Size}{r} + 2\,\Call{Size}{L} + 2\,\Call{Size}{R} > 3}$
 
-Para aplicar uma operação~\textsc{Fix}, devemos primeiramente criar um nível~$i+1$ vazio se este não existir. Após isso trata-se os casos.
+Para aplicar uma operação~\textsc{Fix}, devemos primeiramente criar um nível~$i+1$ vazio se este não existir. Após isso, trata-se os casos.
 
 \begin{description}
     \item[Caso 1.] Se existem no máximo~3 elementos de nível~$i$ entre os níveis~$i$ e~$i+1$, então adicione-os todos no prefixo do nível~$i$, mantendo a ordem, e remova o nível~$i+1$.
     \item[Caso 2.] Caso contrário, sejam~$a$ e~$b$ os nós de nível~$i$ e~$i+1$, respectivamente; realize o procedimento~\func{FixDeques}{a.\V{preffix}, a.\V{suffix}, b.\V{preffix}, b.\V{suffix}}. Se o nível~$i+1$ é agora o último nível e está vazio, remova-o.
 \end{description}
 
-Assumindo que o procedimento~\textsc{FixDeques} funciona, os casos tratam corretamente o~\textsc{Fix}. No Caso~1, não existe nível~$i+2$, pois o nível~$i+1$ não tem mais que~1 elemento, então se não fosse o último nível, teria dígito~2. Além disso, o prefixo do nível~$i$ vai ter, ao final da função,~2 ou~3 elementos, já que é impossível o caso em que existe apenas~1 elemento de nível~$i$ entre os níveis~$i$ e~$i+1$, pois isso implica que não existem elementos em~$i+1$, e o nível~$i+1$ teria dígito~2 (uma contradição pela semi-regularidade da estrutura), ou não existe, e então o nível~$i$ é o último e tem exatamente~1 elemento, mas nesse caso o dígito desse nível não é~2.
+Assumindo que o procedimento~\textsc{FixDeques} funciona, os casos tratam corretamente o~\textsc{Fix}. No Caso~1, não existe nível~$i+2$, pois o nível~$i+1$ não tem mais que~1 elemento, então se não fosse o último nível, teria dígito~2, uma contradição pela semi-regularidade da estrutura.
+
+Além disso, o prefixo do nível~$i$ vai ter, ao final da função,~2 ou~3 elementos, já que é impossível o caso em que existe apenas~1 elemento de nível~$i$ entre os níveis~$i$ e~$i+1$, pois isso implica que não existem elementos em~$i+1$, e o nível~$i+1$ teria dígito~2 (uma contradição pela semi-regularidade da estrutura), ou não existe, e então o nível~$i$ é o último e tem exatamente~1 elemento, mas nesse caso o dígito desse nível não é~2.
 
 Ainda resta, na operação~\textsc{Fix}, arrumar os campos~$\V{child}$ e~$\V{next}$ dos nós modificados, que podem ter mudado. Essas dificuldades serão tratadas durante a implementação, discutida nas próximas seções.
 
@@ -414,7 +416,7 @@ Logo, não existe situação em que a execução da função~\textsc{FixDeques} 
     \EndIf
     
     \If{$b \neq \Null \And \Call{Digit}{b, \V{last}} = 1$}
-        \If{$a.\V{child} = \Null$} \Comment{Nível $i + 1$ tinha dígito diferente de~1} \label{line:fix:next_a_bb}
+        \If{$a.\V{child} = \Null$} \Comment{Nível $i + 1$ tinha dígito diferente de~1.} \label{line:fix:next_a_bb}
             \State $a.\V{next} = b.\V{next}$
             \State $b.\V{next} = \Null$ \label{line:fix:next_a_be}
         \EndIf
@@ -436,10 +438,10 @@ O Código~\ref{lst:op_fix} apresenta a implementação de~\func{Fix}{a}, uma ope
 
 A função~\func{Digit}{a, \V{last}} retorna o dígito do nó~$a$, onde~$\V{last}$ é~\textbf{true} se não existe nível depois de~$a$, e~\textbf{false} caso contrário. Receber~$\V{last}$ é necessário pois um nó pode ter o campo~$\V{child}$ nulo, mas ainda assim existir um nó no próximo nível. Nesse caso, o nó de próximo nível é o campo~$\V{next}$ da cabeça da sub-pilha que contém~$a$. Veja a Figura~\ref{fig:func_ex3}, o nó de nível~3 tem campo~$\V{child}$ nulo, mas existe nó de nível~4, e um ponteiro para este está armazenado apenas no nó de nível~1.
 
-As linhas~{\nref{line:fix:p1b}-\nref{line:fix:p1e}} copiam o nó de nível~$i+1$ na variável~$b$, criando um nó vazio se este não existir.
+As linhas~{\nref{line:fix:p1b}-\nref{line:fix:p1e}} copiam o nó de nível~$i+1$ na variável~$b$, criando um nó vazio se este não existir. Este nó pode estar tanto no campo~$\V{child}$ quanto no campo~$\V{next}$ de~$a$, se ele existir tiver dígito~1 ou~0, respectivamente.
 Também é armazenado na váriavel~$\V{last}$ o valor~\textbf{true} se não existe nível~$i+2$, e~\textbf{false} caso contrário. A notação de Iverson~$[$\texttt{predicado}$]$ retorna~\textbf{true} (ou~1) se \texttt{predicado} é verdade e~\textbf{false} (ou~0) se é falso.
 
-As linhas~{\nref{line:fix:p2b}-\nref{line:fix:p2e}} resolvem o Caso~1, como discutido na Seção~\ref{sec:fix_det}. Usamos o fato que cada sub-deque em ambos os níveis tem no máximo~1 elemento.
+As linhas~{\nref{line:fix:p2b}-\nref{line:fix:p2e}} resolvem o Caso~1, como discutido na Seção~\ref{sec:fix_det}, adicionando todos elementos das sub-deques dos níveis~$i$ e~$i+1$ no prefixo do nó~$a$, e apagando~$b$. Usamos o fato que cada sub-deque em ambos os níveis tem no máximo~1 elemento.
 
 O Caso~2 é tratado nas linhas~{\nref{line:fix:p3b}-\nref{line:fix:p3e}}. Na Seção~\ref{sec:fix_deques} discutimos que o procedimento~\textsc{FixDeques} está correto. O~\keyword{if} da linha~\nref{line:fix:if_empty} verifica se não existe nível~$i+2$ e ambas as sub-deques do nível~$i+1$ estão vazias. Nesse caso o nível~$i+1$ é removido.
 
