@@ -58,7 +58,6 @@ TEST(DSimple, VectorAndKth) {
 			d = d.PushBack(v.back());
 			p.push_back(i);
 		}
-		std::cout << "Done build" << std::endl;
 		eq_vec(d, v);
 		std::random_shuffle(p.begin(), p.end());
 		for(int i = 0; i < int(v.size()); i++)

@@ -213,15 +213,18 @@ void Fix(Node *a) {
 		if(a->suffix.size() != 0) {
 			a->preffix.push_back(a->suffix.front()); a->suffix.pop_front();
 		}
+		delete b;
 		b = nullptr;
 	} else { // Caso 2
 		b->size += (a->preffix.size() >= 4) + (a->suffix.size() >= 4);
 		b->size -= (a->preffix.size() <= 1) + (a->suffix.size() <= 1);
 		FixDeques(a->preffix, a->suffix, b->preffix, b->suffix);
-		if(b->preffix.size() == 0 && b->suffix.size() == 0 && last)
+		if(b->preffix.size() == 0 && b->suffix.size() == 0 && last) {
+			delete b;
 			b = nullptr;
+		}
 	}
-	if(b != nullptr && Digit(b, last) != 1) {
+	if(b != nullptr && Digit(b, last) == 1) {
 		if(a->child == nullptr) {
 			a->next = b->next;
 			b->next = nullptr;
