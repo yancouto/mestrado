@@ -19,27 +19,44 @@ public:
 	/** Próximo nó.
 	 * Este campo armazena um ponteiro para o próximo nó da lista ligada.
 	 */
-	const Node *next;
+	Node *next;
 
 	/** Profundidade do nó.
 	 * Se seguirmos o link #next por #depth vezes chegamos no nó \c null.
 	 */
-	int depth;
+	const int depth;
 
 	/** Nó de pulo.
 	 * Aponta para o nó \c u com `u.#depth = J(#depth)`, onde \c J é a operação de diminuir em 1 o
 	 * digito menos significativo não-nulo na base skew-binary canônica.
 	 * @see \cite Myers83 para mais informação sobre skew-binary.
 	 */
-	const Node *jmp;
+	Node *jmp;
 
 	/** k-ésimo ancestral.
 	 * @param k Indice do ancestral.
 	 * @returns O k-ésimo ancestral do nó. Se `k = 0`, retorna o próprio nó.
 	 */
-	const Node* K_Ancestor(int k) const;
+	Node* K_Ancestor(int k);
 
-	Node(const T& x, const Node *nx);
+	/** Número de pointeiros para o nó.
+	 * Este campo, não persistente, armazena, a todo momento, quantos ponteiros existem para esse
+	 * nó. Ele conta os ponteiros #nxt de outros nós e ponteiros armazenados em
+	 * #stack::Stack::node.
+	 *
+	 * Isto é feito pois C++ não tem
+	 * [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)),
+	 * logo devemos manualmente deletar os nós que não tem mais como ser atingidos. Este campo
+	 * é usado para remover o nó quando não existem mais ponteiros para ele. Já que a estrutura
+	 * é acíclica, isso acontece quando o vértice não é mais atingível.
+	 *
+	 * Como esta é uma classe auxiliar, toda a remoção acontece na classe stack::Stack.
+	 */
+	int ptr_ct;
+
+	Node(const T& x, Node *nx);
+	Node(const Node&) = delete;
+	Node& operator=(const Node&) = delete;
 };
 
 /** Pilha persistente.
@@ -79,7 +96,7 @@ public:
 	 * modificar este nó.
 	 * @see Node
 	 */
-	const Node<T> *node;
+	Node<T> *node;
 
 	/** Construtor de pilha vazia.
 	 * Contrói uma pilha sem nenhum elemento.
@@ -144,9 +161,13 @@ public:
 	Stack<T> Pop() const;
 
 	///@}
+
+	~Stack();
 	
+	Stack& operator=(const Stack &o);
+	Stack(const Stack &o);
 private:
-	Stack(const Node<T> *u);
+	Stack(Node<T> *u);
 };
 
 } // namespace stack

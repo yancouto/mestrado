@@ -4,11 +4,15 @@ branches:
     only: master
 addons:
     apt:
-        packages: doxygen
+        packages:
+            - doxygen
+env:
+    global:
+        - MAKEFLAGS="-j"
 before_install:
-- sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
+- sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full valgrind
 script:
-- make
+- make NO_VALGRIND=true
 deploy:
     provider: pages
     skip_cleanup: true

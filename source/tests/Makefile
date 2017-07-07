@@ -105,3 +105,8 @@ $(addsuffix .test, $(TESTS)): %.test : %
 	@echo "${TESTS}" | sed -e 's/ /\n/g' >$@
 
 test_all: $(addsuffix .test, $(TESTS)) .gitignore
+
+$(addsuffix .memcheck, $(TESTS)) : %.memcheck : %
+	valgrind -q --leak-check=yes ./$<
+
+memcheck: $(addsuffix .memcheck, $(TESTS))

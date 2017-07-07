@@ -6,7 +6,7 @@ namespace deque1 {
 
 template<class T> Deque<T>::Deque() : first(nullptr), last(nullptr) {}
 
-template<class T> Deque<T>::Deque(const Node<T> *f, const Node<T> *l) : first(f), last(l) {}
+template<class T> Deque<T>::Deque(Node<T> *f, Node<T> *l) : first(f), last(l) {}
 
 template<class T> const T& Deque<T>::Front() const { return first->val; }
 
@@ -14,7 +14,7 @@ template<class T> const T& Deque<T>::Back() const { return last->val; }
 
 namespace {
 
-template<class T> const Node<T>* LCA(const Node<T> *a, const Node<T> *b) {
+template<class T> Node<T>* LCA(Node<T> *a, Node<T> *b) {
 	if(a->depth > b->depth) std::swap(a, b);
 	b = b->K_Ancestor(b->depth - a->depth);
 	if(a == b) return a;
@@ -47,7 +47,7 @@ template<class T> Deque<T> Deque<T>::Swap() const { return Deque<T>(last, first)
 
 template<class T> Deque<T> Deque<T>::PushFront(const T& x) const {
 	if(first == nullptr) {
-		const Node<T> *u = new Node<T>(x, nullptr);
+		Node<T> *u = new Node<T>(x, nullptr);
 		return Deque<T>(u, u);
 	} else
 		return Deque<T>(new Node<T>(x, first), last);

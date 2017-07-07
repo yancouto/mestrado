@@ -47,11 +47,11 @@ public:
 	 * Este é o nó que indica o primeiro elemento da deque. Os elementos da deque são os nós
 	 * no caminho entre #first e #last.
 	 */
-	const Node<T> *first;
+	Node<T> *first;
 	/** Ultimo nó.
 	 * @see first para mais informação.
 	 */
-	const Node<T> *last;
+	Node<T> *last;
 
 	/** Construtor vazio.
 	 * Constrói uma deque sem nenhum elemento.
@@ -124,7 +124,7 @@ public:
 	///@}
 
 private:
-	Deque(const Node<T> *f, const Node<T> *l);
+	Deque(Node<T> *f, Node<T> *l);
 };
 
 } // namespace deque1

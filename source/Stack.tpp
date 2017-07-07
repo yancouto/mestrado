@@ -2,12 +2,11 @@
 
 namespace stack {
 
-template<class T> Node<T>::Node(const T& x, const Node<T> *nx) : val(x), next(nx) {
+template<class T> Node<T>::Node(const T& x, Node<T> *nx) : val(x), next(nx), depth(nx? nx->depth + 1 : 1), ptr_ct(0) {
 	if(nx == nullptr) {
-		depth = 1;
 		jmp = nullptr;
 	} else {
-		depth = nx->depth + 1;
+		nx->ptr_ct++;
 		const Node<T> *j = nx->jmp;
 		int jdepth = j? j->depth : 0;
 		int j2depth = j && j->jmp? j->jmp->depth : 0;
@@ -18,9 +17,9 @@ template<class T> Node<T>::Node(const T& x, const Node<T> *nx) : val(x), next(nx
 	}
 }
 
-template<class T> const Node<T>* Node<T>::K_Ancestor(int k) const {
+template<class T> Node<T>* Node<T>::K_Ancestor(int k) {
 	int ndepth = depth - k;
-	const Node<T> *u = this;
+	Node<T> *u = this;
 	while(u->depth != ndepth) {
 		if(u->jmp && u->jmp->depth >= ndepth)
 			u = u->jmp;
@@ -31,7 +30,31 @@ template<class T> const Node<T>* Node<T>::K_Ancestor(int k) const {
 }
 
 template<class T> Stack<T>::Stack() : node(nullptr) {}
-template<class T> Stack<T>::Stack(const Node<T> *u) : node(u) {}
+template<class T> Stack<T>::Stack(Node<T> *u) : node(u) { if(node != nullptr) node->ptr_ct++; }
+template<class T> Stack<T>::Stack(const Stack<T> &o) : node(nullptr) { *this = o; }
+
+namespace {
+
+template<class T> void ptr_clean(Node<T> *u) {
+	while(u != nullptr && --u->ptr_ct == 0) {
+		Node<T> *nx = u->next;
+		delete u;
+		u = nx;
+	}
+}
+
+}
+
+template<class T> Stack<T>& Stack<T>::operator=(const Stack<T> &o) {
+	ptr_clean(node);
+	node = o.node;
+	if(node) node->ptr_ct++;
+	return *this;
+}
+
+template<class T> Stack<T>::~Stack() {
+	ptr_clean(node);
+}
 
 template<class T> const T& Stack<T>::Top() const { return node->val; }
 
