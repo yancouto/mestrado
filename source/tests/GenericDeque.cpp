@@ -58,6 +58,7 @@ TEST(DSimple, VectorAndKth) {
 			d = d.PushBack(v.back());
 			p.push_back(i);
 		}
+		std::cout << "Done build" << std::endl;
 		eq_vec(d, v);
 		std::random_shuffle(p.begin(), p.end());
 		for(int i = 0; i < int(v.size()); i++)
@@ -153,7 +154,7 @@ TEST(DSimple, StdDequeStored) {
 		Deque<pii> d; std::deque<pii> sd;
 		std::vector<Deque<pii>> dq;
 		std::vector<Query> qu;
-		for(int i = 0; i < 50000; i++) {
+		for(int i = 0; i < 100000; i++) {
 			if(rnd() <= p && !sd.empty()) {
 				if(rnd() <= .5) {
 					qu.push_back({i - 1, 0, sd.back()});
