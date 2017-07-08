@@ -77,7 +77,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 TESTS = $(basename $(wildcard *.tests.cpp))
 
-.PHONY: clean .gitignore
+.PHONY: clean .gitignore $(addsuffix .mf, $(TESTS))
 clean:
 	rm -f $(TESTS) gtest.a gtest_main.a **/*.o *.o
 
@@ -85,7 +85,7 @@ clean:
 PERCENT=%
 
 $(addsuffix .mf, $(TESTS)): %.mf : %.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -M >$@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -MM >$@
 
 export CPPFLAGS
 export CXXFLAGS
