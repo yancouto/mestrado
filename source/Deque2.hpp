@@ -8,6 +8,15 @@
 
 namespace deque2 {
 
+struct any {
+	const void *ptr;
+	any(const void *p);
+	inline void add_ref();
+	template<class T> inline void rem_ref(int);
+private:
+	int ref_ct;
+};
+
 /** Nó da deque recursiva.
  * Um nó representa uma deque persistente e tem três campos opcionais: #preffix, #center e #suffix.
  * A deque resultante é a deque que tem como primeiro elemento #preffix (se for não-nulo),
@@ -24,21 +33,27 @@ public:
 	/** Prefixo da deque.
 	 * Se for não-nulo, #preffix é um ponteiro para o valor do primeiro elemento da deque.
 	 */
-	const void* preffix;
+	any* preffix;
 	/** Sub-deque central.
 	 * Uma deque que armazena pares de elementos de \c T , e tem os elementos "do meio" da deque.
 	 */
-	const Node *center;
+	Node *center;
 	/** Sufixo da deque.
 	 * Se for não-nulo, #suffix um ponteiro para o valor do último elemento da deque.
 	 */
-	const void* suffix;
+	any* suffix;
 
 	/** Tamanho da deque.
 	 * Número de elementos total da deque. Esse número vai ser duas vezes o número de elementos
 	 * em #center mais um para cada ponteiro não-nulo em #preffix e #suffix .
 	 */
 	int size;
+
+	Node(any *p, Node *c, any *s, int sz);
+	void add_ref();
+	template<class T> void rem_ref(int=0);
+private:
+	int ref_ct;
 };
 
 /** Deque persistente de estrutura recursiva.
@@ -72,7 +87,7 @@ public:
 	 * Este é o nó que representa a deque inteira.
 	 * @see Node para saber a razão desta classe não ter o tipo \c T .
 	 */
-	const Node *node;
+	Node *node;
 
 	/** Construtor vazio.
 	 * Constrói uma deque sem nenhum elemento.
@@ -136,8 +151,12 @@ public:
 
 	///@}
 
+	~Deque();
+	Deque(const Deque& o);
+	Deque& operator=(const Deque &o);
+
 private:
-	Deque(const Node *u);
+	Deque(Node *u);
 };
 
 } // namespace deque2
