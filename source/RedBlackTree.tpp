@@ -1,8 +1,5 @@
 // Esse arquivo é importado apenas por RedBlackTree.hpp e não deve ser importado manualmente.
 
-#include <unordered_set>
-#include <iostream>
-
 namespace red_black_tree {
 
 template<class T> Node<T>::Node(const T& val, int version) : child{nullptr, nullptr}, red(true),
@@ -108,6 +105,7 @@ template<class T> RedBlackTree<T>::~RedBlackTree() {
 		if(u->child[0] != nullptr && u->child[0]->timestamp != -1) toDelete.push_back(u->child[0]);
 		if(u->child[1] != nullptr && u->child[1]->timestamp != -1) toDelete.push_back(u->child[1]);
 		if(u->extraTimestamp != -1 && u->extra->timestamp != -1) toDelete.push_back(u->extra);
+		if(u->copy != nullptr && u->copy->timestamp != -1) toDelete.push_back(u->copy);
 		all.push_back(u);
 	}
 	for(Node<T> *x : all) delete x;
