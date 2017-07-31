@@ -2,12 +2,18 @@
 
 #include <utility>
 #include <cassert>
+#include <algorithm>
+#include <iostream>
 
 namespace deque3 {
 
 template<class T> SubDeque<T>::SubDeque() : i(0), size_(0) {}
 
 template<class T> int SubDeque<T>::size() const { return size_; }
+
+template<class T> bool SubDeque<T>::empty() const { return size_ == 0; }
+
+template<class T> void SubDeque<T>::clear() { size_ = 0; }
 
 template<class T> void SubDeque<T>::push_back(const T& x) {
 	assert(size_ < 5);
@@ -47,53 +53,49 @@ template<class T> const T& SubDeque<T>::operator[](int i) const {
 	return v[(this->i + i) % 5];
 }
 
-
-template<class T> Deque<T>::Deque() : node(nullptr) {}
-
-template<class T> Deque<T>::Deque(const Node *u) : node(u) {}
-
-Node::Node(const Node *c) : child(c), next(nullptr), size(2 * (c? c->size : 0)) {}
-
 /* Nesse namespace são implementadas versões de todos os métodos de Deque, mas estes recebem
  * Nodes e trabalham com ponteiros void.
  */
 namespace {
 
 // tipo da sub-deque
-typedef std::pair<const void*, const void*> pair;
+typedef std::pair<any*, any*> pair;
 
-const void* _Front(const Node *a) {
+any* _Front(Node *a) {
 	if(a->preffix.size() != 0)
 		return a->preffix.front();
 	else
 		return a->suffix.front();
 }
 
-const void* _Back(const Node *a) {
+any* _Back(const Node *a) {
 	if(a->suffix.size() != 0)
 		return a->suffix.back();
 	else
 		return a->preffix.back();
 }
 
-const Node* _PushFront(const Node *a, const void *x) {
+Node* _PushFront(Node *a, any *x) {
 	Node *a_ = Copy(a);
 	a_->preffix.push_front(x);
+	x->add_ref();
 	a_->size++;
 	Check(a_);
 	return a_;
 }
 
-const Node* _PushBack(const Node *a, const void *x) {
+Node* _PushBack(Node *a, any *x) {
 	Node *a_ = Copy(a);
 	a_->suffix.push_back(x);
+	x->add_ref();
 	a_->size++;
 	Check(a_);
 	return a_;
 }
 
-const Node* _PopFront(const Node *a) {
+Node* _PopFront(Node *a) {
 	Node *a_ = Copy(a);
+	_Front(a_)->rem_ref();
 	if(a_->preffix.size() != 0)
 		a_->preffix.pop_front();
 	else
@@ -103,8 +105,9 @@ const Node* _PopFront(const Node *a) {
 	return a_;
 }
 
-const Node* _PopBack(const Node *a) {
+Node* _PopBack(Node *a) {
 	Node *a_ = Copy(a);
+	_Back(a_)->rem_ref();
 	if(a_->suffix.size() != 0)
 		a_->suffix.pop_back();
 	else
@@ -114,16 +117,16 @@ const Node* _PopBack(const Node *a) {
 	return a_;
 }
 
-const void* _K_th(const Node *d, const Node *next, int k) {
+any* _K_th(Node *d, Node *next, int k) {
 	if(k < int(d->preffix.size())) return d->preffix[k];
 	if((d->size - k - 1) < int(d->suffix.size()))
 		return d->suffix[k - (d->size - int(d->suffix.size()))];
 	k -= d->preffix.size();
 	const pair *p;
 	if(d->child != nullptr)
-		p = static_cast<const pair*>(_K_th(d->child, next, k / 2));
+		p = static_cast<const pair*>(_K_th(d->child, next, k / 2)->ptr);
 	else
-		p = static_cast<const pair*>(_K_th(next, next->next, k / 2));
+		p = static_cast<const pair*>(_K_th(next, next->next, k / 2)->ptr);
 	if((k % 2) == 0)
 		return p->first;
 	else
@@ -133,23 +136,23 @@ const void* _K_th(const Node *d, const Node *next, int k) {
 } // namespace
 
 template<class T> const T& Deque<T>::Front() const {
-	return *static_cast<const T*>(_Front(node));
+	return *static_cast<const T*>(_Front(node)->ptr);
 }
 
 template<class T> const T& Deque<T>::Back() const {
-	return *static_cast<const T*>(_Back(node));
+	return *static_cast<const T*>(_Back(node)->ptr);
 }
 
 template<class T> const T& Deque<T>::K_th(int k) const {
-	return *static_cast<const T*>(_K_th(node, node->next, k));
+	return *static_cast<const T*>(_K_th(node, node->next, k)->ptr);
 }
 
 template<class T> Deque<T> Deque<T>::PushFront(const T& x) const {
-	return Deque<T>(_PushFront(node, new T(x)));
+	return Deque<T>(_PushFront(node, new any(new T(x))));
 }
 
 template<class T> Deque<T> Deque<T>::PushBack(const T& x) const {
-	return Deque<T>(_PushBack(node, new T(x)));
+	return Deque<T>(_PushBack(node, new any(new T(x))));
 }
 
 template<class T> Deque<T> Deque<T>::PopFront() const {
@@ -166,13 +169,15 @@ void Check(Node *a) {
 	else if(a->next != nullptr &&
 	        Digit(a->next, (a->next->child == nullptr && a->next->next == nullptr)) == 2) {
 		Node *c = Copy(a->next);
+		c->add_ref();
+		if(a->next != nullptr) a->next->safe_rem_ref();
 		a->next = c;
 		Fix(c);
 	}
 }
 
 Node* Copy(const Node *a) {
-	if(a == nullptr) return new Node(nullptr);
+	if(a == nullptr) return new Node();
 	return new Node(*a);
 }
 
@@ -195,20 +200,25 @@ void Fix(Node *a) {
 		b = Copy(a->next);
 		last = (b->next == nullptr && b->child == nullptr);
 	} else {
-		b = new Node(nullptr);
+		b = new Node();
 		last = true;
 	}
+	b->level = a->level + 1;
 	// Caso 1
 	if(a->preffix.size() + a->suffix.size() + 2 * b->preffix.size() + 2 * b->suffix.size() <= 3) {
 		if(b->preffix.size() != 0) {
-			const pair* xy = static_cast<const pair*>(b->preffix.front()); b->preffix.pop_front();
-			a->preffix.push_back(xy->first);
-			a->preffix.push_back(xy->second);
+			any* xy_ = b->preffix.front(); b->preffix.pop_front();
+			const pair* xy = static_cast<const pair*>(xy_->ptr);
+			a->preffix.push_back(xy->first); xy->first->add_ref();
+			a->preffix.push_back(xy->second); xy->second->add_ref();
+			xy_->rem_ref();
 		}
 		if(b->suffix.size() != 0) {
-			const pair* xy = static_cast<const pair*>(b->suffix.front()); b->suffix.pop_front();
-			a->preffix.push_back(xy->first);
-			a->preffix.push_back(xy->second);
+			any* xy_ = b->suffix.back(); b->suffix.pop_back();
+			const pair* xy = static_cast<const pair*>(xy_->ptr);
+			a->preffix.push_back(xy->first); xy->first->add_ref();
+			a->preffix.push_back(xy->second); xy->second->add_ref();
+			xy_->rem_ref();
 		}
 		if(a->suffix.size() != 0) {
 			a->preffix.push_back(a->suffix.front()); a->suffix.pop_front();
@@ -226,51 +236,131 @@ void Fix(Node *a) {
 	}
 	if(b != nullptr && Digit(b, last) == 1) {
 		if(a->child == nullptr) {
+			if(a->next != nullptr) a->next->safe_rem_ref();
 			a->next = b->next;
 			b->next = nullptr;
 		}
+		b->add_ref();
+		if(a->child != nullptr) a->child->safe_rem_ref();
 		a->child = b;
 	} else {
-		if(b != nullptr && a->child != nullptr)
+		if(b != nullptr && a->child != nullptr) {
+			if(a->next != nullptr) a->next->add_ref();
+			if(b->next != nullptr) b->next->safe_rem_ref();
 			b->next = a->next;
+		}
+		if(b != nullptr) b->add_ref();
+		if(a->next != nullptr) a->next->safe_rem_ref();
 		a->next = b;
+		if(a->child != nullptr) a->child->safe_rem_ref();
 		a->child = nullptr;
 	}
 }
 
-void FixDeques(SubDeque<const void*> &l, SubDeque<const void*> &r,
-               SubDeque<const void*> &L, SubDeque<const void*> &R) {
+// ADD PARAMETER TO THIS AND OTHER FUNCS
+void FixDeques(SubDeque<any*> &l, SubDeque<any*> &r,
+               SubDeque<any*> &L, SubDeque<any*> &R) {
 	if(l.size() >= 4) {
-		const void *b = l.back(); l.pop_back();
-		const void *a = l.back(); l.pop_back();
-		L.push_front(new pair(a, b));
+		any *b = l.back(); l.pop_back();
+		any *a = l.back(); l.pop_back();
+		L.push_front(new any(new pair(a, b)));
+		L.front()->add_ref();
 	}
 	if(r.size() >= 4) {
-		const void *a = r.front(); r.pop_front();
-		const void *b = r.front(); r.pop_front();
-		R.push_back(new pair(a, b));
+		any *a = r.front(); r.pop_front();
+		any *b = r.front(); r.pop_front();
+		R.push_back(new any(new pair(a, b)));
+		R.back()->add_ref();
 	}
 	if(l.size() <= 1) {
-		const pair *ab;
+		any *ab_;
 		if(L.size() != 0) {
-			ab = static_cast<const pair*>(L.front()); L.pop_front();
+			ab_ = L.front(); L.pop_front();
 		} else {
-			ab = static_cast<const pair*>(R.front()); R.pop_front();
+			ab_ = R.front(); R.pop_front();
 		}
-		l.push_back(ab->first);
-		l.push_back(ab->second);
+		const pair *ab = static_cast<const pair*>(ab_->ptr);
+		l.push_back(ab->first); ab->first->add_ref();
+		l.push_back(ab->second); ab->second->add_ref();
+		ab_->rem_ref();
 	}
 	if(r.size() <= 1) {
-		const pair *ab;
+		any *ab_;
 		if(R.size() != 0) {
-			ab = static_cast<const pair*>(R.back()); R.pop_back();
+			ab_ = R.back(); R.pop_back();
 		} else {
-			ab = static_cast<const pair*>(L.back()); L.pop_back();
+			ab_ = L.back(); L.pop_back();
 		}
-		r.push_front(ab->second);
-		r.push_front(ab->first);
+		const pair *ab = static_cast<const pair*>(ab_->ptr);
+		r.push_front(ab->second); ab->second->add_ref();
+		r.push_front(ab->first); ab->first->add_ref();
+		ab_->rem_ref();
 	}
 }
 
+template<class T> Deque<T>::Deque() : node(nullptr) {}
+
+template<class T> Deque<T>::Deque(Node *u) : node(u) {
+	if(node != nullptr)
+		node->add_ref();
+}
+
+Node::Node() : child(nullptr), next(nullptr), size(0), level(0), ref_ct(0) {
+}
+
+Node::Node(const Node &o) {
+	*this = o;
+	for(int i = 0; i < preffix.size(); i++)
+		preffix[i]->add_ref();
+	for(int i = 0; i < suffix.size(); i++)
+		suffix[i]->add_ref();
+	ref_ct = 0;
+	if(child != nullptr) child->add_ref();
+	if(next != nullptr) next->add_ref();
+}
+
+void Node::add_ref() { ref_ct++; }
+
+template<class T> void Node::rem_ref() {
+	if(--ref_ct == 0) {
+		for(int i = 0; i < preffix.size(); i++)
+			preffix[i]->rem_ref<T>(level);
+		for(int i = 0; i < suffix.size(); i++)
+			suffix[i]->rem_ref<T>(level);
+		if(child != nullptr)
+			child->rem_ref<T>();
+		if(next != nullptr)
+			next->rem_ref<T>();
+		child = next = nullptr;
+		preffix.clear();
+		suffix.clear();
+		delete this;
+	}
+}
+
+Node::~Node() {
+	assert(preffix.empty());
+	assert(suffix.empty());
+	if(child != nullptr)
+		child->safe_rem_ref();
+	if(next != nullptr)
+		next->safe_rem_ref();
+}
+
+void Node::safe_rem_ref() { assert(--ref_ct != 0); }
+
+template<class T> Deque<T>::~Deque() {
+	if(node != nullptr)
+		node->rem_ref<T>();
+}
+
+template<class T> Deque<T>::Deque(const Deque &o) : Deque(o.node) {}
+
+template<class T> Deque<T>& Deque<T>::operator=(const Deque &o) {
+	if(o.node != nullptr) o.node->add_ref();
+	if(node != nullptr) node->rem_ref<T>();
+	node = o.node;
+	return *this;
+}
 
 } // namespace deque3

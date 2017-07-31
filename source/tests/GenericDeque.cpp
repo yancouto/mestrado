@@ -22,9 +22,32 @@ TEST(DSimple, Simple) {
 	EXPECT_EQ(d0.Back(), 2);
 	EXPECT_EQ(d0.Front(), 3);
 	d0 = d0.PopBack();
+	d0 = d0; // this may break stuff
 	EXPECT_EQ(d0.Front(), 3);
 	EXPECT_EQ(d0.Back(), 3);
+}
 
+TEST(DSimple, Simple2) {
+	Deque<int> d;
+	for(int i = 0; i < 100; i++)
+		d = d.PushBack(i);
+	for(int i = 0; i < 100; i++) {
+		EXPECT_EQ(d.Front(), i);
+		d = d.PopFront();
+	}
+	for(int i = 0; i < 100; i++)
+		if(i & 1)
+			d = d.PushFront(i);
+		else
+			d = d.PushBack(i);
+	for(int i = 99; i >= 0; i--)
+		if(i & 1) {
+			EXPECT_EQ(d.Front(), i);
+			d = d.PopFront();
+		} else {
+			EXPECT_EQ(d.Back(), i);
+			d = d.PopBack();
+		}
 }
 
 TEST(DSimple, Example) {

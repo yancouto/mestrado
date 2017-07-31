@@ -6,7 +6,7 @@
 #ifndef DEQUE3_HPP_
 #define DEQUE3_HPP_
 
-#include <deque>
+#include "Deque2.hpp"
 
 namespace deque3 {
 
@@ -17,6 +17,8 @@ namespace deque3 {
 template<class T> class SubDeque {
 public:
 	inline int size() const;
+	inline bool empty() const;
+	inline void clear();
 
 	void push_back(const T &x);
 	void push_front(const T &x);
@@ -49,6 +51,8 @@ private:
 	int size_;
 };
 
+using any = deque2::any;
+
 /** Nó da deque de Kaplan e Tarjan.
  * Um nó representa uma deque persistente e tem três campos: #preffix, #center e #suffix.
  * #preffix e #suffix são deques não persistentes de tamanho até 5.
@@ -66,20 +70,20 @@ public:
 	/** Prefixo da deque.
 	 * Se for não-nulo, #preffix é um ponteiro para o valor do primeiro elemento da deque.
 	 */
-	SubDeque<const void*> preffix;
+	SubDeque<any*> preffix;
 	/** Sub-deque central.
 	 * Uma deque que armazena pares de elementos de \c T , e tem os elementos "do meio" da deque.
 	 */
-	const Node *child;
+	Node *child;
 	/** Sufixo da deque.
 	 * Se for não-nulo, #suffix um ponteiro para o valor do último elemento da deque.
 	 */
-	SubDeque<const void*> suffix;
+	SubDeque<any*> suffix;
 
 	/** Próximo nó na pilha de nós.
 	 * É o próximo nó que tem digito diferente de 1.
 	 */
-	const Node *next;
+	Node *next;
 
 	/** Tamanho da deque.
 	 * Número de elementos total da deque. Esse número vai ser duas vezes o número de elementos
@@ -87,11 +91,19 @@ public:
 	 */
 	int size;
 
+	int level;
+	int ref_ct;
+	inline void add_ref();
+	template<class T> inline void rem_ref();
+	inline void safe_rem_ref();
+
 	/** Construtor.
 	 * Sub-deques são inicializadas vazias. #next é inicializado com \c null.
-	 * @param c Nó #center
 	 */
-	Node(const Node *c);
+	Node();
+
+	Node(const Node &o);
+	~Node();
 };
 
 /** Deque persistente de Kaplan e Tarjan.
@@ -125,7 +137,7 @@ public:
 	 * Este é o nó que representa a deque inteira.
 	 * @see Node para saber a razão desta classe não ter o tipo \c T .
 	 */
-	const Node *node;
+	Node *node;
 
 	/** Construtor vazio.
 	 * Constrói uma deque sem nenhum elemento.
@@ -189,8 +201,12 @@ public:
 
 	///@}
 
+	~Deque();
+	Deque(const Deque &o);
+	Deque& operator=(const Deque &o);
+
 private:
-	Deque(const Node *u);
+	Deque(Node *u);
 };
 
 /** @name Funções auxiliares
@@ -239,8 +255,8 @@ void Fix(Node *a);
  * `l.size() + r.size() + 2*L.size() + 2*R.size() > 3`.
  * @relates deque3::Deque
  */
-void FixDeques(SubDeque<const void*> &l, SubDeque<const void*> &r,
-               SubDeque<const void*> &L, SubDeque<const void*> &R);
+void FixDeques(SubDeque<any*> &l, SubDeque<any*> &r,
+               SubDeque<any*> &L, SubDeque<any*> &R);
 
 ///@}
 

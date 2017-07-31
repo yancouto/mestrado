@@ -13,6 +13,7 @@ struct any {
 	any(const void *p);
 	inline void add_ref();
 	template<class T> inline void rem_ref(int);
+	inline void rem_ref();
 private:
 	int ref_ct;
 };

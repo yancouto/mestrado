@@ -1,6 +1,8 @@
 // Esse arquivo é importado apenas por Stack.hpp e não deve ser importado manualmente.
 
 #include <utility>
+#include <cassert>
+#include <iostream>
 
 namespace deque2 {
 
@@ -31,6 +33,7 @@ template<class T> void any::rem_ref(int level) {
 	}
 }
 
+void any::rem_ref() { rem_ref<int>(1); /* nao propaga */ }
 
 /* Nesse namespace são implementadas versões de todos os métodos de Deque, mas estes recebem
  * Nodes e trabalham com ponteiros void.
