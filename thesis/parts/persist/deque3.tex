@@ -10,7 +10,7 @@ Modificaremos a implementação do Capítulo~\ref{cap:deque2} para que todas as 
 
 \subsection{Deque persistente como um contador binário}
 
-Note que, na estrutura do Capítulo~\ref{sec:deque2}, se adicionarmos elementos apenas usando~\func{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
+Note que, na estrutura do Capítulo~\ref{cap:deque2}, se adicionarmos elementos apenas usando~\func{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
 
 Esse comportamento é similar ao de um contador binário. Podemos considerar que cada nível é um dígito:~0 se~$\V{preffix}$ é nulo ou~1 se~$\V{preffix}$ é não nulo. O primeiro nível é o dígito menos significativo. Assim, adicionar um elemento usando~\func{PushFront}{d, x} é equivalente a somar~1 no contador binário, pois se encontramos um~0 colocamos~$x$ ali, senão, formamos um par de~$x$ com o elemento que ali estava (transformando essa posição em~0), e adicionamos esse par na posição seguinte~(somamos~1 na posição seguinte).
 
