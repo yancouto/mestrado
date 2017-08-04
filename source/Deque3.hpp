@@ -54,9 +54,9 @@ private:
 using any = deque2::any;
 
 /** Nó da deque de Kaplan e Tarjan.
- * Um nó representa uma deque persistente e tem três campos: #preffix, #center e #suffix.
- * #preffix e #suffix são deques não persistentes de tamanho até 5.
- * A deque resultante é a deque que tem como primeiros elementos os elementos de #preffix,
+ * Um nó representa uma deque persistente e tem três campos: #prefix, #center e #suffix.
+ * #prefix e #suffix são deques não persistentes de tamanho até 5.
+ * A deque resultante é a deque que tem como primeiros elementos os elementos de #prefix,
  * últimos elementos os de #suffix, e demais elementos são armazenados em pares na sub-deque
  * #center .
  *
@@ -68,9 +68,9 @@ using any = deque2::any;
 class Node {
 public:
 	/** Prefixo da deque.
-	 * Se for não-nulo, #preffix é um ponteiro para o valor do primeiro elemento da deque.
+	 * Se for não-nulo, #prefix é um ponteiro para o valor do primeiro elemento da deque.
 	 */
-	SubDeque<any*> preffix;
+	SubDeque<any*> prefix;
 	/** Sub-deque central.
 	 * Uma deque que armazena pares de elementos de \c T , e tem os elementos "do meio" da deque.
 	 */
@@ -87,7 +87,7 @@ public:
 
 	/** Tamanho da deque.
 	 * Número de elementos total da deque. Esse número vai ser duas vezes o número de elementos
-	 * em #center mais o tamanho de #preffix e #suffix.
+	 * em #center mais o tamanho de #prefix e #suffix.
 	 */
 	int size;
 

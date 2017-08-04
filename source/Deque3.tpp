@@ -62,8 +62,8 @@ namespace {
 typedef std::pair<any*, any*> pair;
 
 any* _Front(Node *a) {
-	if(a->preffix.size() != 0)
-		return a->preffix.front();
+	if(a->prefix.size() != 0)
+		return a->prefix.front();
 	else
 		return a->suffix.front();
 }
@@ -72,12 +72,12 @@ any* _Back(const Node *a) {
 	if(a->suffix.size() != 0)
 		return a->suffix.back();
 	else
-		return a->preffix.back();
+		return a->prefix.back();
 }
 
 Node* _PushFront(Node *a, any *x) {
 	Node *a_ = Copy(a);
-	a_->preffix.push_front(x);
+	a_->prefix.push_front(x);
 	x->add_ref();
 	a_->size++;
 	Check(a_);
@@ -96,8 +96,8 @@ Node* _PushBack(Node *a, any *x) {
 Node* _PopFront(Node *a) {
 	Node *a_ = Copy(a);
 	_Front(a_)->rem_ref();
-	if(a_->preffix.size() != 0)
-		a_->preffix.pop_front();
+	if(a_->prefix.size() != 0)
+		a_->prefix.pop_front();
 	else
 		a_->suffix.pop_front();
 	a_->size--;
@@ -111,17 +111,17 @@ Node* _PopBack(Node *a) {
 	if(a_->suffix.size() != 0)
 		a_->suffix.pop_back();
 	else
-		a_->preffix.pop_back();
+		a_->prefix.pop_back();
 	a_->size--;
 	Check(a_);
 	return a_;
 }
 
 any* _K_th(Node *d, Node *next, int k) {
-	if(k < int(d->preffix.size())) return d->preffix[k];
+	if(k < int(d->prefix.size())) return d->prefix[k];
 	if((d->size - k - 1) < int(d->suffix.size()))
 		return d->suffix[k - (d->size - int(d->suffix.size()))];
-	k -= d->preffix.size();
+	k -= d->prefix.size();
 	const pair *p;
 	if(d->child != nullptr)
 		p = static_cast<const pair*>(_K_th(d->child, next, k / 2)->ptr);
@@ -183,12 +183,12 @@ Node* Copy(const Node *a) {
 
 int Digit(const Node *a, bool last) {
 	static const int digit[] = {2, 1, 0, 0, 1, 2};
-	if(a->preffix.size() == 0 && last)
+	if(a->prefix.size() == 0 && last)
 		return digit[a->suffix.size()];
 	else if(a->suffix.size() == 0 && last)
-		return digit[a->preffix.size()];
+		return digit[a->prefix.size()];
 	else
-		return std::max(digit[a->preffix.size()], digit[a->suffix.size()]);
+		return std::max(digit[a->prefix.size()], digit[a->suffix.size()]);
 }
 
 void Fix(Node *a) {
@@ -205,31 +205,31 @@ void Fix(Node *a) {
 	}
 	b->level = a->level + 1;
 	// Caso 1
-	if(a->preffix.size() + a->suffix.size() + 2 * b->preffix.size() + 2 * b->suffix.size() <= 3) {
-		if(b->preffix.size() != 0) {
-			any* xy_ = b->preffix.front(); b->preffix.pop_front();
+	if(a->prefix.size() + a->suffix.size() + 2 * b->prefix.size() + 2 * b->suffix.size() <= 3) {
+		if(b->prefix.size() != 0) {
+			any* xy_ = b->prefix.front(); b->prefix.pop_front();
 			const pair* xy = static_cast<const pair*>(xy_->ptr);
-			a->preffix.push_back(xy->first); xy->first->add_ref();
-			a->preffix.push_back(xy->second); xy->second->add_ref();
+			a->prefix.push_back(xy->first); xy->first->add_ref();
+			a->prefix.push_back(xy->second); xy->second->add_ref();
 			xy_->rem_ref();
 		}
 		if(b->suffix.size() != 0) {
 			any* xy_ = b->suffix.back(); b->suffix.pop_back();
 			const pair* xy = static_cast<const pair*>(xy_->ptr);
-			a->preffix.push_back(xy->first); xy->first->add_ref();
-			a->preffix.push_back(xy->second); xy->second->add_ref();
+			a->prefix.push_back(xy->first); xy->first->add_ref();
+			a->prefix.push_back(xy->second); xy->second->add_ref();
 			xy_->rem_ref();
 		}
 		if(a->suffix.size() != 0) {
-			a->preffix.push_back(a->suffix.front()); a->suffix.pop_front();
+			a->prefix.push_back(a->suffix.front()); a->suffix.pop_front();
 		}
 		delete b;
 		b = nullptr;
 	} else { // Caso 2
-		b->size += (a->preffix.size() >= 4) + (a->suffix.size() >= 4);
-		b->size -= (a->preffix.size() <= 1) + (a->suffix.size() <= 1);
-		FixDeques(a->preffix, a->suffix, b->preffix, b->suffix);
-		if(b->preffix.size() == 0 && b->suffix.size() == 0 && last) {
+		b->size += (a->prefix.size() >= 4) + (a->suffix.size() >= 4);
+		b->size -= (a->prefix.size() <= 1) + (a->suffix.size() <= 1);
+		FixDeques(a->prefix, a->suffix, b->prefix, b->suffix);
+		if(b->prefix.size() == 0 && b->suffix.size() == 0 && last) {
 			delete b;
 			b = nullptr;
 		}
@@ -310,8 +310,8 @@ Node::Node() : child(nullptr), next(nullptr), size(0), level(0), ref_ct(0) {
 
 Node::Node(const Node &o) {
 	*this = o;
-	for(int i = 0; i < preffix.size(); i++)
-		preffix[i]->add_ref();
+	for(int i = 0; i < prefix.size(); i++)
+		prefix[i]->add_ref();
 	for(int i = 0; i < suffix.size(); i++)
 		suffix[i]->add_ref();
 	ref_ct = 0;
@@ -323,8 +323,8 @@ void Node::add_ref() { ref_ct++; }
 
 template<class T> void Node::rem_ref() {
 	if(--ref_ct == 0) {
-		for(int i = 0; i < preffix.size(); i++)
-			preffix[i]->rem_ref<T>(level);
+		for(int i = 0; i < prefix.size(); i++)
+			prefix[i]->rem_ref<T>(level);
 		for(int i = 0; i < suffix.size(); i++)
 			suffix[i]->rem_ref<T>(level);
 		if(child != nullptr)
@@ -332,14 +332,14 @@ template<class T> void Node::rem_ref() {
 		if(next != nullptr)
 			next->rem_ref<T>();
 		child = next = nullptr;
-		preffix.clear();
+		prefix.clear();
 		suffix.clear();
 		delete this;
 	}
 }
 
 Node::~Node() {
-	assert(preffix.empty());
+	assert(prefix.empty());
 	assert(suffix.empty());
 	if(child != nullptr)
 		child->safe_rem_ref();
