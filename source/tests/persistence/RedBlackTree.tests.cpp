@@ -1,5 +1,5 @@
-#include "../RedBlackTree.hpp"
-#include "gtest/gtest.h"
+#include "../../RedBlackTree.hpp"
+#include <gtest/gtest.h>
 
 #include <vector>
 #include <algorithm>

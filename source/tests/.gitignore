@@ -1,6 +1,6 @@
-Stack.tests
-Deque1.tests
-Deque3.tests
-Deque2.tests
-RedBlackTree.tests
-Queue.tests
+persistence/RedBlackTree.tests
+persistence/Deque1.tests
+persistence/Deque3.tests
+persistence/Stack.tests
+persistence/Deque2.tests
+persistence/Queue.tests

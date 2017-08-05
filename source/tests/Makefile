@@ -75,7 +75,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 # Tests all tests automagically
 
-TESTS = $(basename $(wildcard *.tests.cpp))
+TESTS = $(basename $(wildcard *.tests.cpp **/*.tests.cpp))
 
 .PHONY: clean .gitignore $(addsuffix .mf, $(TESTS))
 clean:
@@ -85,7 +85,7 @@ clean:
 PERCENT=%
 
 $(addsuffix .mf, $(TESTS)): %.mf : %.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -MM >$@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -MM -MT $(addsuffix .o, $(basename $<) ) >$@
 
 export CPPFLAGS
 export CXXFLAGS

@@ -1,5 +1,5 @@
-#include "../Deque1.hpp"
-#include "gtest/gtest.h"
+#include "../../Deque1.hpp"
+#include <gtest/gtest.h>
 
 using namespace deque1;
 

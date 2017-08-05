@@ -1,5 +1,5 @@
-#include "../Deque3.hpp"
-#include "gtest/gtest.h"
+#include "../../Deque3.hpp"
+#include <gtest/gtest.h>
 
 using namespace deque3;
 

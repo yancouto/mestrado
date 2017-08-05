@@ -1,5 +1,5 @@
-#include "../Stack.hpp"
-#include "gtest/gtest.h"
+#include "../../Stack.hpp"
+#include <gtest/gtest.h>
 
 #include <vector>
 
