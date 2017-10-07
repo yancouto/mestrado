@@ -376,7 +376,7 @@ A maior parte das modificações envolvidas em uma inserção são mudanças de 
 			\State \Break \label{line:insrb:c2e}
 		\EndIf
 	\EndWhile
-	\State $\roots[\cur].\red = \False$ \Comment{Caso~$x$ seja a raiz, e vermelho.} \label{line:insrb:loope}
+	\State $\roots[\cur].\red = \False$ \Comment{Caso a raiz tenha sido pintada de vermelha.} \label{line:insrb:loope}
 \EndFunction
 \end{algorithmic}
 \caption{Inserção em árvore rubro-negra parcialmente persistente.} \label{lst:ins_rb}
@@ -393,7 +393,7 @@ Por último, a linha~\nref{line:insrb:loope} pinta a raiz de preto, já que o la
 %% O(lgn) + O(1) amortizado
 A função consome tempo amortizado~$\Oh(\lg n)$ pois a altura da árvore é~$\Oh(\lg n)$, ambos os lações das linhas~\nref{line:insrb:whilefind} e~\nref{line:insrb:loopb} realizam um número de iterações proporcional a altura, e a função~\textsc{Rotate} e~\textsc{Modify} consomem tempo (e espaço) amortizado constante. Como essas funções só são chamadas um número constante de vezes, o consumo de espaço é amortizado~$\Oh(1)$.
 
-O Código~\ref{lst:rotrb} mostra a implementação da função~\textsc{Rotate}, que usa apenas um número constante de chamadas a~\textsc{Modify}. Note que é necessário, entre quaisquer duas chamadas, manter que cada nó tem no máximo um outro nó que aponta para ele, logo é preciso ter mais cuidado que com a implementação em uma ABB efêmera. Apesar das funções~\textsc{Child} e~\textsc{Modify} funcionarem se receberem nós que já foram copiados neste operação, na função~\textsc{Rotate} é necessário acessar o campo~$\parent$ de~$u$, por isso na linha~\nref{line:rotrb:active} trocamos~$u$ por sua cópia, se existir.
+O Código~\ref{lst:rotrb} mostra a implementação da função~\textsc{Rotate}, que usa apenas um número constante de chamadas a~\textsc{Modify}. Note que é necessário, entre quaisquer duas chamadas, manter que cada nó tem no máximo um outro nó que aponta para ele, logo é preciso ter mais cuidado que com a implementação em uma ABB efêmera. Apesar das funções~\textsc{Child} e~\textsc{Modify} funcionarem se receberem nós que já foram copiados nesta operação, na função~\textsc{Rotate} é necessário acessar o campo~$\parent$ de~$u$, por isso na linha~\nref{line:rotrb:active} trocamos~$u$ por sua cópia, se existir.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -407,7 +407,7 @@ O Código~\ref{lst:rotrb} mostra a implementação da função~\textsc{Rotate}, 
 	\If{$u.\parent \neq \Null$}
 		\State \Call{Modify}{$u.\parent, [\Call{Child}{u.\parent, 1} = u], v$}
 	\Else
-		\State $\roots[\cur] = \Call{Active}{v}$ \Comment{Se~$x$ não tiver pai este é a raiz.}
+		\State $\roots[\cur] = \Call{Active}{v}$ \Comment{Se~$u$ não tiver pai,~$u$ é a raiz.}
 	\EndIf
 	\State \Call{Modify}{$v, \Not\ \side, u$}
 \EndFunction
@@ -421,9 +421,9 @@ Remover um nó é mais complicado que inserir, pois o nó que desejamos excluir 
 
 Se~$u$ não tem filho direito, então podemos apenas substituí-lo por seu filho esquerdo (que pode ser~\keyword{null}), pois assim as propriedades de ABB continuam sendo seguidas.
 
-Se~$u$ tem filho direito,~seja~$x$ o nó de menor valor em sua subárvore direita (ou seja, o nó com menor valor maior que o valor de~$u$). O nó~$x$ não tem filho esquerdo (ou existiria um nó com valor menor que o dele na mesma subárvore), logo podemos substituir~$x$ por seu filho direito, e substituir~$u$ por~$x$.
+Se~$u$ tem filho direito,~seja~$x$ o nó de menor valor na subárvore direita de~$u$ (ou seja, o nó com menor valor maior que o valor de~$u$). O nó~$x$ não tem filho esquerdo (ou existiria um nó com valor menor que o dele na mesma subárvore), logo podemos substituir~$x$ por seu filho direito, e substituir~$u$ por~$x$.
 
-As propriedades de ABB continuam a ser seguidas pois todos os elementos da subárvore direita tem valores maiores ou iguais aos de~$x$ (pois este era o mínimo desta subárvore), e os elementos da subárvore esquerda tem valores menores ou iguais aos de~$x$ pois este era da subárvore direita. Assumimos no código a seguir que os nós tem ponteiro de pai em seu campo~$\parent$.
+As propriedades de ABB continuam a ser seguidas pois todos os elementos da subárvore direita de~$u$ têm valores maiores ou iguais aos de~$x$ (pois este era o mínimo desta subárvore), e os elementos da subárvore esquerda de~$u$ tem valores menores ou iguais aos de~$x$ pois este era da subárvore direita de~$u$. Assumimos no código a seguir que os nós têm ponteiro de pai em seu campo~$\parent$.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -439,10 +439,11 @@ As propriedades de ABB continuam a ser seguidas pois todos os elementos da subá
 	\State $v = u.\parent$
 	\If{$v \neq \Null$}
 		\State $v.\child[[v.\child[1] = u]] = x$
-		\State $x.\parent = v$
 	\Else
 		\State $\V{root} = x$
-		\State $x.\parent = \Null$
+	\EndIf
+	\If{$x \neq \Null$}
+		\State $x.\parent = v$
 	\EndIf
 \EndFunction
 
@@ -462,17 +463,17 @@ As propriedades de ABB continuam a ser seguidas pois todos os elementos da subá
 \end{algorithmic}
 \end{algorithm}
 
-A função~\Call{MinElement}{$u$} retorna o nó com menor valor da subárvore de~$u$. Pelas propriedades de uma ABB, este está na subárvore esquerda de~$u$ se esta existe, então o~\keyword{while} segue links de esquerda até encontrar o menor elemento.
+A função~\Call{MinElement}{$u$} retorna um nó com menor valor da subárvore de~$u$. Pelas propriedades de uma ABB, este está na subárvore esquerda de~$u$ se esta existe, então o~\keyword{while} segue links de esquerda até encontrar o menor elemento.
 
-A função~\Call{Transplant}{$u, x$} substitui o nó~$u$ pelo nó~$x$. Para fazer isso, ela faz o pai de~$u$ apontar para~$x$ em vez de~$u$ (tratando o caso quando~$u$ é raiz). Note que ela sobrescreve o campo~$\parent$ de~$x$, mesmo que ele não seja nulo, mas em nossos usos isto sera útil. A função não modifica os filhos de~$u$ ou~$x$.
+A função~\Call{Transplant}{$u, x$} substitui o nó~$u$ pelo nó~$x$. Para fazer isso, ela faz o pai de~$u$ apontar para~$x$ em vez de~$u$ (tratando o caso quando~$u$ é raiz). A função não modifica os filhos de~$u$ ou~$x$.
 
-A linha~\nref{line:rmabb:findb} busca pelo nó~$u$ com valor~$\val$. O~\keyword{if} da linha~\nref{line:rmabb:if1} trata o caso quando~$u$ não tem filho direito, substituindo ele por seu filho esquerdo, usando a função~\textsc{Transplant}. Note que o nó~$u$ vai terminar a função apontando para um filho que não tem ponteiro de pai para~$u$, mas isto não é um problema pois o nó~$u$ foi removido da árvore.
+A linha~\nref{line:rmabb:findb} busca pelo nó~$u$ com valor~$\val$. O~\keyword{if} da linha~\nref{line:rmabb:if1} trata o caso em que~$u$ não tem filho direito, substituindo-o por seu filho esquerdo, usando a função~\textsc{Transplant}. Note que, ao final da função, o nó~$u$ aponta para um filho que não tem ponteiro de pai para~$u$, mas isto não é um problema pois o nó~$u$ foi removido da árvore.
 
 Se~$u$ tem filho direito, a linha~\nref{line:rmabb:minb} busca o nó~$x$, mínimo da subárvore direita de~$u$. Este nó é trocado por seu filho direito e~$u$ é trocado por este nó. Após a chamada de~\Call{Transplant}{$u, x$}, o nó~$x$ é inválido pois, apesar de estar no lugar de~$u$, tem ponteiros em~$\child$ que não são válidos, por isso a linha~\nref{line:rmabb:cpchild} copia os filhos de~$u$ para~$x$. Note que o código funciona mesmo quando~$x$ é o próprio filho direito de~$u$.
 
 \section{Remoção em rubro-negra}
 
-Para remover um nó de uma árvore rubro-negra, fazemos como em uma ABB normal, mas é necessário se preocupar com as propriedades rubro-negras. Quando~$u$ tem filho direito, ao substituir~$u$ por~$x$, podemos copiar a cor de~$u$ para~$x$, e assim essa operação não viola nenhuma propriedade. Porém, a substituição de~$x$ por seu filho direito, ou se~$u$ não tem filho direito e é substituído por seu filho esquerdo, podem causar violações das propriedades. Nesses casos, porém, como~$x$ ou~$u$ não tem um dos filhos, a estrutura da subárvore é bem simples. Trataremos o caso de~$u$ não ter filho direito, o outro é simétrico.
+Para remover um nó de uma árvore rubro-negra, fazemos como em uma ABB normal, mas é necessário se preocupar com as propriedades rubro-negras. Quando~$u$ tem filho direito, ao substituir~$u$ por~$x$, podemos copiar a cor de~$u$ para~$x$, e assim essa operação não viola nenhuma propriedade local a~$u$. Porém, a substituição de~$x$ por seu filho direito ou, no caso em que~$u$ não tem filho direito, a substituição de~$u$ por seu filho esquerdo, podem causar violações das propriedades em torno de~$x$ e~$u$. Nesses casos, porém, como~$x$ ou~$u$ não tem um dos filhos, a estrutura da subárvore é bem simples. Trataremos o caso de~$u$ não ter filho direito, o outro caso é simétrico.
 
 \begin{figure}
 \centering
@@ -480,25 +481,25 @@ Para remover um nó de uma árvore rubro-negra, fazemos como em uma ABB normal, 
 
 \begin{scope}
 	\Tree [.\node[b]{$u$}; ]
-	\node[n, yshift=-2cm]{(A)};
+	\node[n, yshift=-2cm]{(a)};
 \end{scope}
 \begin{scope}[xshift=5cm]
 	\Tree [.\node[r]{$u$}; ]
-	\node[n, yshift=-2cm]{(B)};
+	\node[n, yshift=-2cm]{(b)};
 \end{scope}
 \begin{scope}[xshift=10cm]
 	\Tree [.\node[b]{$u$}; \node[r]{}; \edge[n];\node[n]{}; ]
-	\node[n, yshift=-2cm]{(C)};
+	\node[n, yshift=-2cm]{(c)};
 \end{scope}
 
 \end{tikzpicture}
 \caption{Possíveis subárvores rubro-negras com raiz~$u$ que não tem filho direito.} \label{fig:rbnorchild}
 \end{figure}
 
-Pelas propriedades~2 e~3, quando um nó~$u$ não tem o filho direito, a estrutura de sua subárvore pode ser apenas uma das três ilustradas na figura~\ref{fig:rbnorchild}.
-Se a versão~\Call{Transplant}{$u, x$} de árvores rubro-negras também copiar a cor de~$u$ para~$x$, caso este não seja nulo, todas propriedades rubro-negras continuam a ser respeitadas nas árvores~(B) e~(C). Na árvore~(A),~$u$ é removido e substituido por~\keyword{null}, logo os caminhos até links nulos que passavam por~$u$ agora tem nó negro a menos, a menos que~$u$ fosse a raiz, nesse caso agora a árvore é vazia e segue todas as propriedades.
+Pelas propriedades~2 e~3, quando um nó~$u$ não tem o filho direito, a estrutura de sua subárvore pode ser apenas uma das três ilustradas na Figura~\ref{fig:rbnorchild}.
+Se a versão~\Call{Transplant}{$u, x$} de árvores rubro-negras também copiar a cor de~$u$ para~$x$, caso este não seja nulo, todas as propriedades rubro-negras continuam a ser respeitadas nas árvores~(b) e~(c), quando~$u$ é substituído por seu filho esquerdo. Na árvore~(a),~$u$ é removido e substituído por~\keyword{null}, logo os caminhos até links nulos que passavam por~$u$ agora têm um nó negro a menos, exceto se~$u$ for a raiz. Nesse caso, a árvore final é vazia e segue todas as propriedades.
 
-Usamos então a função~\textsc{AddBlack}, que arruma a violação da regra 3.
+Usamos então a função~\textsc{AddBlack}, que arruma a violação da propriedade 3.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -564,15 +565,15 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da regra 3.
 \caption{\textsc{Remove} em árvore rubro-negra parcialmente persistente.} \label{lst:remove_rb}
 \end{algorithm}
 
-O código funciona de forma parecida com o para ABBs quaisquer. A função~\textsc{Find}, chamada na linha~\nref{line:rmrb:if1}, funciona como a implementada na Seção~\ref{sec:rbacesso}, mas navega na versão mais atual da estrutura, e retorna o nó em vez de seu valor. A função~\textsc{MinElement} funciona como anteriormente, mas usando~\textsc{Child} para acessar os filhos. Já~\Call{Transplant}{$u, x$} foi modificada para remover o ponteiro que aponta para~$x$, caso esse exista. Isto faz diferença no caso da ABB (parcialmente) persistente pois queremos manter a propriedade de que no máximo um nó aponta para~$x$ a cada passo. A função~\textsc{Transplant} também copia a cor de~$u$ para~$x$, caso este não seja nulo.
+O código funciona de forma parecida com o para ABBs quaisquer. A função~\textsc{Find}, chamada na linha~\nref{line:rmrb:if1}, funciona como a implementada na Seção~\ref{sec:rbacesso}, mas navega na versão mais atual da estrutura, e retorna o nó em vez do seu valor. A função~\textsc{MinElement} funciona como anteriormente, mas usando~\textsc{Child} para acessar os filhos. Já~\Call{Transplant}{$u, x$} foi modificada para remover o ponteiro que aponta para~$x$, caso esse exista. Isto faz diferença no caso da ABB (parcialmente) persistente pois queremos manter a propriedade de que no máximo um nó aponta para~$x$ a cada passo. A função~\textsc{Transplant} também copia a cor de~$u$ para~$x$, caso este não seja nulo.
 
-Se~$u$ não tem filho direito, no~\keyword{if} da linha~\nref{line:rmrb:if1} este é trocado pelo seu filho esquerdo e, como discutido, se~$u$ é preto e não tem filho esquerdo, ocorre uma violação da regra~3 (a menos que~$u$ seja a raiz), que é então consertada por~\textsc{AddBlack}. Esta função recebe um nó e qual a direção do filho que deveria ser preto; isso é feito pois esse filho é na verdade um link nulo. Note que a sua chamada na linha~\nref{line:rmrb:addblack1} funciona pois, como~$u$ era preto, com certeza seu irmão~(outro filho de~$v$) existe, logo, após a substituição, apenas um filho de~$v$ será nulo. Discutiremos a implementação desta função nas próximas subseções.
+Se~$u$ não tem filho direito, no~\keyword{if} da linha~\nref{line:rmrb:if1} este é trocado pelo seu filho esquerdo e, como discutido, se~$u$ é preto e não tem filho esquerdo, ocorre uma violação da propriedade~3 (a menos que~$u$ seja a raiz), que é então consertada por~\textsc{AddBlack}. Esta função recebe um nó e qual a direção do filho que deveria ser preto; isso é feito pois esse filho pode na verdade ser um link nulo. A função então modifica a árvore, rotacionando e mudando cores, de forma a remover a violação   da propriedade~3. Discutiremos a implementação desta função nas próximas subseções.
 
 Se~$u$ tem filho direito, o processo funciona assim como em uma~ABB qualquer, mas chamamos~\textsc{AddBlack} caso a substituição de~$x$ tenha causado uma violação. O nó~$y$ é o pai de~$x$, exceto quando~$x$ é o próprio filho direito de~$u$, pois neste caso~${x.\parent = u}$ no começo do bloco, mas o nó~$u$ será substituido pelo nó~$x$, logo fazemos~$y = x$, pois este será o nó que aponta para o link nulo que deveria ser preto (se a função~\textsc{AddBlack} for chamada).
 
 \subsection{Subindo violações}
 
-Na função~\Call{AddBlack}{$y, \side$}, assim como no final da inserção, teremos um laço que, a cada iteração, ou termina com todas as violações, ou de certa forma ``sobe'' essas violações. A violação é da regra~3, pois todos os caminhos de~$y$ à links nulos seguindo seu filho~$\side$ tem um nó negro a menos que os caminhos passando por seu outro filho.
+Na função~\Call{AddBlack}{$y, \side$}, assim como no final da inserção, teremos um laço que, a cada iteração, ou termina com todas as violações, ou de certa forma ``sobe'' essas violações. A violação é da propriedade~3, pois todos os caminhos de~$y$ a links nulos seguindo seu filho~$\side$ têm um nó negro a menos que os caminhos passando por seu outro filho.
 
 Seja~$x$ o filho de~$y$ na direção~$\side$ (pode ser nulo), e~$z$ seu filho na outra direção. Então se~$x$ existe e é vermelho, basta pintá-lo de preto e a propriedade~3 voltará a ser satisfeita. Caso contrário consideraremos alguns casos. Note que o filho~$z$ sempre existe, pois os caminhos começando em~$y$ e indo na direção de~$z$ precisam ter pelo menos um nó negro. Sejam~$z_x$ e~$z_z$ os filhos de~$z$ do lado~$\side$ e do outro lado, respectivamente.
 
@@ -656,34 +657,34 @@ banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 \begin{description}
 	\item[Caso 1.] $z$ é preto,~$z_x$ e~$z_z$ ou não existem ou são negros.
 
-	A Figura~\ref{fig:rmrbc1} mostra esse caso, o nó pontilhado indica que este nó pode ser tanto vermelho quanto negro. Todas as figuras assumem que~$x$ é filho esquerdo. O nó~$x$ pode não existir, este representa apenas uma direção a partir de~$y$.
+	A Figura~\ref{fig:rmrbc1} mostra esse caso. O nó pontilhado indica que este nó pode ser tanto vermelho quanto negro. Todas as figuras assumem que~$x$ é filho esquerdo. O nó~$x$ pode não existir, este representa apenas uma direção a partir de~$y$.
 
-	Pintamos~$z$ de vermelho e~$y$ de preto. Dessa forma, como os filhos de~$z$ são negros (ou não existem), a propriedade~2 não é quebrada, e temos um nó negro a mais nos caminhos que passam por~$y$ e~$x$. Se~$y$ é vermelho, o laço termina pois todas as propriedades foram restauradas, caso contrário, não é possível pintar~$y$ de preto duas vezes, e os caminhos que vão do pai de~$y$ para~$y$ tem um preto a menos. Assim, recomeçamos o laço trocando~$y$ por seu pai e~$\side$ pelo lado apropriado.
+	Pintamos~$z$ de vermelho e~$y$ de preto. Dessa forma, como os filhos de~$z$ são negros (ou não existem), a propriedade~2 não é quebrada, e temos um nó negro a mais nos caminhos que passam por~$y$ e~$x$. Se~$y$ é vermelho, o laço termina pois todas as propriedades foram restauradas, caso contrário, não é possível pintar~$y$ de preto duas vezes, e os caminhos que vão do pai de~$y$ para~$y$ têm um preto a menos. Assim, recomeçamos o laço trocando~$y$ por seu pai e~$\side$ pelo lado apropriado.
 
-	Se~$y$ for a raiz, o pai desta é~\keyword{null}, e o laço deve acabar neste caso, já que não é um problema todos os caminhos a partir da raiz terem um preto a menos, isso apenas significa que a altura negra (quantidade de nós negros dos caminhos da raiz até qualquer link nulo) da árvore diminui após esta remoção.
+	Se~$y$ for a raiz, o pai desta é~\keyword{null}, e o laço deve acabar neste caso, já que não é um problema todos os caminhos a partir da raiz terem um preto a menos. Isso apenas significa que a altura negra (quantidade de nós negros dos caminhos da raiz até qualquer link nulo) da árvore diminui após esta remoção. % TODO: traduzir link
 
 	\item[Caso 2.] $z$ é preto, $z_z$ é vermelho.
 
-	Rotacionamos~$y$ em direção à~$z$, trocamos a cor destes dois nós e pintamos~$z_z$ de preto. A Figura~\ref{fig:rmrbc2} ilustra esse caso. Note que os caminhos nesta subárvore que passam por~$\alpha$ e~$z_z$ contém o mesmo número de nós negros (independentemente da cor de~$y$), e os caminhos que passam por~$x$ tem um nó negro a mais. Logo, a propriedade~3 volta a valer. Além disso, a propriedade~2 continua valendo pois os nós modificados são negros, exceto talvez~$z$, mas este tem a mesma posição e cor que~$y$, e a propriedade~2 não era violada no início da iteração, logo continua não violada.
+	Rotacionamos~$y$ em direção a~$z$, trocamos a cor destes dois nós e pintamos~$z_z$ de preto. A Figura~\ref{fig:rmrbc2} ilustra esse caso. Note que os caminhos nesta subárvore que passam por~$\alpha$ e~$z_z$ contém o mesmo número de nós negros (independentemente da cor de~$y$), e os caminhos que passam por~$x$ têm um nó negro a mais. Logo, a propriedade~3 volta a valer. Além disso, a propriedade~2 continua valendo pois os nós modificados são negros, exceto talvez por~$z$, mas este tem a mesma posição e cor que~$y$, e a propriedade~2 não era violada no início da iteração, logo continua não violada.
 
 	\item[Caso 3.] $z$ é preto,~$z_x$ é vermelho e~$z_z$ é preto ou não existe.
 
-	Rotacionamos~$z$ em direção a~$z_x$, e trocamos a cor destes dois nós. A Figura~\ref{fig:rmrbc3} ilustra esse caso. Note que os caminhos que passam por~$\alpha$,~$\beta$ e~$z_z$ continuam com o mesmo número de nós negros, logo a propriedade~3 não é violada nesses nós (mas continua sendo violada por~$x$). Após estas modificações, o caso~2 pode ser aplicado, já que~$x$ tem um irmão negro~(este nó é $z_z$) com filho do lado contrário a~$x$ vermelho~(este nó é~$z$).
+	Rotacionamos~$z$ em direção a~$z_x$, e trocamos a cor destes dois nós. A Figura~\ref{fig:rmrbc3} ilustra esse caso. Note que os caminhos que passam por~$\alpha$,~$\beta$ e~$z_z$ continuam com o mesmo número de nós negros, logo a propriedade~3 não é violada nesses nós (mas continua sendo violada por~$x$). Após estas modificações, o caso~2 pode ser aplicado, já que~$x$ tem um irmão negro~(este nó é~$z_z$) com filho do lado contrário a~$x$ vermelho~(este nó é~$z$).
 
 	\item[Caso 4.] $z$ é vermelho.
 
-	Como os caminhos até links nulos de~$y$ na direção de~$z$ tem pelo menos um nó negro,~$z_x$ e~$z_y$ existem e são negros (já que a propriedade~2 não é violada). Além disso,~$y$ é preto (já que~$z$ é vermelho). Assim, rotacionamos~$y$ na direção de~$z$ e trocamos a cor destes dois nós. Note que os caminhos que passam por~$x$,~$z_x$ e~$z_z$ continuam com o mesmo número de nós negros.
+	Como os caminhos até links nulos de~$y$ na direção de~$z$ têm pelo menos um nó negro,~$z_x$ e~$z_y$ existem e são negros (já que a propriedade~2 não é violada). Além disso,~$y$ é preto (já que~$z$ é vermelho). Assim, rotacionamos~$y$ na direção de~$z$ e trocamos a cor destes dois nós. Note que os caminhos que passam por~$x$,~$z_x$ e~$z_z$ continuam com o mesmo número de nós negros.
 
 	A Figura~\ref{fig:rmrbc4} ilustra esse caso. O novo irmão de~$x$ é preto (este nó é~$z_x$), e por isso algum dos outros casos~(1, 2, ou 3) se aplica. Note que, se o caso~1 se aplica, como~$y$ é vermelho, este pode ser pintado de preto, e por isso o laço termina após a aplicação deste caso.
 
 
 \end{description}
 
-Não é imediatamente claro que os~quatro casos cobrem todas as possibilidades. Como discutido, existe pelo menos um nó negro em todos os caminhos que passam por~$y$ em direção à~$z$, logo~$z$ existe. Se~$z$ é vermelho, estamos no caso~4. Caso contrário,~$z$ é preto. Se~$z$ os filhos de~$z$ são ambos negros ou não existem (note que, pela propriedade~3, não é possível que um não exista e o outro seja preto), estamos no caso~1. Caso contrário, algum dos filhos de~$z$ é vermelho (ou ambos). Se~$z_z$ é vermelho, estamos no caso~2, e caso contrário~$z_x$ é vermelho e~$z_z$ não, logo estamos no caso~4.
+Não é imediatamente claro que os~quatro casos cobrem todas as possibilidades. Como discutido, existe pelo menos um nó negro em todos os caminhos que passam por~$y$ em direção a~$z$, logo~$z$ existe. Se~$z$ é vermelho, estamos no caso~4. Caso contrário,~$z$ é preto. Se os filhos de~$z$ são ambos negros ou não existem (note que, pela propriedade~3, não é possível que um não exista e o outro seja preto), estamos no caso~1. Caso contrário, algum dos filhos de~$z$ é vermelho (ou ambos). Se~$z_z$ é vermelho, estamos no caso~2, e caso contrário~$z_x$ é vermelho e~$z_z$ não, logo estamos no caso~4.
 
-Portanto, sempre um dos casos é sempre aplicável. Se o caso~1 é aplicado, algumas mudanças de cores são feitas, se~$y$ era vermelho o laço termina, e caso contrário o laço continua, mas a altura de~$y$ diminui. Se o caso~2 é aplicado, as violações são removidas e o laço termina. Se o caso~3 é aplicado, segue uma imediata aplicação do caso~2 e o laço também termina. Se o caso~4 é aplicado, segue uma aplicação de algum dos outros casos. Se esta aplicação for do caso~2 ou~3, o laço termina depois de algumas rotações. Se for uma aplicação do caso~1, como~$y$ é vermelho após a aplicação do caso~4, o laço vai terminar após este caso.
+Portanto, sempre um dos casos é aplicável. Se o caso~1 é aplicado, algumas mudanças de cores são feitas; se~$y$ era vermelho o laço termina, e caso contrário o laço continua, mas a altura de~$y$ diminui. Se o caso~2 é aplicado, as violações são removidas e o laço termina. Se o caso~3 é aplicado, segue uma imediata aplicação do caso~2 e o laço também termina. Se o caso~4 é aplicado, segue uma aplicação de algum dos outros casos. Se esta aplicação for do caso~2 ou~3, o laço termina depois de algumas rotações. Se for uma aplicação do caso~1, como~$y$ é vermelho após a aplicação do caso~4, o laço vai terminar após este caso.
 
-Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanças de campos são feitas durante uma remoção, para substituir o nó no começo da remoção e para terminar o laço durante a chamada de~\textsc{AddBlack}. Dessa, forma, usando~\textsc{Child} e~\textsc{Modify} para manter a persistência (parcial), a operação de remoção consome tempo~$\Oh(\lg n)$ e espaço~$\Oh(1)$.
+Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanças de campos são feitas durante uma remoção, para substituir o nó no começo da remoção e para terminar o laço durante a chamada de~\textsc{AddBlack}. Portanto, usando~\textsc{Child} e~\textsc{Modify} para manter a persistência (parcial), a operação de remoção consome tempo~$\Oh(\lg n)$ e espaço~$\Oh(1)$.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -731,7 +732,7 @@ Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanç
 \caption{Implementação de~\textsc{AddBlack}.} \label{lst:addblack}
 \end{algorithm}
 
-A implementação da função~\textsc{AddBlack} no Código~\ref{lst:addblack} segue os casos descritos nesta seção. É necessário cuidado ao modificar a cor de um nó, já que é necessário modificar na versão mais atual. Por isso, na aplicação dos casos, as mudanças de cores são feitas antes das rotações (que podem gerar cópias dos nós), e após as rotações as versões mais novas de cada nó são atualizadas.
+A implementação da função~\textsc{AddBlack} no Código~\ref{lst:addblack} segue os casos descritos nesta seção. É necessário cuidado ao modificar a cor de um nó, já que é necessário fazer essa modificação na versão mais atual do nó. Por isso, na aplicação dos casos, as mudanças de cores são feitas antes das rotações (que podem gerar cópias dos nós), e após as rotações as versões mais novas de cada nó são atualizadas.
 
 
 \end{document}
