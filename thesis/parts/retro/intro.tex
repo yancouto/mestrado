@@ -1,0 +1,23 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter*{Introdução}
+\chaptermark{Introdução}
+\addcontentsline{toc}{chapter}{Introdução}
+
+Assim como persistência, retroatividade é uma forma de modificar versões passadas estruturas de dados (EDs). Enquanto em uma estrutura persistente podemos copiar uma versão antiga da estrutura e modificá-la, em uma estrutura retroativa podemos adicionar e remover modificações no passado, e ver como elas se ``propagam'' até a versão presente da estrutura.
+
+Mais formalmente, uma~\deff{estrutura retroativa} é uma estrutura na qual cada operação de modificação tem um tempo associado. As operações são aplicadas em ordem de tempo, e assumimos que existe no máximo uma operação realizada em um dado tempo. Temos então uma lista~${U = (u_{t_1}, \ldots, u_{t_m})}$ de operações de modificação, com~${t_1 < t_2 < \cdots < t_m}$, e tal estrutura permite as seguintes operações:
+
+\begin{itemize}
+	\item $\text{Insert}(t, u)$ --- Inserir em~$U$ a operação~$u$ no tempo~$t$.
+	\item $\text{Delete}(t)$ --- Remover de~$U$ a operação com tempo~$t$.
+	\item $\text{Query}(t, u)$ --- Realiza a operação de acesso~$u$ no tempo~$t$.
+\end{itemize}
+
+Assumimos que as operações são sempre válidas para a estrutura.
+
+Uma estrutura é \deff{parcialmente retroativa} se permite as operações acima, mas as operações de acesso (chamadas à função~Query) só podem ser feitas na versão atual da estrutura~(${t = \infty}$); a estrutura é~\deff{totalmente retroativa}, ou apenas retroativa, se permite operações de acesso em qualquer tempo~$t$.
+
+\end{document}
