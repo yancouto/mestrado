@@ -2,7 +2,7 @@
 
 \begin{document}
 
-\chapter{Árvore rubro-negra} \label{cap:rubronegra}
+\chapter{Árvore rubro-negra} \label{cap:rubronegra_persist}
 
 Iremos implementar uma árvore rubro-negra parcialmente persistente utilizando a técnica de node copying, discutida na Seção~\ref{sec:nodecopying}. Uma árvore rubro-negra é uma árvore de busca binária balanceada, na qual cada nó é vermelho ou preto, e as cores são usadas para auxiliar no rebalanceamento.
 
@@ -10,7 +10,7 @@ Com uma implementação baseada na de Cormen et al.~\cite{CormenRedBlack}, a cad
 
 A implementação de Sedgewick e Wayne~\cite{SedgewickRedBlack}, apesar de ser considerada mais simples, não serve para os nossos propósitos, pois, ao considerar apenas árvores rubro-negras esquerdistas, os algoritmos de inserção e remoção podem realizar~$\Theta(\lg n)$ rotações, logo não é possível manter o consumo de espaço~$\Oh(m)$, usando node copying.
 
-Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garante esse espaço, e é totalmente persistente. Esse método é discutido na Seção~\ref{sec:implfuncional}, e também usado nos Capítulos~\ref{cap:pilha},~\ref{cap:deque1},~\ref{cap:deque2} e~\ref{cap:deque3}. Basta, em operações de modificação, copiar todo o caminho percorrido na árvore, a partir da raiz.
+Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garante esse espaço, e é totalmente persistente. Esse método é discutido na Seção~\ref{sec:implfuncional}, e também usado nos Capítulos~\ref{cap:pilha_persist},~\ref{cap:deque1_persist},~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}. Basta, em operações de modificação, copiar todo o caminho percorrido na árvore, a partir da raiz.
 
 \section{Definições}
 

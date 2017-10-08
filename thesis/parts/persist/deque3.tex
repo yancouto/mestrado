@@ -2,15 +2,15 @@
 
 \begin{document}
 
-\chapter{Deque de Kaplan e Tarjan} \label{cap:deque3}
+\chapter{Deque de Kaplan e Tarjan} \label{cap:deque3_persist}
 
-Modificaremos a implementação do Capítulo~\ref{cap:deque2} para que todas as operações, exceto~\textsc{k-th}, consumam tempo e espaço~$\Oh(1)$. Esta implementação foi inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}.
+Modificaremos a implementação do Capítulo~\ref{cap:deque2_persist} para que todas as operações, exceto~\textsc{k-th}, consumam tempo e espaço~$\Oh(1)$. Esta implementação foi inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}.
 
 \section{Contadores Binários} \label{sec:contbin}
 
 \subsection{Deque persistente como um contador binário}
 
-Note que, na estrutura do Capítulo~\ref{cap:deque2}, se adicionarmos elementos apenas usando~\func{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
+Note que, na estrutura do Capítulo~\ref{cap:deque2_persist}, se adicionarmos elementos apenas usando~\func{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
 
 Esse comportamento é similar ao de um contador binário. Podemos considerar que cada nível é um dígito:~0 se~$\V{preffix}$ é nulo ou~1 se~$\V{preffix}$ é não nulo. O primeiro nível é o dígito menos significativo. Assim, adicionar um elemento usando~\func{PushFront}{d, x} é equivalente a somar~1 no contador binário, pois se encontramos um~0 colocamos~$x$ ali, senão, formamos um par de~$x$ com o elemento que ali estava (transformando essa posição em~0), e adicionamos esse par na posição seguinte~(somamos~1 na posição seguinte).
 
@@ -78,7 +78,7 @@ A Figura~\ref{fig:cont_ex} mostra os casos possíveis em que se realiza a opera�
 
 No Caso~1, o resultado ou não tem dígito~2, ou tem um dígito~2 com um~0 imediatamente à sua esquerda, logo o contador continua regular. No Caso~2, quando o dígito~$i + 1$ é~0, o resultado tem o dígito~$i$ como~0, e o dígito~$j$ como o primeiro~2, logo a regularidade é respeitada. No Caso~3, o dígito~$i+1$ passa a ser o primeiro~2, mas como ele era anteriormente~1, ainda existe um~0 antes da posição~$j$. Além disso, o dígito~$i$ é~0, logo a regularidade é respeitada.
 
-O contador portanto continua regular, mudando no máximo~3 dígitos. Para encontrar o primeiro~2 em tempo constante, podemos manter uma pilha com todos os índices de dígitos que são~2. Vamos esboçar um código para fazer essa adição. Supomos que temos uma pilha~$p$ implementada como a do~Capítulo~\ref{cap:pilha}, e que o contador é armazenado em um vetor~$x$, indexado a partir de~0.
+O contador portanto continua regular, mudando no máximo~3 dígitos. Para encontrar o primeiro~2 em tempo constante, podemos manter uma pilha com todos os índices de dígitos que são~2. Vamos esboçar um código para fazer essa adição. Supomos que temos uma pilha~$p$ implementada como a do~Capítulo~\ref{cap:pilha_persist}, e que o contador é armazenado em um vetor~$x$, indexado a partir de~0.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -107,7 +107,7 @@ A função~\func{Add1}{x, p} adiciona~1 ao contador redundante regular~$x$ que t
 
 \section{Visão geral}
 
-Como discutido na Seção~\ref{sec:contbin}, a implementação de deque apresentada no Capítulo~\ref{cap:deque2} tem uma certa relação com contadores binários. Iremos então usar a ideia de contadores binários redundantes, também discutidos na Seção~\ref{sec:contbin}, para modificar a implementação da deque persistente para que qualquer operação da deque, exceto~\textsc{k-th}, consuma tempo~$\Oh(1)$.
+Como discutido na Seção~\ref{sec:contbin}, a implementação de deque apresentada no Capítulo~\ref{cap:deque2_persist} tem uma certa relação com contadores binários. Iremos então usar a ideia de contadores binários redundantes, também discutidos na Seção~\ref{sec:contbin}, para modificar a implementação da deque persistente para que qualquer operação da deque, exceto~\textsc{k-th}, consuma tempo~$\Oh(1)$.
 
 A representação se mantém parecida. Cada nível contém um prefixo e um sufixo da deque, com o nível~$i+1$ armazenando pares de elementos do nível~$i$. Os prefixos e sufixos, porém, são deques (não-persistentes) que podem conter até~5 elementos.
 
@@ -282,9 +282,9 @@ A Figura~\ref{fig:func_ex3} mostra como fica a estrutura, baseando-se nessa impl
 
 \section{Representação}
 
-A representação de um nó da deque será similar à do Capítulo~\ref{cap:deque2}. Cada nó~$u$ terá os campos~$\V{preffix}$,~$\V{suffix}$,~$\V{child}$ e~$\V{next}$.
+A representação de um nó da deque será similar à do Capítulo~\ref{cap:deque2_persist}. Cada nó~$u$ terá os campos~$\V{preffix}$,~$\V{suffix}$,~$\V{child}$ e~$\V{next}$.
 
-Os campos~$\V{preffix}$ e~$\V{suffix}$, como anteriormente, guardam um prefixo e um sufixo da deque, considerando $u$ como raiz, mas agora estes campos são deques não-persistentes de tamanho até~5. Usamos que~$\{\}$ cria uma deque não-persistente vazia, e que cada deque tem funções homônimas às descritas no início do Capítulo~\ref{cap:deque2}, mas não recebem a deque e não retornam uma nova deque. Além disso, uma função~\func{Size}{} retorna o número de elementos na deque não-persistente. Por exemplo, se~$d$ é uma deque não-persistente,~$d.\func{PopBack}{}$ remove o último elemento de~$d$ e o retorna, modificando~$d$.
+Os campos~$\V{preffix}$ e~$\V{suffix}$, como anteriormente, guardam um prefixo e um sufixo da deque, considerando $u$ como raiz, mas agora estes campos são deques não-persistentes de tamanho até~5. Usamos que~$\{\}$ cria uma deque não-persistente vazia, e que cada deque tem funções homônimas às descritas no início do Capítulo~\ref{cap:deque2_persist}, mas não recebem a deque e não retornam uma nova deque. Além disso, uma função~\func{Size}{} retorna o número de elementos na deque não-persistente. Por exemplo, se~$d$ é uma deque não-persistente,~$d.\func{PopBack}{}$ remove o último elemento de~$d$ e o retorna, modificando~$d$.
 
 O campo~$\V{next}$ aponta para o próximo nível com dígito diferente de~1, se existir e se~$u$ não tiver dígito~1, ou se~$u$ for o primeiro nível. O campo~$\V{child}$ aponta para o nó de nível~$i + 1$, se existir, e se este nó tem dígito~1.
 

@@ -2,7 +2,7 @@
 
 \begin{document}
 
-\chapter{Deque com LA e LCA} \label{cap:deque1}
+\chapter{Deque com LA e LCA} \label{cap:deque1_persist}
 
 Uma~\deff{fila duplamente terminada} ou fila de duas pontas é uma estrutura de dados que generaliza pilhas. Essa estrutura é uma pilha em que é possível adicionar e remover elementos de qualquer uma das suas extremidades. Ela é usualmente chamada de deque, uma abreviatura de dequeue.
 
@@ -20,15 +20,15 @@ Estamos interessados nas seguintes operações:
 
 Note que, usando apenas \func{PushFront}{d, x}, \func{Front}{d} e \func{PopFront}{d}, simulamos uma pilha. Analogamente, usando apenas \func{PushBack}{d, x}, \func{Front}{d} e \func{PopFront}{d}, simulamos uma fila simples.
 
-Apresentaremos uma implementação persistente de deques, que se baseia nas implementações de pilhas e filas persistentes discutidas no Capítulo~\ref{cap:pilha}, e não na estrutura recursiva discutida nos Capítulos~\ref{cap:deque2} e~\ref{cap:deque3}. Esta implementação utiliza Level Ancestor e Lowest Common Ancestor (ancestral comum mais profundo) como bibliotecas dadas, que serão discutidas na Parte~\ref{part:arvores}.
+Apresentaremos uma implementação persistente de deques, que se baseia nas implementações de pilhas e filas persistentes discutidas no Capítulo~\ref{cap:pilha_persist}, e não na estrutura recursiva discutida nos Capítulos~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}. Esta implementação utiliza Level Ancestor e Lowest Common Ancestor (ancestral comum mais profundo) como bibliotecas dadas, que serão discutidas na Parte~\ref{part:arvores}.
 
-Esta implementação foi desenvolvida por mim. As implementações de~\textsc{k-th} e fila no Capítulo~\ref{cap:pilha} também são de minha autoria. Desenvolvi inicialmente a ideia para uma pilha persistente ao escrever um problema para a Seletiva USP de 2016, uma prova que seleciona alunos da USP para participar da Maratona de Programação. O problema em inglês pode ser acessado em~\href{http://codeforces.com/gym/101064/problem/G}{\texttt{codeforces.com/gym/101064/problem/G}}.
+Esta implementação foi desenvolvida por mim. As implementações de~\textsc{k-th} e fila no Capítulo~\ref{cap:pilha_persist} também são de minha autoria. Desenvolvi inicialmente a ideia para uma pilha persistente ao escrever um problema para a Seletiva USP de 2016, uma prova que seleciona alunos da USP para participar da Maratona de Programação. O problema em inglês pode ser acessado em~\href{http://codeforces.com/gym/101064/problem/G}{\texttt{codeforces.com/gym/101064/problem/G}}.
 
 Acreditamos que, mesmo sendo necessário resolver o problema do Level Ancestor e Lowest Common Ancestor, esta implementação é mais simples que as outras, apresentadas nos capítulos seguintes. O mesmo preprocessamento necessário para resolver o problema do Level Ancestor também permite resolver o problema do Lowest Common Ancestor.
 
 \section{Representação e visão geral}
 
-Na implementação de pilhas no Capítulo~\ref{cap:pilha}, a lista ligada, quando em um contexto persistente, se torna uma arborescência, e a pilha associada a cada nó é o caminho deste nó até a raiz. É possível adicionar novas folhas, pois estas não mudam os ponteiros dos outros elementos; e então é possível adicionar elementos ao começo da pilha.
+Na implementação de pilhas no Capítulo~\ref{cap:pilha_persist}, a lista ligada, quando em um contexto persistente, se torna uma arborescência, e a pilha associada a cada nó é o caminho deste nó até a raiz. É possível adicionar novas folhas, pois estas não mudam os ponteiros dos outros elementos; e então é possível adicionar elementos ao começo da pilha.
 
 Na implementação de filas, no mesmo capítulo, também foi discutido como simular a remoção de elementos do final da estrutura, guardando, junto com o nó, o tamanho da fila. Dessa forma, os elementos da estrutura são um prefixo do caminho do vértice até a raiz. Isso, porém, não permite adicionar elementos ao final, pois isso significaria modificar nós presentes em versões anteriores, e a implementação não seria mais funcional.
 
@@ -120,7 +120,7 @@ Para adicionar um elemento no início da deque, criamos uma nova folha conectada
 
 Para remover um elemento do começo, alteramos apenas~$\V{first}$ para apontar para o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$; para remover um elemento do final, alteramos~$\V{last}$ para apontara para o penúltimo elemento do caminho de~$\V{first}$ para~$\V{last}$. Como fazer essas operações será discutido nas próximas seções. Na Figura~\ref{fig:deque_ex1} ao remover o último elemento da deque~$(\V{first}_5, \V{last}_5)$ obtemos a deque~$(\V{first}_6, \V{last}_6)$.
 
-Devemos ter uma representação especial para deques vazias, por exemplo o valor~\keyword{null} em~$\V{first}$ e~$\V{last}$. Ao remover um elemento de uma deque com um único elemento (quando~$\V{first}=\V{last}$), retornamos este nó vazio; e para adicionar algum elemento à deque vazia basta criamos e retornamos um novo nó que aponta para~\keyword{null}. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em que a raiz é~\keyword{null}, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
+Devemos ter uma representação especial para deques vazias, por exemplo o valor~\keyword{null} em~$\V{first}$ e~$\V{last}$. Ao remover um elemento de uma deque com um único elemento (quando~$\V{first}=\V{last}$), retornamos este nó vazio; e para adicionar algum elemento à deque vazia basta criamos e retornamos um novo nó que aponta para~\keyword{null}. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em que a raiz é~\keyword{null}, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha_persist}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
 
 \section{Acesso e inserção}
 

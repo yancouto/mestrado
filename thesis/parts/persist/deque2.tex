@@ -2,11 +2,11 @@
 
 \begin{document}
 
-\chapter{Deque Recursiva} \label{cap:deque2}
+\chapter{Deque Recursiva} \label{cap:deque2_persist}
 
-Neste capítulo, apresentaremos um implementação persistente desta estrutura, em que cada operação leva tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o tamanho atual da deque, ou seja, com a mesma complexidade que a implementação do capítulo anterior. A implementação é discutida em~\cite{Kaplan2001} e serve como base para a implementação discutida no Capítulo~\ref{cap:deque3}.
+Neste capítulo, apresentaremos um implementação persistente desta estrutura, em que cada operação leva tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o tamanho atual da deque, ou seja, com a mesma complexidade que a implementação do capítulo anterior. A implementação é discutida em~\cite{Kaplan2001} e serve como base para a implementação discutida no Capítulo~\ref{cap:deque3_persist}.
 
-Diferente das definições do Capítulo~\ref{cap:deque1}, usaremos que a função~\textsc{Pop} retorna o elemento removido, assim como a nova deque. Isso é usado para facilitar a implementação da função~\textsc{Pop}.
+Diferente das definições do Capítulo~\ref{cap:deque1_persist}, usaremos que a função~\textsc{Pop} retorna o elemento removido, assim como a nova deque. Isso é usado para facilitar a implementação da função~\textsc{Pop}.
 \begin{itemize}
 	\item \func{PopFront}{d} --- Retorna o primeiro elemento de~$d$, e uma deque igual a~$d$, mas sem este elemento.
 	\item \func{PopFront}{d} --- Retorna o último elemento de~$d$, e uma deque igual a~$d$, mas sem este elemento.

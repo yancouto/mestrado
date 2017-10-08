@@ -2,7 +2,7 @@
 
 \begin{document}
 
-\chapter{Pilhas e filas} \label{cap:pilha}
+\chapter{Pilhas e filas} \label{cap:pilha_persist}
 Pilhas são uma das estruturas de dados mais simples. Discutiremos neste capítulo como transformá-las em estruturas persistentes. Em nosso pseudocódigo, usaremos estruturas de dados como objetos, ou seja, estas podem ser armazenadas em variáveis. As operações aplicadas sobre uma ED são funções que recebem essa ED como argumento (além de possíveis argumentos adicionais). Além disso, existe uma função que retorna uma ED vazia.
 
 Para manipular estruturas persistentes, é conveniente que, ao chamar uma operação de modificação, uma nova versão da ED seja retornada, e a versão anterior continue válida, ou seja, continue podendo ser usada para operações de acesso, ou de modificação. A estrutura da versão anterior pode mudar, mas a resposta para qualquer operação de acesso deve ser a mesma. Assim, nesse contexto, uma pilha é uma lista de elementos, que permite as seguintes operações:
