@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/yancouto/mestrado.svg?branch=master)](https://travis-ci.org/yancouto/mestrado)
+[![PDF Link](https://img.shields.io/badge/thesis-pdf-brightgreen.svg)](https://yancouto.github.io/mestrado/thesis.pdf)
+[![Documentação](https://img.shields.io/badge/documentation-doxygen-brightgreen.svg)](https://yancouto.github.io/mestrado/)
 
 ## Estruturas de dados avançadas
 
