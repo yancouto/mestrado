@@ -6,7 +6,7 @@
 
 Diferente de persistência, a estrutura mais simples de tornar retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
 
-No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{K-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um exemplo de uso de uma fila retroativa.
+No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{k-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um exemplo de uso de uma fila retroativa.
 
 O motivo da fila ser a estrutura mais simples de tornar retroativa é que as operações de~\textsc{Enqueue} e~\textsc{Dequeue} são quase ``independentes''. Como~\textsc{Enqueue}s são feitos no final da estrutura e~\textsc{Dequeue}s são feitos no começo, a ordem em que~\textsc{Dequeue}s são feitos não influencia a estrutura. Note que, no Exemplo~\ref{ex:fila_retro}, se a inserção de~\textsc{Dequeue} fosse depois do segundo~\textsc{Enqueue}, o efeito na fila final seria o mesmo.
 
@@ -53,12 +53,12 @@ Mais formalmente, se as inserções são~$E = (e_1, \ldots, e_e)$, então a estr
 
 \section{Representação}
 
-Para implementar a fila retroativa, usaremos uma estrutura que armazena um conjunto de chaves e valores, onde as chaves vem de um conjunto totalmente ordenado, e permite as seguintes operações:
+Para implementar a fila retroativa, usaremos uma estrutura auxiliar que armazena um conjunto de chaves e valores, onde as chaves vem de um conjunto totalmente ordenado, e permite as seguintes operações:
 
 \begin{itemize}
 	\item $\Call{Insert}{k, v}$ --- Insere a chave~$k$ associada ao valor~$v$.
 	\item $\Call{Remove}{k}$ --- Remove a chave~$k$ e seu valor associado.
-	\item $\Call{K-th}{k}$ --- Devolve o valor associado à~$k$-ésima menor chave. % esquisito k ser chave e indice
+	\item $\Call{k-th}{k}$ --- Devolve o valor associado à~$k$-ésima menor chave. % esquisito k ser chave e indice
 	\item $\Call{Count}{k}$ --- Conta o número de chaves~$k'$ tal que~$k' \leq k$.
 \end{itemize}
 
@@ -68,5 +68,34 @@ Essas operações podem ser implementadas usando uma ABB balanceada tal que cada
 \newcommand{\enqs}{\V{enq}}
 
 Uma fila retroativa terá dois campos,~$\enqs$ e~$\deqs$, ambos armazenam estruturas como a ED auxiliar descrita acima. O campo~$\enqs$ armazena as operações de~\textsc{Enqueue}, as chaves são o tempo e o valor é o valor inserido na fila. O campo~$\deqs$ armazena as operações de~\textsc{Dequeue}, as chaves são o tempo, e não é necessário armazenar nada no valor, logo usaremos~$\Null$ como o valor.
+
+\section{Implementação}
+
+A fila é uma FIFO (first in, first out), isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Isso significa que, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordernadas por tempo, que temos em~$\enqs$, e contar o número de~\textsc{Dequeue}s até~$t$, que é possível usando~$\deqs$. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
+
+Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{Enqueue}{x}")$ usaremos~$\Call{Insert-Enqueue}{t, x}$, e faremos o mesmo para~\textsc{Dequeue} e para remoções de operações.
+
+\begin{algorithm}
+\caption{Fila retroativa} \label{lst:filaretro}
+\begin{algorithmic}[1]
+	\Function{Insert-Enqueue}{$t, x$}
+		\State $\enqs.\Call{Insert}{t, x}$
+	\EndFunction
+	\Function{Insert-Dequeue}{$t$}
+		\State $\deqs.\Call{Insert}{t, \Null}$
+	\EndFunction
+	\Function{Delete-Enqueue}{$t$}
+		\State $\enqs.\Call{Remove}{t}$
+	\EndFunction
+	\Function{Delete-Dequeue}{$t$}
+		\State $\deqs.\Call{Remove}{t}$
+	\EndFunction
+	\Function{Query-k-th}{$t, k$}
+		\State $d_t = \deqs.\Call{Count}{t}$
+		\State \Return $\enqs.\Call{k-th}{d_t + k}$
+	\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
 
 \end{document}
