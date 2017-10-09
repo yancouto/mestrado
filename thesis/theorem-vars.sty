@@ -1,0 +1,25 @@
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{amssymb}
+
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{result}{Resultado}
+\newtheorem*{complexity}{Complexidade}
+\newtheorem{corollary}{Corolário}[theorem]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}[theorem]{Proposição}
+\newtheorem*{definition}{Definição}
+\newtheorem*{invar}{Invariante}
+
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\V}[1]{\mathit{#1}}
+\newcommand{\code}[1]{$\V{#1}$}
+\newcommand{\Oh}{\mathcal{O}}
+\newcommand{\tdots}{\,.\,.\,} % in place of \ldots
+\newcommand{\func}[2]{\mbox{\textsc{#1}$(#2)$}}
+\newcommand{\deff}[1]{\emph{#1}}
+\newcommand*{\nref}[1]{%
+  {\protect\NoHyper\ref{#1}\protect\endNoHyper}%
+}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}

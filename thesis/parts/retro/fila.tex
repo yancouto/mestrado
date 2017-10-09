@@ -1,10 +1,10 @@
-\documentclass[../../main.tex]{subfiles}
+\documentclass[main.tex]{subfiles}
 
 \begin{document}
 
 \chapter{Fila retroativa}
 
-Diferente de persistência, a estrutura mais simples de tornar retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persiste}. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
+Diferente de persistência, a estrutura mais simples de tornar retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
 
 No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{K-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um exemplo de uso de uma fila retroativa.
 
