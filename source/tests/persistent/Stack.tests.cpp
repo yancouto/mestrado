@@ -1,4 +1,4 @@
-#include "../../Stack.hpp"
+#include "../../persistent/Stack.hpp"
 #include <gtest/gtest.h>
 
 #include <vector>

@@ -1,6 +1,5 @@
 # Copiado e adaptado de gtest/googletest/make/Makefile
-# Apenas edite os targets no final, adicionando targets para .o's de
-# e estes targets como dependecias de "all_tests".
+# Todos os arquivos terminados em ".tests.cpp" são testados.
 
 ###################################################################
 ###################################################################

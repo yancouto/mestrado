@@ -67,7 +67,7 @@ public:
  * subir k links na lista ligada em tempo logaritmico, apenas armazenando um ponteiro e
  * um inteiro em cada nó.
  *
- * A deque armazena elementos do tipo `T`, e só assume que esse tipo tem um construtor de cópia.
+ * A pilha armazena elementos do tipo `T`, e só assume que esse tipo tem um construtor de cópia.
  * Uma diferença do código discutido no Capítulo 2 da tese é que aqui as funções não recebem a
  * pilha, mas são métodos desta.
  *

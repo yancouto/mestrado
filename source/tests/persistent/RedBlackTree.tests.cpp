@@ -1,4 +1,4 @@
-#include "../../RedBlackTree.hpp"
+#include "../../persistent/RedBlackTree.hpp"
 #include <gtest/gtest.h>
 
 #include <vector>
