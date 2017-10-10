@@ -336,7 +336,7 @@ void doLarge(bool isOrdered) {
 			EXPECT_EQ(rb.Find(x, rb.current()) != nullptr, s.find(x) != s.end());
 		} else {
 			if(isOrdered) v.push_back(i);
-			else v.push_back(rand() * rand() + rand());
+			else v.push_back(rand() * RAND_MAX + rand());
 			rb.Insert(v.back());
 			s.insert(v.back());
 		}

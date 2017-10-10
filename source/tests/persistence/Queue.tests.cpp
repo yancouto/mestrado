@@ -29,7 +29,7 @@ TEST(QSimple, VecIdentity) {
 		std::vector<int> v;
 		Queue<int> p;
 		for(int i = 0; i < 10000; i++) {
-			v.push_back(rand() * rand() + rand());
+			v.push_back(rand() * RAND_MAX + rand());
 			p = p.Enqueue(v[i]);
 		}
 		for(int i = 0; i < 10000; i++) {
@@ -66,7 +66,7 @@ TEST(QPersistence, Vector) {
 		std::vector<Queue<int>> st;
 		Queue<int> p = Queue<int>();
 		for(int i = 0; i < 100000; i++) {
-			v.push_back(rand() * rand() + rand());
+			v.push_back(rand() * RAND_MAX + rand());
 			p = p.Enqueue(v.back());
 			if(i >= 100) p = p.Dequeue();
 			st.push_back(p);

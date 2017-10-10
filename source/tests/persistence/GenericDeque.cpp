@@ -77,7 +77,7 @@ TEST(DSimple, VectorAndKth) {
 		std::vector<int> v, p;
 		Deque<int> d;
 		for(int i = 0; i < 10000; i++) {
-			v.push_back(rand() * rand() + rand());
+			v.push_back(rand() * RAND_MAX + rand());
 			d = d.PushBack(v.back());
 			p.push_back(i);
 		}

@@ -5,17 +5,17 @@
  *
  * @section persist Implementações Persistentes
  *
- * @subsection pilha Pilha
+ * @subsection pilhap Pilha
  * A [pilha](@ref persistence::stack::Stack) é a estrutura de dados mais simples, e, implementada
  * usando lista ligada, já é automaticamente persistente. Para acessar o k-ésimo elemento usando
  * esta implementação, porém, é necessário usar técnicas mais avançadas @cite Myers83 .
  *
- * @subsection fila Fila
+ * @subsection filap Fila
  * Como a implementação de pilha possui acesso ao k-ésimo elemento, é possível implementar uma
  * [fila](@ref persistence::queue::Queue) usando apenas essa implementação e um inteiro indicando
  * o tamanho atual da fila.
  *
- * @subsection deque Deque
+ * @subsection dequep Deque
  * A deque é uma lista na qual é possível inserir e remover elementos das duas pontas. Damos
  * 3 implementações para uma deque persistente. [A primeira](@ref persistence::deque1::Deque) é
  * similar à implementação das pilhas e filas, usando a mesma técnica.
@@ -23,10 +23,19 @@
  * de ter mais casos a ser tratados. [A terceira](@ref deque3::Deque) implementação é uma expansão
  * da segunda, e melhora o tempo consumido por operação.
  *
- * @subsection arn Árvore Rubro-Negra
+ * @subsection arnp Árvore Rubro-Negra
  * Uma [árvore rubro-negra](@ref persistence::red_black_tree::RedBlackTree) é uma árvore de busca
  * binária balanceada. A implementação é parcialmente persistente, e é feita usando o método de
  * Node copying @cite DriscollSST1989 . Por ser uma implementação parcialmente persistente, e como
  * as cores dos nós servem apenas para auxiliar em seu balanceamento, estas não são armazenadas de
  * forma persistente e conseguimos assim consumir espaço constante por operação de modificação.
+ *
+ * @section retro Implementações Retroativas
+ *
+ * Nestas implementações, apresentadas na Parte III, usamos que o tempo é indicado por um inteiro.
+ *
+ * @subsection filar Fila
+ * A [fila](@ref retroactivity::queue::Queue) é a estrutura mais simples de ser implementada
+ * de forma persistente. Para ser implementada desta forma, é preciso utilizar uma
+ * [ED auxiliar](@ref aux::OrderedMap) que pode ser implementada com uma ABB.
  */

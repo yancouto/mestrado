@@ -29,7 +29,7 @@ TEST(STSimple, Reverse) {
 		std::vector<int> v;
 		Stack<int> p;
 		for(int i = 0; i < 100000; i++) {
-			v.push_back(rand() * rand() + rand());
+			v.push_back(rand() * RAND_MAX + rand());
 			p = p.Push(v[i]);
 		}
 		std::reverse(v.begin(), v.end());
@@ -67,7 +67,7 @@ TEST(STPersistence, Vector) {
 		std::vector<Stack<int>> st;
 		Stack<int> p = Stack<int>();
 		for(int i = 0; i < 100000; i++) {
-			v.push_back(rand() * rand() + rand());
+			v.push_back(rand() * RAND_MAX + rand());
 			p = p.Push(v.back());
 			st.push_back(p);
 			perm.push_back(i);

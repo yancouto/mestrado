@@ -4,7 +4,7 @@
 
 \chapter{Fila retroativa}
 
-Diferente de persistência, a estrutura mais simples de tornar retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
+Diferente de persistência, a estrutura mais simples de tornar retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}, mas consideramos que inserções são feitas no final e remoções no começo da lista. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
 
 No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{k-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um exemplo de uso de uma fila retroativa.
 
@@ -93,6 +93,9 @@ Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{E
 	\Function{Query-k-th}{$t, k$}
 		\State $d_t = \deqs.\Call{Count}{t}$
 		\State \Return $\enqs.\Call{k-th}{d_t + k}$
+	\EndFunction
+	\Function{Query-First}{$t$}
+		\State \Return $\Call{Query-k-th}{t, 1}$
 	\EndFunction
 \end{algorithmic}
 \end{algorithm}
