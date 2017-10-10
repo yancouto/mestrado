@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <iostream>
 
+namespace persistence {
+
 namespace deque3 {
 
 template<class T> SubDeque<T>::SubDeque() : i(0), size_(0) {}
@@ -364,3 +366,5 @@ template<class T> Deque<T>& Deque<T>::operator=(const Deque &o) {
 }
 
 } // namespace deque3
+
+} // namespace persistence

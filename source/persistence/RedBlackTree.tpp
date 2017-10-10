@@ -1,5 +1,7 @@
 // Esse arquivo é importado apenas por RedBlackTree.hpp e não deve ser importado manualmente.
 
+namespace persistence {
+
 namespace red_black_tree {
 
 template<class T> Node<T>::Node(const T& val, int version) : child{nullptr, nullptr}, red(true),
@@ -242,3 +244,5 @@ template<class T> void RedBlackTree<T>::AddBlack(Node<T> *y, bool side) {
 }
 
 } // namespace red_black_tree
+
+} // namespace persistence

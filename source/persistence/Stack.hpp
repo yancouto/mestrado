@@ -3,8 +3,10 @@
  * Veja Stack para mais informação.
  */
 
-#ifndef STACK_HPP_
-#define STACK_HPP_
+#ifndef PERSISTENCE_STACK_HPP_
+#define PERSISTENCE_STACK_HPP_
+
+namespace persistence {
 
 namespace stack {
 
@@ -77,7 +79,7 @@ public:
  * antigas da estrutura, como no exemplo abaixo:
  *
  * @code
- * using namespace stack;
+ * using namespace persistence::stack;
  * Stack<int> p1; // ()
  * Stack<int> p2 = p1.Push(1); // (1)
  * Stack<int> p3 = p2.Push(2); // (2, 1)
@@ -172,6 +174,8 @@ private:
 
 } // namespace stack
 
+} // namespace persistence
+
 #include "Stack.tpp"
 
-#endif
+#endif // PERSISTENCE_STACK_HPP_

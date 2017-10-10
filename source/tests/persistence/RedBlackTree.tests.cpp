@@ -1,11 +1,11 @@
-#include "../../persistent/RedBlackTree.hpp"
+#include "../../persistence/RedBlackTree.hpp"
 #include <gtest/gtest.h>
 
 #include <vector>
 #include <algorithm>
 #include <set>
 
-using namespace red_black_tree;
+using namespace persistence::red_black_tree;
 
 template<class T> bool isRed(Node<T> *u) { return u && u->red; }
 

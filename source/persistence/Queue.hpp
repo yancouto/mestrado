@@ -3,10 +3,12 @@
  * Veja Queue para mais informação.
  */
 
-#ifndef QUEUE_HPP_
-#define QUEUE_HPP_
+#ifndef PERSISTENCE_QUEUE_HPP_
+#define PERSISTENCE_QUEUE_HPP_
 
 #include "Stack.hpp"
+
+namespace persistence {
 using stack::Stack;
 
 namespace queue {
@@ -24,6 +26,7 @@ namespace queue {
  * seguinte exemplo:
  *
  * @code
+ * using namespace persistence::queue;
  * Queue<int> q1; // ()
  * Queue<int> q2 = q1.Enqueue(1); // (1)
  * Queue<int> q3 = q2.Enqueue(2); // (2, 1)
@@ -112,6 +115,8 @@ private:
 
 } // namespace queue
 
+} // namespace persistence
+
 #include "Queue.tpp"
 
-#endif // QUEUE_HPP_
+#endif // PERSISTENCE_QUEUE_HPP_

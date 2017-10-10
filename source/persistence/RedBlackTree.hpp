@@ -3,10 +3,12 @@
  * Veja RedBlackTree para mais informação.
  */
 
-#ifndef REDBLACKTREE_HPP_
-#define REDBLACKTREE_HPP_
+#ifndef PERSISTENCE_REDBLACKTREE_HPP_
+#define PERSISTENCE_REDBLACKTREE_HPP_
 
 #include <vector>
+
+namespace persistence {
 
 namespace red_black_tree {
 
@@ -282,6 +284,8 @@ template<class T> class RedBlackTree {
 
 } // namespace red_black_tree
 
+} // namespace persistence
+
 #include "RedBlackTree.tpp"
 
-#endif // REDBLACKTREE_HPP_
+#endif // PERSISTENCE_REDBLACKTREE_HPP_

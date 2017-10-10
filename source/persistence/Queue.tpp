@@ -1,5 +1,7 @@
 // Esse arquivo é importado apenas por Queue.hpp e não deve ser importado manualmente.
 
+namespace persistence {
+
 namespace queue {
 
 template<class T> Queue<T>::Queue() : size(0) {}
@@ -15,5 +17,6 @@ template<class T> Queue<T> Queue<T>::Enqueue(const T& x) const {
 
 template<class T> Queue<T> Queue<T>::Dequeue() const { return Queue<T>(stack, size - 1); }
 
-
 } // namespace queue
+
+} // namespace persistence

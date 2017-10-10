@@ -2,6 +2,8 @@
 
 #include <utility>
 
+namespace persistence {
+
 namespace deque1 {
 
 template<class T> Deque<T>::Deque() : first(nullptr), last(nullptr) {}
@@ -69,3 +71,5 @@ template<class T> Deque<T> Deque<T>::PopFront() const {
 template<class T> Deque<T> Deque<T>::PopBack() const { return Swap().PopFront().Swap(); }
 
 } // namespace deque1
+
+} // namespace persistence

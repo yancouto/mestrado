@@ -4,6 +4,8 @@
 #include <cassert>
 #include <iostream>
 
+namespace persistence {
+
 namespace deque2 {
 
 namespace {
@@ -195,5 +197,6 @@ template<class T> Deque<T> Deque<T>::PopBack() const {
 	return Deque<T>(_PopBack(node).second);
 }
 
-
 } // namespace deque2
+
+} // namespace persistence

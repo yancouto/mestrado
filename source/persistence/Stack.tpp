@@ -1,5 +1,7 @@
 // Esse arquivo é importado apenas por Stack.hpp e não deve ser importado manualmente.
 
+namespace persistence {
+
 namespace stack {
 
 template<class T> Node<T>::Node(const T& x, Node<T> *nx) : val(x), next(nx), depth(nx? nx->depth + 1 : 1), ptr_ct(0) {
@@ -69,3 +71,5 @@ template<class T> Stack<T> Stack<T>::Push(const T& x) const {
 template<class T> Stack<T> Stack<T>::Pop() const { return Stack<T>(node->next); }
 
 } // namespace stack
+
+} // namespace persistence

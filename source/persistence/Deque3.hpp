@@ -3,10 +3,12 @@
  * Veja Deque para mais informação.
  */
 
-#ifndef DEQUE3_HPP_
-#define DEQUE3_HPP_
+#ifndef PERSISTENCE_DEQUE3_HPP_
+#define PERSISTENCE_DEQUE3_HPP_
 
 #include "Deque2.hpp"
+
+namespace persistence {
 
 namespace deque3 {
 
@@ -262,6 +264,8 @@ void FixDeques(SubDeque<any*> &l, SubDeque<any*> &r,
 
 } // namespace deque3
 
+} // namespace persistence
+
 #include "Deque3.tpp"
 
-#endif // DEQUE3_HPP_
+#endif // PERSISTENCE_DEQUE3_HPP_

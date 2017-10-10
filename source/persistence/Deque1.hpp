@@ -3,10 +3,12 @@
  * Veja Deque para mais informação.
  */
 
-#ifndef DEQUE1_HPP_
-#define DEQUE1_HPP_
+#ifndef PERSISTENCE_DEQUE1_HPP_
+#define PERSISTENCE_DEQUE1_HPP_
 
 #include "Stack.hpp"
+
+namespace persistence {
 
 namespace deque1 {
 
@@ -30,7 +32,7 @@ template<class T> using Node = stack::Node<T>;
  * seguinte exemplo:
  *
  * @code
- * using namespace deque1;
+ * using namespace persistence::deque1;
  * Deque<int> d1; // ()
  * Deque<int> d2 = d1.PushFront(1); // (1)
  * Deque<int> d3 = d2.PushFront(2); // (2, 1)
@@ -129,6 +131,8 @@ private:
 
 } // namespace deque1
 
+} // namespace persistence
+
 #include "Deque1.tpp"
 
-#endif // DEQUE1_HPP_
+#endif // PERSISTENCE_DEQUE1_HPP_

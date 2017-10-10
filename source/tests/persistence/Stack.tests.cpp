@@ -1,9 +1,9 @@
-#include "../../persistent/Stack.hpp"
+#include "../../persistence/Stack.hpp"
 #include <gtest/gtest.h>
 
 #include <vector>
 
-using namespace stack;
+using namespace persistence::stack;
 
 TEST(STSimple, Example) {
 	Stack<int> p0;

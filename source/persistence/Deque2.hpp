@@ -3,11 +3,14 @@
  * Veja Deque para mais informação.
  */
 
-#ifndef DEQUE2_HPP_
-#define DEQUE2_HPP_
+#ifndef PERSISTENCE_DEQUE2_HPP_
+#define PERSISTENCE_DEQUE2_HPP_
+
+namespace persistence {
 
 namespace deque2 {
 
+/// @cond DEV
 struct any {
 	const void *ptr;
 	any(const void *p);
@@ -17,6 +20,7 @@ struct any {
 private:
 	int ref_ct;
 };
+/// @endcond
 
 /** Nó da deque recursiva.
  * Um nó representa uma deque persistente e tem três campos opcionais: #preffix, #center e #suffix.
@@ -162,6 +166,8 @@ private:
 
 } // namespace deque2
 
+} // namespace persistence
+
 #include "Deque2.tpp"
 
-#endif // DEQUE2_HPP_
+#endif // PERSISTENCE_DEQUE2_HPP_

@@ -1,9 +1,9 @@
-#include "../../persistent/Queue.hpp"
+#include "../../persistence/Queue.hpp"
 #include <gtest/gtest.h>
 
 #include <vector>
 
-using namespace queue;
+using namespace persistence::queue;
 
 TEST(QSimple, Example) {
 	Queue<int> p0;
