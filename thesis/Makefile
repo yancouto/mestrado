@@ -6,4 +6,4 @@ clean:
 	latexmk -C
 
 main.pdf:
-	latexmk --pdf main.tex
+	latexmk --pdf -interaction=nonstopmode main.tex

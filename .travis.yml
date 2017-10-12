@@ -1,7 +1,7 @@
-sudo: required
 dist: trusty
 branches:
     only: master
+language: r
 addons:
     apt:
         packages:
@@ -10,9 +10,11 @@ env:
     global:
         - MAKEFLAGS="-j"
 before_install:
-- sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full valgrind
+    - tlmgr install texliveonfly
+    - tlmgr install latexmk
 script:
-- make NO_VALGRIND=true
+    - texliveonfly main.tex
+    - make NO_VALGRIND=true
 deploy:
     provider: pages
     skip_cleanup: true
