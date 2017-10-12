@@ -13,7 +13,7 @@ before_install:
     - tlmgr install texliveonfly
     - tlmgr install latexmk
 script:
-    - texliveonfly main.tex
+    - cd thesis && texliveonfly main.tex && cd ..
     - make NO_VALGRIND=true
 deploy:
     provider: pages
