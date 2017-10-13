@@ -12,7 +12,9 @@ env:
 before_install:
     - tlmgr install texliveonfly
     - tlmgr install latexmk
-    - tlmgr install babel-portuguese
+    - tlmgr install babel-portuges
+    - tlmgr install courier
+    - tlmgr install lm
 script:
     - cd thesis && texliveonfly main.tex && cd ..
     - make NO_VALGRIND=true
