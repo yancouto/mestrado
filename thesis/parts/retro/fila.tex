@@ -2,15 +2,17 @@
 
 \begin{document}
 
-\chapter{Fila retroativa}
+\chapter{Fila retroativa} \label{cap:pilha_retro}
 
-Diferente de persistência, a estrutura mais simples de tornar retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}, mas consideramos que inserções são feitas no final e remoções no começo da lista. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
+Diferente de persistência, a estrutura mais simples de se converter retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}, mas consideramos que inserções são feitas no final e remoções no começo da lista, enquanto no Capítulo~\ref{cap:pilha_persist} as inserções eram feitas no começo e remoções no final. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
 
-No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{k-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um exemplo de uso de uma fila retroativa.
+No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{k-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um uso de uma fila retroativa.
 
-O motivo da fila ser a estrutura mais simples de tornar retroativa é que as operações de~\textsc{Enqueue} e~\textsc{Dequeue} são quase ``independentes''. Como~\textsc{Enqueue}s são feitos no final da estrutura e~\textsc{Dequeue}s são feitos no começo, a ordem em que~\textsc{Dequeue}s são feitos não influencia a estrutura. Note que, no Exemplo~\ref{ex:fila_retro}, se a inserção de~\textsc{Dequeue} fosse depois do segundo~\textsc{Enqueue}, o efeito na fila final seria o mesmo.
+Considere a implementação de pilha em um vetor~$A$. Temos duas variáveis,~$L$ e~$R$, que indicam a posição do primeiro e do último elemento da fila no vetor, respectivamente. Os elementos da fila são então, em ordem,~$A[L], A[L + 1], \ldots, A[R]$. Inicializamos~$L = 1$ e~$R = 0$; para realizar um \Call{Dequeue}{\null}, incrementamos~$L$ de um; para realizar um~\Call{Enqueue}{$x$}, incrementamos~$R$ de um e armazenamos~$x$ na posição~$R$ de~$A$; para realizar um~\Call{k-th}{$k$}, retornamos o valor~$A[L + k - 1]$.
 
-Mais formalmente, se as inserções são~$E = (e_1, \ldots, e_e)$, então a estrutura no tempo~$t$ é a lista~$(e_{d_t}, \ldots, e_{e_t})$, onde~$d_t$ é o número de remoções realizadas até o tempo~$t$ e~$e_t$ é o número de inserções realizadas até o tempo~$t$.
+Para implementar uma fila retroativa, usaremos a mesma ideia da implementação em vetor, porém precisamos de uma estrutura mais sofisticada que um vetor, para permitir inserções entre dois elementos. Com essa estrutura, será possível obter o valor de~$L$ e~$R$ em qualquer ponto do tempo.
+
+Note que o valor de~$R$ nunca diminue, assim, nunca modificamos uma posição do vetor uma segunda vez. Portanto,~$A[i]$ armazena o valor inserido pelo~$i$-ésimo~\textsc{Enqueue}. De forma mais geral, em uma estrutura retroativa, se as inserções são~$E = (e_1, \ldots, e_e)$, então a estrutura no tempo~$t$ é a lista~$(e_{d_t}, \ldots, e_{e_t})$, onde~$d_t$ é o número de remoções realizadas até o tempo~$t$ e~$e_t$ é o número de inserções realizadas até o tempo~$t$. Para responder uma operação de~\Call{k-th}{$k$}, basta então ser possível determinar~$d_t$ (que é o valor~$L - 1$ no instante~$t$) e encontrar o~$(d_t + k)$-ésimo elemento.
 
 \begin{table}
 \centering
@@ -59,10 +61,10 @@ Para implementar a fila retroativa, usaremos uma estrutura auxiliar que armazena
 	\item $\Call{Insert}{k, v}$ --- Insere a chave~$k$ associada ao valor~$v$.
 	\item $\Call{Remove}{k}$ --- Remove a chave~$k$ e seu valor associado.
 	\item $\Call{k-th}{k}$ --- Devolve o valor associado à~$k$-ésima menor chave. % esquisito k ser chave e indice
-	\item $\Call{Count}{k}$ --- Conta o número de chaves~$k'$ tal que~$k' \leq k$.
+	\item $\Call{Count}{k}$ --- Conta o número de chaves~$k'$ tais que~$k' \leq k$.
 \end{itemize}
 
-Essas operações podem ser implementadas usando uma ABB balanceada tal que cada operação consuma tempo logarítmico no número de elementos atualmente no conjunto, e espaço linear.
+Essas operações podem ser implementadas usando uma ABB balanceada na qual cada operação consome tempo logarítmico no número de elementos atualmente no conjunto, e espaço linear.
 
 \newcommand{\deqs}{\V{deq}}
 \newcommand{\enqs}{\V{enq}}
@@ -71,9 +73,9 @@ Uma fila retroativa terá dois campos,~$\enqs$ e~$\deqs$, ambos armazenam estrut
 
 \section{Implementação}
 
-A fila é uma FIFO (first in, first out), isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Isso significa que, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordernadas por tempo, que temos em~$\enqs$, e contar o número de~\textsc{Dequeue}s até~$t$, que é possível usando~$\deqs$. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
+A fila é uma FIFO (first in, first out). Isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Portanto, assim como discutido na introdução do capítulo, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordernadas por tempo, que temos em~$\enqs$, e contar o número de~\textsc{Dequeue}s até~$t$, que é possível usando~$\deqs$, e somar~$k$ a esse número. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
 
-Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{Enqueue}{x}")$ usaremos~$\Call{Insert-Enqueue}{t, x}$, e faremos o mesmo para~\textsc{Dequeue} e para remoções de operações.
+Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{Enqueue}{x}")$ usaremos~$\Call{Insert-Enqueue}{t, x}$, e faremos o mesmo para~\textsc{Dequeue}, para remoções de operações e operações de acesso.
 
 \begin{algorithm}
 \caption{Fila retroativa} \label{lst:filaretro}
@@ -91,7 +93,7 @@ Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{E
 		\State $\deqs.\Call{Remove}{t}$
 	\EndFunction
 	\Function{Query-k-th}{$t, k$}
-		\State $d_t = \deqs.\Call{Count}{t}$
+		\State $d_t = \deqs.\Call{Count}{t}$ \Comment{n$^\text{o}$ de \textsc{Dequeue}s que ocorreram até o tempo~$t$.}
 		\State \Return $\enqs.\Call{k-th}{d_t + k}$
 	\EndFunction
 	\Function{Query-First}{$t$}
