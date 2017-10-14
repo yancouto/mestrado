@@ -138,7 +138,7 @@ Perceba também que a árvore de versões não é igual à árvore da estrutura.
 
 A operação~\func{Top}{p} retorna o primeiro elemento da pilha, porém apresentaremos nesta seção como implementar uma função mais poderosa. A operação de acesso~\func{k-th}{p, k} retorna o~$k$-ésimo elemento de~$p$. Esta operação é então uma generalização de~\textsc{Top}, já que~${\Call{k-th}{p, 1} = \Call{Top}{p}}$.
 
-Lembre-se que~$p$ é o nó de uma arborescência, entãor~\func{k-th}{p, k} precisa determinar o~$k$-ésimo ancestral de~$p$, ou seja, o vértice alcançado a partir de~$p$ ao caminhar por~$k$ links~$\V{next}$. \\
+Lembre-se que~$p$ é o nó de uma arborescência, então~\func{k-th}{p, k} precisa determinar o~$k$-ésimo ancestral de~$p$, ou seja, o vértice alcançado a partir de~$p$ ao caminhar por~$k$ links~$\V{next}$. \\
 
 \hrule
 \begin{algorithmic}[1]
@@ -190,8 +190,7 @@ Filas são estruturas quase tão simples quanto pilhas. Elas também são listas
 	\item \func{Dequeue}{q} --- Retorna uma fila igual a~$q$, mas com seu último elemento removido.
 \end{itemize}
 
-É possível, como com pilhas, implementar uma fila usando lista ligada (que na verdade é uma árvore quando se adiciona a pe
-rsistência). É necessário também, para cada versão, armazenar o tamanho atual da fila, ou seja, a fila deixa de ser apenas um nó da árvore e passa a ser um objeto que contém um nó e um inteiro. Seria então necessário usar~Level Ancestor na operação~\func{k-th}{q, k} ou~\func{Last}{q}.
+É possível, como com pilhas, implementar uma fila usando lista ligada (que na verdade é uma árvore quando se adiciona a persistência). É necessário também, para cada versão, armazenar o tamanho atual da fila, ou seja, a fila deixa de ser apenas um nó da árvore e passa a ser um objeto que contém um nó e um inteiro. Seria então necessário usar~Level Ancestor na operação~\func{k-th}{q, k} ou~\func{Last}{q}.
 
 Utilizaremos, entretanto, as próprias funções de pilha para implementar uma fila. Uma fila é representada por um par em que o primeiro elemento é uma pilha e o segundo é o tamanho da fila. No pseudocódigo, usaremos que~$(p,s)$ cria um par ordenado contendo a pilha~$a$ e um inteiro~$b$, e todo par tem os campos~$\V{stack}$ e~$\V{size}$ contendo cada um de seus elementos.
 Assumimos que criar pares, e retorná-los por função, consome tempo constante.

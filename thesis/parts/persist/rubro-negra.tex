@@ -65,7 +65,7 @@ Considerando apenas os nós negros, a árvore é totalmente balanceada (propried
 \newcommand{\cur}{\V{current}}
 
 
-Em uma árvore rubro-negra efêmera (não-persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó.
+Em uma árvore rubro-negra efêmera (não persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó.
 
 O ponteiro extra simula o vetor~$\V{changes}$ usado durante a Seção~\ref{sec:nodecopying}, que no caso sempre teria zero ou um elemento.
 
@@ -198,7 +198,7 @@ Note que na linha~\nref{line:copyrb:side} devemos usar~$[\Call{Child}{v, 1} = u]
 
 Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB (efêmera e não rubro-negra). Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente a árvore continua sendo uma ABB válida.
 
-Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituimos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda, pela forma como percorremos a árvore.
+Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituímos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda, pela forma como percorremos a árvore.
 
 Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda tem valores menores ou iguais e os nós da subárvore direita tem valores maiores ou iguais ao valor do nó.
 
@@ -273,7 +273,7 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 
 	O nó~$x$ não viola mais nenhuma propriedade, mas o nó~$z$ se tornou vermelho e pode ter o pai vermelho ou ser a raiz, logo a próxima iteração deve ter~$x' = z$.
 
-\item[Caso 2.] Caso contrário ($w$ não existe ou é preto), se~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquedo de~$z$ e~$x$ é filho esquerdo de~$y$), então realizamos uma rotação de~$z$ em direção à~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
+\item[Caso 2.] Caso contrário ($w$ não existe ou é preto), se~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquerdo de~$z$ e~$x$ é filho esquerdo de~$y$), então realizamos uma rotação de~$z$ em direção à~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
 
 	Os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, antes da transformação, os caminhos que passam por~$w$ passam por~$z$ e~$w$ (se existir). Após a transformação, os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ apenas por este (se existir) e~$y$. Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
 
@@ -569,7 +569,7 @@ O código funciona de forma parecida com o para ABBs quaisquer. A função~\text
 
 Se~$u$ não tem filho direito, no~\keyword{if} da linha~\nref{line:rmrb:if1} este é trocado pelo seu filho esquerdo e, como discutido, se~$u$ é preto e não tem filho esquerdo, ocorre uma violação da propriedade~3 (a menos que~$u$ seja a raiz), que é então consertada por~\textsc{AddBlack}. Esta função recebe um nó e qual a direção do filho que deveria ser preto; isso é feito pois esse filho pode na verdade ser um link nulo. A função então modifica a árvore, rotacionando e mudando cores, de forma a remover a violação   da propriedade~3. Discutiremos a implementação desta função nas próximas subseções.
 
-Se~$u$ tem filho direito, o processo funciona assim como em uma~ABB qualquer, mas chamamos~\textsc{AddBlack} caso a substituição de~$x$ tenha causado uma violação. O nó~$y$ é o pai de~$x$, exceto quando~$x$ é o próprio filho direito de~$u$, pois neste caso~${x.\parent = u}$ no começo do bloco, mas o nó~$u$ será substituido pelo nó~$x$, logo fazemos~$y = x$, pois este será o nó que aponta para o link nulo que deveria ser preto (se a função~\textsc{AddBlack} for chamada).
+Se~$u$ tem filho direito, o processo funciona assim como em uma~ABB qualquer, mas chamamos~\textsc{AddBlack} caso a substituição de~$x$ tenha causado uma violação. O nó~$y$ é o pai de~$x$, exceto quando~$x$ é o próprio filho direito de~$u$, pois neste caso~${x.\parent = u}$ no começo do bloco, mas o nó~$u$ será substituído pelo nó~$x$, logo fazemos~$y = x$, pois este será o nó que aponta para o link nulo que deveria ser preto (se a função~\textsc{AddBlack} for chamada).
 
 \subsection{Subindo violações}
 

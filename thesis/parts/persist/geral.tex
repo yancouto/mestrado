@@ -125,7 +125,7 @@ O Código~\ref{lst:geraloffline} mostra uma implementação, em alto nível, do 
 \begin{proof}
 A prova é por indução na altura de~$v_i$. No início da função, estamos na versão~$j$, então ao aplicar a operação~$i$, a estrutura muda para a versão~$i$. Além disso, todas as mudanças para reverter a versão~$i$ para~$j$ estão armazenadas em~$\V{mod}$.
 
-A linha~\nref{line:off:opac} aplica as operações de acesso da versão~$i$. O~\keyword{for} da linha~\nref{line:off:for} chama, para cada filho de~$v_i$, a função~\textsc{DFS} neste. Seja~$v_x$ o primeiro filho acessado; pela hipótese de indução, como~$v_x$ tem altura menor que~$v_i$ e a estrutura está na versão~$i$ e~${i \rightarrow x}$, temos que a função aplica corretamente as operações de acesso das versões na sub-árvore de~$v_x$, e ao final da chamada de~\Call{DFS}{$v_x$}, a estrutura está novamente no estado~$i$.
+A linha~\nref{line:off:opac} aplica as operações de acesso da versão~$i$. O~\keyword{for} da linha~\nref{line:off:for} chama, para cada filho de~$v_i$, a função~\textsc{DFS} neste. Seja~$v_x$ o primeiro filho acessado; pela hipótese de indução, como~$v_x$ tem altura menor que~$v_i$ e a estrutura está na versão~$i$ e~${i \rightarrow x}$, temos que a função aplica corretamente as operações de acesso das versões na subárvore de~$v_x$, e ao final da chamada de~\Call{DFS}{$v_x$}, a estrutura está novamente no estado~$i$.
 
 Dessa forma, as chamadas da função~\textsc{DFS} para todos os filhos de~$v_i$ funcionam corretamente, e por isso as operações de acesso de todos os descendentes de~$v_i$ são realizadas. Por último, o~\keyword{while} da linha~\nref{line:off:while} desfaz as mudanças feitas na versão~$i$ e retorna a estrutura para a versão~$j$, completando a prova.
 \end{proof}
