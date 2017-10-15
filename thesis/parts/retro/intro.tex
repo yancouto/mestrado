@@ -16,9 +16,9 @@ Mais formalmente, uma~\deff{estrutura retroativa} é uma estrutura na qual cada 
 	\item $\text{Query}(t, u)$ --- Realiza a operação de acesso~$u$ no tempo~$t$.
 \end{itemize}
 
-Assumimos que as operações são sempre válidas para a estrutura. Por exemplo, em uma fila retroativa, nunca um~\textsc{Dequeue} é chamado quando a fila está vazia. Note que a remoção de uma operação pode tornar uma operação inválida, logo assumimos que tais remoções não ocorrem.
+Assumimos que as operações são sempre válidas para a estrutura. Por exemplo, em uma fila retroativa, nunca um~\textsc{Dequeue} é chamado quando a fila está vazia. Note que a remoção de uma operação pode tornar uma operação inválida, logo assumimos que tais remoções inválidas não ocorrem.
 
-Uma estrutura é \deff{parcialmente retroativa} se permite as operações acima, mas as operações de acesso (chamadas à função~Query) só podem ser feitas na versão atual da estrutura~(${t = \infty}$); a estrutura é~\deff{totalmente retroativa}, ou apenas retroativa, se permite operações de acesso em qualquer tempo~$t$.
+Uma estrutura é \deff{parcialmente retroativa} se permite as operações acima, mas as operações de acesso (chamadas à função~Query) só podem ser feitas na versão atual da estrutura~(${t = \infty}$); a estrutura é~\deff{totalmente retroativa}, ou apenas~\deff{retroativa}, se permite operações de acesso em qualquer tempo~$t$.
 
 Retroatividade foi introduzida por Demaine, Iacono e Langerman~\cite{DemaineIL2007}, num artigo onde deram a definição de retroatividade, resultados gerais, e provaram que várias estruturas possuem versões retroativas.
 

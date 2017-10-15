@@ -1,0 +1,30 @@
+\documentclass[quali.tex]{subfile}
+
+\begin{document}
+
+\section{Progresso}
+
+Além das estruturas apresentadas nesse documento, detalho a seguir o meu progresso na tese de mestrado. O código fonte do texto e implementações mais atualizadas estão no~GitHub (\href{https://github.com/yancouto/mestrado}{\texttt{github.com/yancouto/mestrado}}). Uma cópia atualizada da tese fica em\mbox{~\href{https://yancouto.github.io/mestrado/thesis.pdf}{\texttt{yancouto.github.io/mestrado/thesis.pdf}}}.
+
+Todas as estruturas estudadas foram implementadas em~C++, devidamente testadas e documentadas. A documentação fica em~\mbox{\href{https://yancouto.github.io/mestrado/}{\texttt{yancouto.github.io/mestrado}}}.
+
+De forma mais informal, também disponibilizo problemas (no estilo ACM-ICPC) sobre alguns tópicos vistos durante o mestrado em~\mbox{\href{http://codeforces.com/gym/101261}{\texttt{codeforces.gym/101261}}}.
+
+\subsection{Persistência}
+
+Na área de persistência, o texto já está completo (a menos de revisões). Os capítulos desta parte são:
+
+\begin{description}
+	\item[Pilhas e filas] Como neste documento.
+	\item[Deque com LA e LCA] Esta implementação de deques persistentes, de minha autoria, utiliza algoritmos de Level Ancestor, assim como a implementação de~\textsc{k-th} em pilhas e filas.
+	\item[Deque recursiva] Implementação de deque persistente usando uma estrutura recursiva que se inspira em contadores binários.
+	\item[Deque de Kaplan e Tarjan] Esta implementação, inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}, se baseia na do capítulo anterior, e consome tempo constante em todas as operações exceto~\textsc{k-th}.
+	\item[Técnicas gerais] Este capítulo define mais formalmente uma estrutura de dados, e detalha quatro técnicas para deixar qualquer ED, sob algumas suposições, persistente.
+	\item[Árvore rubro-negra] A implementação utiliza o método descrito em por Driscoll et al.~\cite{DriscollSST1989}, aplicado sobre a implementação de árvore rubro-negra descrita por~Cormen et al.~\cite{CormenRedBlack}.
+\end{description}
+
+\subsection{Retroatividade}
+
+Esta parte ainda está em desenvolvimento. Por hora, apenas o capítulo sobre filas (também presente nesse documento) foi escrito. A fila retroativa foi implementada, testada e documentada.
+
+\end{document}

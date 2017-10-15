@@ -1,0 +1,45 @@
+\documentclass[11pt,oneside,a4paper, openany]{book}
+
+% Meus .sty
+\usepackage{../thesis/formatting}
+\usepackage{../thesis/code}
+\usepackage{../thesis/theorem-vars}
+\usepackage{../thesis/drawing}
+
+\renewcommand\thesection{\arabic{section}}
+
+\title{Estruturas de dados avançadas}
+\author{Yan Couto}
+\date{\today}
+
+\setcounter{secnumdepth}{2}
+
+\begin{document}
+
+\mainmatter
+
+\begin{center}
+	\textsc{Exame de Qualificação} \\[2ex]
+	\textbf{\huge{Estruturas de dados avançadas}}\\[2ex]
+
+	\Large{Yan Soares Couto} \\[2ex]
+
+	Orientadora: Cristina G. Fernandes\\[5ex]
+\end{center}
+
+\pagenumbering{arabic}
+
+\subfile{intro}
+
+\subfile{pilha_persist}
+
+\subfile{fila_retro}
+
+\subfile{progresso}
+
+\subfile{planejamento}
+
+\bibliographystyle{plain}
+\bibliography{../thesis/main}
+
+\end{document}

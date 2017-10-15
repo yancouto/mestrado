@@ -1,10 +1,10 @@
-\documentclass[main.tex]{subfiles}
+\documentclass[quali.tex]{subfile}
 
 \begin{document}
 
-\chapter{Fila retroativa} \label{cap:pilha_retro}
+\section{Fila retroativa}
 
-Diferente de persistência, a estrutura mais simples de se converter retroativa é a fila. A fila que usaremos é definida como a do~Capítulo~\ref{cap:pilha_persist}, mas consideramos que inserções são feitas no final e remoções no começo da lista, enquanto no Capítulo~\ref{cap:pilha_persist} as inserções eram feitas no começo e remoções no final. Apresentaremos neste capítulo a implementação de uma fila totalmente retroativa.
+Diferente de persistência, a estrutura mais simples de se converter retroativa é a fila. A fila que usaremos é definida como a da seção anterior, mas consideramos que inserções são feitas no final e remoções no começo da lista, enquanto na seção anterior as inserções eram feitas no começo e remoções no final. Apresentaremos nesta seção a implementação de uma fila totalmente retroativa.
 
 No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{k-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um uso de uma fila retroativa.
 
@@ -53,7 +53,7 @@ Note que o valor de~$R$ nunca diminui, assim, nunca modificamos uma posição do
 \caption{Exemplo de uso de uma fila retroativa. Na esquerda, as operações realizadas, no centro o estado atual da fila, e na direita a sequência de operações, ordenada por tempo.} \label{ex:fila_retro}
 \end{table}
 
-\section{Representação}
+\subsection{Representação}
 
 Para implementar a fila retroativa, usaremos uma estrutura auxiliar que armazena um conjunto de chaves e valores, onde as chaves vem de um conjunto totalmente ordenado, e permite as seguintes operações:
 
@@ -71,9 +71,9 @@ Essas operações podem ser implementadas usando uma ABB balanceada na qual cada
 
 Uma fila retroativa terá dois campos,~$\enqs$ e~$\deqs$, ambos armazenam estruturas como a ED auxiliar descrita acima. O campo~$\enqs$ armazena as operações de~\textsc{Enqueue}, as chaves são o tempo e o valor é o valor inserido na fila. O campo~$\deqs$ armazena as operações de~\textsc{Dequeue}, as chaves são o tempo, e não é necessário armazenar nada no valor, logo usaremos~$\Null$ como o valor.
 
-\section{Implementação}
+\subsection{Implementação}
 
-A fila é uma FIFO (first in, first out). Isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Portanto, assim como discutido no começo do capítulo, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordenadas por tempo, que temos em~$\enqs$, e contar o número de~\textsc{Dequeue}s até~$t$, que é possível usando~$\deqs$, e somar~$k$ a esse número. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
+A fila é uma FIFO (first in, first out). Isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Portanto, assim como discutido no começo da seção, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordenadas por tempo, que temos em~$\enqs$, e contar o número de~\textsc{Dequeue}s até~$t$, que é possível usando~$\deqs$, e somar~$k$ a esse número. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
 
 Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{Enqueue}{x}")$ usaremos~$\Call{Insert-Enqueue}{t, x}$, e faremos o mesmo para~\textsc{Dequeue}, para remoções de operações e operações de acesso.
 
@@ -101,6 +101,5 @@ Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{E
 	\EndFunction
 \end{algorithmic}
 \end{algorithm}
-
 
 \end{document}

@@ -1,9 +1,10 @@
-\documentclass[main.tex]{subfiles}
+\documentclass[quali.tex]{subfile}
 
 \begin{document}
 
-\chapter{Pilhas e filas} \label{cap:pilha_persist}
-Pilhas são uma das estruturas de dados mais simples. Discutiremos neste capítulo como transformá-las em estruturas persistentes. Em nosso pseudocódigo, usaremos estruturas de dados como objetos, ou seja, estas podem ser armazenadas em variáveis. As operações aplicadas sobre uma ED são funções que recebem essa ED como argumento (além de possíveis argumentos adicionais). Além disso, existe uma função que retorna uma ED vazia.
+\section{Pilhas e filas persistentes}
+
+Pilhas são uma das estruturas de dados mais simples. Discutiremos nesta seção como transformá-las em estruturas persistentes. Em nosso pseudocódigo, usaremos estruturas de dados como objetos, ou seja, estas podem ser armazenadas em variáveis. As operações aplicadas sobre uma ED são funções que recebem essa ED como argumento (além de possíveis argumentos adicionais). Além disso, existe uma função que retorna uma ED vazia.
 
 Para manipular estruturas persistentes, é conveniente que, ao chamar uma operação de modificação, uma nova versão da ED seja retornada, e a versão anterior continue válida, ou seja, continue podendo ser usada para operações de acesso, ou de modificação. A estrutura da versão anterior pode mudar, mas a resposta para qualquer operação de acesso deve ser a mesma. Assim, nesse contexto, uma pilha é uma lista de elementos, que permite as seguintes operações:
 
@@ -14,11 +15,9 @@ Para manipular estruturas persistentes, é conveniente que, ao chamar uma opera�
 	\item \func{Pop}{p} --- Retorna uma pilha igual a~$p$, mas com seu primeiro elemento removido.
 \end{itemize}
 
-Na literatura, é usual chamar o primeiro elemento de uma pilha de~\emph{topo}, porém, nesse texto, devido ao que vem pela frente, acreditamos que era mais claro a nomenclatura adotada acima.
-
 Temos que~\func{Push}{p, x} e~\func{Pop}{p} são operações de modificação e~\func{Top}{p} é uma operação de acesso. Para facilitar a notação, em geral usamos a função~\func{Stack}{} para criar a pilha~$p_0$ e após isso a~$i$-ésima operação de modificação cria a pilha~$p_i$.
 
-\section{Persistência total}
+\subsection{Persistência total}
 
 Para implementar uma pilha persistente, utilizaremos a implementação de pilhas usando lista ligada. Essa implementação consiste de vários nós, cada um com dois campos:~\code{val}, com o valor armazenado neste nó, e~\code{next}, com um ponteiro para o próximo nó na lista. O último nó da lista ligada tem como seu campo~\code{next} um valor especial~\keyword{null}, que indica que este é o último nó da lista.
 
@@ -55,7 +54,7 @@ O Código~\ref{lst:pilhapersist} mostra a implementação de tal pilha persisten
 \end{algorithmic}
 \end{algorithm}
 
-\section{Exemplo}
+\subsection{Exemplo}
 
 Vamos considerar a sequência de operações no Exemplo~\ref{ex:pilha}. Na esquerda temos as operações realizadas, e na direita as novas pilhas criadas, ou o valor retornado pela operação~\textsc{Top}.
 
@@ -134,7 +133,7 @@ Perceba também que a árvore de versões não é igual à árvore da estrutura.
 \end{figure}
 
 
-\section{Acesso a outros elementos}
+\subsection{Acesso a outros elementos}
 
 A operação~\func{Top}{p} retorna o primeiro elemento da pilha, porém apresentaremos nesta seção como implementar uma função mais poderosa. A operação de acesso~\func{k-th}{p, k} retorna o~$k$-ésimo elemento de~$p$. Esta operação é então uma generalização de~\textsc{Top}, já que~${\Call{k-th}{p, 1} = \Call{Top}{p}}$.
 
@@ -154,14 +153,14 @@ Lembre-se que~$p$ é o nó de uma arborescência, então~\func{k-th}{p, k} preci
 
 O algoritmo acima implementa a operação de maneira muito simples, porém com consumo de tempo~$\Theta(k)$.
 
-\subsection{Ancestrais em árvores}
+\subsubsection{Ancestrais em árvores}
 
-% TODO Mudar isso quando escrever a parte I XXX
+% TODO Mudar isso quando escrever a parte I
 O problema de encontrar o~$k$-ésimo ancestral de um nó em uma árvore enraizada é um problema clássico de árvores, conhecido como~\deff{Level Ancestor Problem}. Em geral, porém, a árvore é estática, ou seja, conhecemos a árvore de antemão e podemos realizar algum tipo de preprocessamento sobre ela antes de responder a consultas.
 
 O algoritmo eficiente de mais simples implementação para resolver esse problema~\cite{BenderM-F2004} consome espaço~$\Oh(n \lg n)$ e tempo~${\langle\Oh(n \lg n), \Oh(\lg n)\rangle}$, ou seja, tempo~$\Oh(n \lg n)$ de preprocessamento e, depois disso, tempo~$\Oh(\lg n)$ por consulta, onde~$n$ é o número de nós da árvore. Outro algoritmo~\cite{Myers83} um pouco mais complicado garante o mesmo consumo de tempo assintótico, mas exige apenas espaço linear.
 
-No nosso problema, entretanto, a árvore não é estática, pois ao criar uma nova versão estamos possivelmente criando uma nova folha. É possível adaptar esse algoritmo para funcionar mesmo com esse tipo de modificação. Os detalhes de tal implementação serão discutidos na Parte~\ref{part:arvores}; por enquanto vamos usá-los como uma biblioteca dada.
+No nosso problema, entretanto, a árvore não é estática, pois ao criar uma nova versão estamos possivelmente criando uma nova folha. É possível adaptar esse algoritmo para funcionar mesmo com esse tipo de modificação. Os detalhes de tal implementação serão discutidos em outra parte da tese; por enquanto vamos usá-los como uma biblioteca dada.
 
 Poucas mudanças são necessárias para utilizar esse algoritmo. Um processamento que consome tempo e espaço~$\Oh(\lg h)$ é necessário ao adicionar um novo vértice, onde~$h$ é a profundidade do nó adicionado. É claro que~$\Oh(\lg h) = \Oh(\lg n)$, onde~$n$ é o número de versões atualmente existentes, ou seja, o número de operações de modificação realizadas. Assumimos que esse processamento é realizado ao chamar~$\New \Call{Node}{x, \V{nx}}$, logo o código que apresentamos até agora não precisa ser modificado, mas a operação~\func{Push}{p, x} agora consome tempo e espaço~$\Oh(\lg n)$.
 
@@ -177,7 +176,7 @@ O Código~\ref{lst:pilha-kth} implementa então a operação~\func{k-th}{p, k}, 
 \caption{Implementação de~\func{k-th}{p, k} usando~Level Ancestor como caixa preta.} \label{lst:pilha-kth}
 \end{algorithm}
 
-\section{Filas persistentes}
+\subsection{Filas persistentes}
 
 Filas são estruturas quase tão simples quanto pilhas. Elas também são listas, e permitem inserções no começo e remoções no final. Mais precisamente, permitem as seguintes operações:
 
