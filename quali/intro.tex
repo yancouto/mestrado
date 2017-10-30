@@ -4,6 +4,8 @@
 
 \section{Introdução}
 
+Essa dissertação irá abordar os conceitos de persistência e retroatividade em estruturas de dados. As próximas duas subseções da introdução apresentam esses conceitos. A Seção~\ref{sec:pilha_persist} apresenta dois exemplos simples de estruturas persistentes enquanto que a Seção~\ref{sec:fila_retro} apresenta um exemplo simples de estrutura retroativa. A Seção~\ref{sec:progresso} descreve brevemente os tópicos da dissertação que já foram estudados e escritos, majoritariamente sobre persistência. Já a Seção~\ref{sec:planejamento} apresenta os tópicos que planejamos estudar e incluir na dissertação sobre retroatividade, além de um cronograma para o período restante do mestrado.
+
 \subsection{Persistência}
 
 Uma estrutura de dados (ED) é uma forma de organizar dados em programas de computador. Estruturas de dados permitem operações de acesso e de modificação; operações de acesso apenas consultam um ou mais campos de uma ED, enquanto operações de modificação podem alterar os campos da estrutura.
@@ -14,6 +16,8 @@ Considerando um digrafo das versões onde se a versão $j$ foi criada a partir d
 
 O estudo de estruturas persistentes segue dois caminhos: técnicas gerais, para tornar \emph{qualquer} estrutura de dados persistente, ou técnicas para tornar alguma ED específica (como uma pilha ou fila) persistente, deixando-a tão eficiente e simples quanto possível.
 
+Persistência foi formalmente introduzida por Driscoll, Sleator e Tarjan~\cite{DriscollSST1989}, porém já era estudada anteriormente, principalmente para a implementação de estruturas de dados em linguagens funcionais, como pilhas~\cite{Myers83}, filas~\cite{HoodMelville} e ABBs~\cite{Myers82} (árvores de busca binária).
+
 \subsection{Retroatividade}
 
 Assim como persistência, retroatividade é uma forma de modificar versões passadas de estruturas de dados. Enquanto em uma estrutura persistente podemos copiar uma versão antiga da estrutura e modificá-la, em uma estrutura retroativa podemos adicionar e remover modificações no passado, e ver como elas se ``propagam'' até a versão presente da estrutura.
@@ -21,8 +25,8 @@ Assim como persistência, retroatividade é uma forma de modificar versões pass
 Mais formalmente, uma~\deff{estrutura retroativa}~\cite{DemaineIL2007} é uma estrutura na qual cada operação de modificação tem um tempo associado. As operações são aplicadas em ordem de tempo, e assumimos que existe no máximo uma operação realizada em um dado tempo. Temos então uma lista~${U = (u_{t_1}, \ldots, u_{t_m})}$ de operações de modificação, com~${t_1 < t_2 < \cdots < t_m}$, e tal estrutura permite as seguintes operações:
 
 \begin{itemize}
-	\item $\text{Insert}(t, u)$ --- Inserir em~$U$ a operação~$u$ no tempo~$t$.
-	\item $\text{Delete}(t)$ --- Remover de~$U$ a operação com tempo~$t$.
+	\item $\text{Insert}(t, u)$ --- Insere em~$U$ a operação~$u$ no tempo~$t$.
+	\item $\text{Delete}(t)$ --- Remove de~$U$ a operação com tempo~$t$.
 	\item $\text{Query}(t, u)$ --- Realiza a operação de acesso~$u$ no tempo~$t$.
 \end{itemize}
 

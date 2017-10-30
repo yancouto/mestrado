@@ -2,26 +2,30 @@
 
 \begin{document}
 
-\section{Progresso}
+\section{Andamento do trabalho} \label{sec:progresso}
 
-Além das estruturas apresentadas nesse documento, detalho a seguir o meu progresso na tese de mestrado. O código fonte do texto e implementações mais atualizadas estão no~GitHub (\href{https://github.com/yancouto/mestrado}{\texttt{github.com/yancouto/mestrado}}). Uma cópia atualizada da tese fica em\mbox{~\href{https://yancouto.github.io/mestrado/thesis.pdf}{\texttt{yancouto.github.io/mestrado/thesis.pdf}}}.
+Além das estruturas apresentadas nesse documento, detalho a seguir o meu progresso na dissertação de mestrado. Além de preparar o texto da dissertação, tenho implementado cada uma das EDs estudadas. Estas estruturas foram implementadas em~C\texttt{++}, de forma mais próxima possível ao pseudocódigo, devidamente testadas e documentadas. A documentação fica em~\mbox{\href{https://yancouto.github.io/mestrado/}{\texttt{yancouto.github.io/mestrado}}}. O código fonte do texto da dissertação e as implementações mais atualizadas estão no~GitHub (\href{https://github.com/yancouto/mestrado}{\texttt{github.com/yancouto/mestrado}}). Uma cópia atualizada da dissertação fica em\mbox{~\href{https://yancouto.github.io/mestrado/thesis.pdf}{\texttt{yancouto.github.io/mestrado/thesis.pdf}}}.
 
-Todas as estruturas estudadas foram implementadas em~C++, devidamente testadas e documentadas. A documentação fica em~\mbox{\href{https://yancouto.github.io/mestrado/}{\texttt{yancouto.github.io/mestrado}}}.
+
 
 De forma mais informal, também disponibilizo problemas (no estilo ACM-ICPC) sobre alguns tópicos vistos durante o mestrado em~\mbox{\href{http://codeforces.com/gym/101261}{\texttt{codeforces.gym/101261}}}.
 
 \subsection{Persistência}
 
-Na área de persistência, o texto já está completo (a menos de revisões). Os capítulos desta parte são:
+No tópico de persistência, o texto já contém todo o material que pretendemos abordar e está, em princípio, completo (a menos de revisões). Os capítulos desta parte são:
 
-\begin{description}
-	\item[Pilhas e filas] Como neste documento.
-	\item[Deque com LA e LCA] Esta implementação de deques persistentes, de minha autoria, utiliza algoritmos de Level Ancestor, assim como a implementação de~\textsc{k-th} em pilhas e filas.
-	\item[Deque recursiva] Implementação de deque persistente usando uma estrutura recursiva que se inspira em contadores binários.
-	\item[Deque de Kaplan e Tarjan] Esta implementação, inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}, se baseia na do capítulo anterior, e consome tempo constante em todas as operações exceto~\textsc{k-th}.
-	\item[Técnicas gerais] Este capítulo define mais formalmente uma estrutura de dados, e detalha quatro técnicas para deixar qualquer ED, sob algumas suposições, persistente.
-	\item[Árvore rubro-negra] A implementação utiliza o método descrito em por Driscoll et al.~\cite{DriscollSST1989}, aplicado sobre a implementação de árvore rubro-negra descrita por~Cormen et al.~\cite{CormenRedBlack}.
-\end{description}
+\subsubsection*{Pilhas e filas}
+	Apresenta a descrição destas EDs como neste documento.
+\subsubsection*{Deque com Level Ancestor e Lowest Common Ancestor}
+	Apresenta uma implementação de deques persistente de minha autoria, que utiliza algoritmos de Level Ancestor, e é similar a implementação de pilhas e filas persistentes.
+\subsubsection*{Deque recursiva}
+	Apresenta uma implementação de deque persistente de Kaplan~\cite{Kaplan2001}, usando uma estrutura recursiva que se inspira em contadores binários.
+\subsubsection*{Deque de Kaplan e Tarjan}
+	Apresenta uma implementação de deque persistente, inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}, se baseia na do capítulo anterior, e consome tempo constante em todas as operações exceto~\textsc{k-th}.
+\subsubsection*{Técnicas gerais}
+	Define mais formalmente uma estrutura de dados, e detalha quatro técnicas, entre elas algumas dadas por~Driscoll et al.~\cite{DriscollSST1989}, para deixar qualquer ED, sob algumas suposições, persistente.
+\subsubsection*{Árvore rubro-negra}
+	Apresenta a implementação de uma árvore rubro-negra parcialmente persistente, utilizando um dos métodos descritos no capítulo anterior, aplicado sobre a implementação de árvore rubro-negra descrita por~Cormen et al.~\cite{CormenRedBlack}.
 
 \subsection{Retroatividade}
 

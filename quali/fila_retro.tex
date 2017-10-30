@@ -2,9 +2,9 @@
 
 \begin{document}
 
-\section{Fila retroativa}
+\section{Fila retroativa} \label{sec:fila_retro}
 
-Diferente de persistência, a estrutura mais simples de se converter retroativa é a fila. A fila que usaremos é definida como a da seção anterior, mas consideramos que inserções são feitas no final e remoções no começo da lista, enquanto na seção anterior as inserções eram feitas no começo e remoções no final. Apresentaremos nesta seção a implementação de uma fila totalmente retroativa.
+Diferente de persistência, a estrutura mais simples de se converter em retroativa é a fila. A fila que usaremos é definida como a da seção anterior, mas consideramos que inserções são feitas no final e remoções no começo da lista, enquanto na seção anterior as inserções eram feitas no começo e remoções no final. Apresentaremos nesta seção a implementação de uma fila totalmente retroativa.
 
 No pseudocódigo de estruturas retroativas, usaremos estas EDs como objetos que possuem funções que podem ser chamadas sobre elas. No caso da fila, por exemplo, podemos ter um objeto~$q$ e usar a função~$q.\text{Query}(10, ``\textsc{k-th}(3)")$ para acessar o terceiro elemento da fila no tempo~10. O Exemplo~\ref{ex:fila_retro} mostra um uso de uma fila retroativa.
 
@@ -12,7 +12,7 @@ Considere a implementação de uma fila em um vetor~$A$. Temos duas variáveis,~
 
 Para implementar uma fila retroativa, usaremos a mesma ideia da implementação em vetor, porém precisamos de uma estrutura mais sofisticada que um vetor, para permitir inserções entre dois elementos. Com essa estrutura, será possível obter o valor de~$L$ e~$R$ em qualquer ponto do tempo.
 
-Note que o valor de~$R$ nunca diminui, assim, nunca modificamos uma posição do vetor uma segunda vez. Portanto,~$A[i]$ armazena o valor inserido pelo~$i$-ésimo~\textsc{Enqueue}. De forma mais geral, em uma estrutura retroativa, se as inserções são~$E = (e_1, \ldots, e_e)$, então a estrutura no tempo~$t$ é a lista~$(e_{d_t+1}, \ldots, e_{e_t})$, onde~$d_t$ é o número de remoções realizadas até o tempo~$t$ e~$e_t$ é o número de inserções realizadas até o tempo~$t$. Para responder uma operação de~\Call{k-th}{$k$}, basta então ser possível determinar~$d_t$ (que é o valor~$L - 1$ no instante~$t$) e encontrar o~$(d_t + k)$-ésimo elemento.
+Note que o valor de~$R$ nunca diminui, assim, nunca modificamos uma posição do vetor uma segunda vez. Portanto,~$A[i]$ armazena o valor inserido pelo~$i$-ésimo~\textsc{Enqueue}. De forma mais geral, em uma estrutura retroativa, se as inserções são~$E = (e_1, \ldots, e_e)$, então a estrutura no tempo~$t$ é a lista~$(e_{d_t+1}, \ldots, e_{e_t})$, onde~$d_t$ é o número de remoções realizadas até o tempo~$t$ e~$e_t$ é o número de inserções realizadas até o tempo~$t$. Para responder uma operação de~\Call{k-th}{$k$}, basta então ser possível determinar~$d_t$ (que é o valor~$L - 1$ no instante~$t$) e encontrar o~$(d_t + k)$-ésimo elemento da lista.
 
 \begin{table}
 \centering
@@ -55,7 +55,7 @@ Note que o valor de~$R$ nunca diminui, assim, nunca modificamos uma posição do
 
 \subsection{Representação}
 
-Para implementar a fila retroativa, usaremos uma estrutura auxiliar que armazena um conjunto de chaves e valores, onde as chaves vem de um conjunto totalmente ordenado, e permite as seguintes operações:
+Para implementar a fila retroativa, usaremos uma estrutura auxiliar que armazena um conjunto de chaves e valores, onde as chaves vêm de um conjunto totalmente ordenado, e permite as seguintes operações:
 
 \begin{itemize}
 	\item $\Call{Insert}{k, v}$ --- Insere a chave~$k$ associada ao valor~$v$.
@@ -73,7 +73,7 @@ Uma fila retroativa terá dois campos,~$\enqs$ e~$\deqs$, ambos armazenam estrut
 
 \subsection{Implementação}
 
-A fila é uma FIFO (first in, first out). Isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Portanto, assim como discutido no começo da seção, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordenadas por tempo, que temos em~$\enqs$, e contar o número de~\textsc{Dequeue}s até~$t$, que é possível usando~$\deqs$, e somar~$k$ a esse número. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
+A fila é uma FIFO (first in, first out). Isso significa que o elemento removido com o primeiro~\textsc{Dequeue} é o primeiro que foi inserido por um~\textsc{Enqueue}, e assim por diante. Portanto, assim como discutido no começo da seção, para respondermos uma operação~\textsc{k-th} no tempo~$t$, basta ter as operações~\textsc{Enqueue} ordenadas por tempo, que temos em~$\enqs$, e contar o número de operações~\textsc{Dequeue} até~$t$, o que é possível usando~$\deqs$, e somar~$k$ a esse número. As operações de~\text{Insert} e~Delete passam a ser apenas inserções e remoções das EDs auxiliares~$\enqs$ e~$\deqs$.
 
 Para facilitar a apresentação do pseudocódigo, em vez de~Insert$(t, ``\Call{Enqueue}{x}")$ usaremos~$\Call{Insert-Enqueue}{t, x}$, e faremos o mesmo para~\textsc{Dequeue}, para remoções de operações e operações de acesso.
 

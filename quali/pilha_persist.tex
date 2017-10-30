@@ -2,18 +2,20 @@
 
 \begin{document}
 
-\section{Pilhas e filas persistentes}
+\section{Pilhas e filas persistentes} \label{sec:pilha_persist}
 
 Pilhas são uma das estruturas de dados mais simples. Discutiremos nesta seção como transformá-las em estruturas persistentes. Em nosso pseudocódigo, usaremos estruturas de dados como objetos, ou seja, estas podem ser armazenadas em variáveis. As operações aplicadas sobre uma ED são funções que recebem essa ED como argumento (além de possíveis argumentos adicionais). Além disso, existe uma função que retorna uma ED vazia.
 
-Para manipular estruturas persistentes, é conveniente que, ao chamar uma operação de modificação, uma nova versão da ED seja retornada, e a versão anterior continue válida, ou seja, continue podendo ser usada para operações de acesso, ou de modificação. A estrutura da versão anterior pode mudar, mas a resposta para qualquer operação de acesso deve ser a mesma. Assim, nesse contexto, uma pilha é uma lista de elementos, que permite as seguintes operações:
+Para manipular estruturas persistentes, é conveniente que, ao chamar uma operação de modificação, uma nova versão da ED seja retornada, e a versão anterior continue válida, ou seja, continue podendo ser usada para operações de acesso, ou de modificação. O estado da versão anterior pode mudar, mas a resposta para qualquer operação de acesso deve ser a mesma. Assim, nesse contexto, uma pilha é uma lista de elementos, que permite as seguintes operações:
 
 \begin{itemize}
 	\item \func{Stack}{} --- Retorna uma pilha vazia.
-	\item \func{Push}{p, x} --- Retorna uma pilha igual a~$p$, mas com o valor~$x$ inserido no seu começo.
+	\item \func{Push}{p, x} --- Retorna uma pilha igual a~$p$ com o valor~$x$ inserido no seu começo.
 	\item \func{Top}{p} --- Retorna o primeiro elemento da pilha~$p$.
-	\item \func{Pop}{p} --- Retorna uma pilha igual a~$p$, mas com seu primeiro elemento removido.
+	\item \func{Pop}{p} --- Retorna uma pilha igual a~$p$ com seu primeiro elemento removido.
 \end{itemize}
+
+Na literatura, é usual chamar o primeiro elemento de uma pilha de~\emph{topo}, porém, nesse texto, devido às explicações que vêm pela frente, acreditamos que era mais claro a nomenclatura adotada acima.
 
 Temos que~\func{Push}{p, x} e~\func{Pop}{p} são operações de modificação e~\func{Top}{p} é uma operação de acesso. Para facilitar a notação, em geral usamos a função~\func{Stack}{} para criar a pilha~$p_0$ e após isso a~$i$-ésima operação de modificação cria a pilha~$p_i$.
 
@@ -32,7 +34,7 @@ O Código~\ref{lst:pilhapersist} mostra a implementação de tal pilha persisten
 
 
 \begin{algorithm}
-\caption{Pilha persistente} \label{lst:pilhapersist}
+\caption{Pilha persistente.} \label{lst:pilhapersist}
 \begin{algorithmic}[1]
 
 \Function{Stack}{\null}
@@ -96,7 +98,7 @@ Vamos considerar a sequência de operações no Exemplo~\ref{ex:pilha}. Na esque
 
 Em geral adicionamos apenas elementos ao final da lista ligada, mas no caso da pilha persistente podemos adicionar nós em outros pontos, e na verdade a estrutura resultante é uma arborescência, ou seja, uma árvore enraizada onde as arestas apontam para a raiz, considerando que o apontador da raiz é~\keyword{null}. Note que, como discutido anteriormente, a partir de cada nó podemos apenas acessar uma lista.
 
-A Figura~\ref{fig:pilha_ex1} mostra a arborescência criada para a sequência de operações do Exemplo~\ref{ex:pilha}. Em cada nó é indicado o valor armazenado naquele nó, e cada nó aponta para o nó em seu campo~$\V{next}$. Os valores~$p_0, \ldots, p_6$ apontam para os seus nós correspondentes. Note que é possível que~${p_i = p_j}$ para~${i \neq j}$. Isso ocorre no exemplo, onde~$p_4 = p_1$. Isso não ocorre sempre que as pilhas têm os mesmos valores; perceba que~$p_1 \neq p_6$, apesar destas duas pilhas terem os mesmos elementos na mesma ordem.
+A Figura~\ref{fig:pilha_ex1} mostra a arborescência criada para a sequência de operações do Exemplo~\ref{ex:pilha}. Em cada nó é indicado o valor armazenado naquele nó, e a flecha saindo de cada nó aponta para seu campo~$\V{next}$. Os valores~$p_0, \ldots, p_6$ apontam para os seus nós correspondentes. Note que é possível que~${p_i = p_j}$ para~${i \neq j}$. Isso ocorre no exemplo, onde~$p_4 = p_1$. Isso não ocorre sempre que as pilhas têm os mesmos valores; perceba que~$p_1 \neq p_6$, apesar destas duas pilhas terem os mesmos elementos na mesma ordem.
 
 Perceba também que a árvore de versões não é igual à árvore da estrutura. A Figura~\ref{fig:pilha_ex2} mostra a árvore de versões para essa sequência de operações. Nos nós estão os índices das versões~(a~$i$-ésima modificação cria a versão~$i$), e a versão~$i$ é o pai da versão~$j$ se a versão~$j$ foi criada usando a versão~$i$.
 
@@ -137,7 +139,7 @@ Perceba também que a árvore de versões não é igual à árvore da estrutura.
 
 A operação~\func{Top}{p} retorna o primeiro elemento da pilha, porém apresentaremos nesta seção como implementar uma função mais poderosa. A operação de acesso~\func{k-th}{p, k} retorna o~$k$-ésimo elemento de~$p$. Esta operação é então uma generalização de~\textsc{Top}, já que~${\Call{k-th}{p, 1} = \Call{Top}{p}}$.
 
-Lembre-se que~$p$ é o nó de uma arborescência, então~\func{k-th}{p, k} precisa determinar o~$k$-ésimo ancestral de~$p$, ou seja, o vértice alcançado a partir de~$p$ ao caminhar por~$k - 1$ links~$\V{next}$. \\
+Lembre-se que~$p$ é um nó de uma arborescência, e representa o primeiro elemento da pilha, então~\func{k-th}{p, k} precisa determinar o~$(k-1)$-ésimo ancestral de~$p$, ou seja, o nó alcançado a partir de~$p$ ao caminhar por~$k - 1$ links~$\V{next}$. Nesse caso, o~0-ésimo ancestral de um nó é o próprio nó. \\
 
 \hrule
 \begin{algorithmic}[1]
@@ -158,11 +160,11 @@ O algoritmo acima implementa a operação de maneira muito simples, porém com c
 % TODO Mudar isso quando escrever a parte I
 O problema de encontrar o~$k$-ésimo ancestral de um nó em uma árvore enraizada é um problema clássico de árvores, conhecido como~\deff{Level Ancestor Problem}. Em geral, porém, a árvore é estática, ou seja, conhecemos a árvore de antemão e podemos realizar algum tipo de preprocessamento sobre ela antes de responder a consultas.
 
-O algoritmo eficiente de mais simples implementação para resolver esse problema~\cite{BenderM-F2004} consome espaço~$\Oh(n \lg n)$ e tempo~${\langle\Oh(n \lg n), \Oh(\lg n)\rangle}$, ou seja, tempo~$\Oh(n \lg n)$ de preprocessamento e, depois disso, tempo~$\Oh(\lg n)$ por consulta, onde~$n$ é o número de nós da árvore. Outro algoritmo~\cite{Myers83} um pouco mais complicado garante o mesmo consumo de tempo assintótico, mas exige apenas espaço linear.
+O algoritmo eficiente de mais simples implementação para resolver esse problema~\cite{BenderM-F2004} consome espaço~$\Oh(n \lg n)$ e tempo~${\langle\Oh(n \lg n), \Oh(\lg n)\rangle}$, ou seja, tempo~$\Oh(n \lg n)$ de preprocessamento e, depois disso, tempo~$\Oh(\lg n)$ por consulta, onde~$n$ é o número de nós da árvore. Myers~\cite{Myers83} dá também um algoritmo um pouco mais complicado garante o mesmo consumo de tempo assintótico, mas exige apenas espaço linear.
 
-No nosso problema, entretanto, a árvore não é estática, pois ao criar uma nova versão estamos possivelmente criando uma nova folha. É possível adaptar esse algoritmo para funcionar mesmo com esse tipo de modificação. Os detalhes de tal implementação serão discutidos em outra parte da tese; por enquanto vamos usá-los como uma biblioteca dada.
+No nosso problema, entretanto, a árvore não é estática, pois ao criar uma nova versão estamos possivelmente criando uma nova folha. É possível adaptar o algoritmo em~\cite{BenderM-F2004} para funcionar mesmo com esse tipo de modificação, ou usar o algoritmo de Myers~\cite{Myers83}, que já funciona com tais modificações.  Os detalhes de tal implementação serão discutidos em outra parte da dissertação; por enquanto vamos usá-los como uma biblioteca dada.
 
-Poucas mudanças são necessárias para utilizar esse algoritmo. Um processamento que consome tempo e espaço~$\Oh(\lg h)$ é necessário ao adicionar um novo vértice, onde~$h$ é a profundidade do nó adicionado. É claro que~$\Oh(\lg h) = \Oh(\lg n)$, onde~$n$ é o número de versões atualmente existentes, ou seja, o número de operações de modificação realizadas. Assumimos que esse processamento é realizado ao chamar~$\New \Call{Node}{x, \V{nx}}$, logo o código que apresentamos até agora não precisa ser modificado, mas a operação~\func{Push}{p, x} agora consome tempo e espaço~$\Oh(\lg n)$.
+Poucas mudanças são necessárias para utilizar o algoritmo mais simples. Um processamento que consome tempo e espaço~$\Oh(\lg h)$ é necessário ao adicionar um novo nó, onde~$h$ é a profundidade do nó adicionado. É claro que~$\Oh(\lg h) = \Oh(\lg n)$, onde~$n$ é o número de versões atualmente existentes, ou seja, o número de operações de modificação realizadas. Assumimos que esse processamento é realizado ao chamar~$\New \Call{Node}{x, \V{nx}}$, logo o código que apresentamos até agora não precisa ser modificado, mas a operação~\func{Push}{p, x} agora consome tempo e espaço~$\Oh(\lg n)$.
 
 Estas são as únicas mudanças necessárias. A função~\func{LevelAncestor}{p, k} retorna então o~\mbox{$k$-ésimo} ancestral de~$p$, onde o~0-ésimo ancestral de~$p$ é~$p$, e o primeiro é o pai de~$p$. Tal função consome tempo~$\Oh(\lg n)$, onde~$n$ é o número de versões existentes ao criar a versão~$p$.
 O Código~\ref{lst:pilha-kth} implementa então a operação~\func{k-th}{p, k}, e está trivialmente correto.
@@ -182,15 +184,15 @@ Filas são estruturas quase tão simples quanto pilhas. Elas também são listas
 
 \begin{itemize}
 	\item \func{Queue}{} --- Retorna uma fila vazia.
-	\item \func{Enqueue}{q, x} --- Retorna uma fila igual a~$q$, mas com o valor~$x$ inserido no seu começo.
+	\item \func{Enqueue}{q, x} --- Retorna uma fila igual a~$q$ com o valor~$x$ inserido no seu começo.
 	\item \func{Last}{q} --- Retorna o último elemento da fila~$q$.
 	\item \func{k-th}{q, k} --- Retorna o~\mbox{$k$-ésimo} elemento da fila~$q$.
-	\item \func{Dequeue}{q} --- Retorna uma fila igual a~$q$, mas com seu último elemento removido.
+	\item \func{Dequeue}{q} --- Retorna uma fila igual a~$q$ com seu último elemento removido.
 \end{itemize}
 
-É possível, como com pilhas, implementar uma fila usando lista ligada (que na verdade é uma árvore quando se adiciona a persistência). É necessário também, para cada versão, armazenar o tamanho atual da fila, ou seja, a fila deixa de ser apenas um nó da árvore e passa a ser um objeto que contém um nó e um inteiro. Seria então necessário usar~Level Ancestor na operação~\func{k-th}{q, k} ou~\func{Last}{q}.
+É possível, como com pilhas, implementar uma fila usando lista ligada. A lista torna-se uma árvore quando se adiciona a persistência. É necessário também, para cada versão, armazenar o tamanho atual da fila, ou seja, a fila deixa de ser apenas um nó da árvore e passa a ser um objeto que contém um nó e um inteiro. Seria então necessário usar~Level Ancestor na operação~\func{k-th}{q, k} ou~\func{Last}{q}.
 
-Utilizaremos, entretanto, as próprias funções de pilha para implementar uma fila. Uma fila é representada por um par em que o primeiro elemento é uma pilha e o segundo é o tamanho da fila. No pseudocódigo, usaremos que~$(p,s)$ cria um par ordenado contendo a pilha~$a$ e um inteiro~$b$, e todo par tem os campos~$\V{stack}$ e~$\V{size}$ contendo cada um de seus elementos.
+Utilizaremos, entretanto, as próprias funções de pilha para implementar uma fila. Uma fila é representada por um par em que o primeiro elemento é uma pilha e o segundo é o tamanho da fila. No pseudocódigo, usaremos que~$(p,s)$ cria um par ordenado contendo a pilha~$p$ e um inteiro~$s$, e todo par tem os campos~$\V{stack}$ e~$\V{size}$ contendo cada um de seus elementos.
 Assumimos que criar pares, e retorná-los por função, consome tempo constante.
 
 
@@ -209,7 +211,7 @@ Assumimos que criar pares, e retorná-los por função, consome tempo constante.
 \EndFunction
 
 \Function{Last}{$q$}
-    \State \Return $\Call{k-th}{q.\V{stack}, q.\V{size}}$
+    \State \Return $\Call{k-th}{q.\V{stack}, q.\V{size}}$ \Comment{Função homônima da pilha}
 \EndFunction
 
 \Function{Dequeue}{$q$}
@@ -217,10 +219,10 @@ Assumimos que criar pares, e retorná-los por função, consome tempo constante.
 \EndFunction
 
 \end{algorithmic}
-\caption{Implementação das operações de uma fila.} \label{lst:fila}
+\caption{Fila persistente.} \label{lst:fila}
 \end{algorithm}
 
-O Código~\ref{lst:fila} mostra a implementação das operações da fila. A correção segue diretamente da correção das funções para pilha. De fato, podendo acessar qualquer elemento de uma pilha, implementar uma fila é simples, já que usamos apenas apenas as operações~\textsc{Push} e~\textsc{k-th}, e simplesmente ignoramos os elementos que existem após o final da fila.
+O Código~\ref{lst:fila} mostra a implementação das operações da fila. A correção segue diretamente da correção das funções para pilha. De fato, podendo acessar qualquer elemento de uma pilha, implementar uma fila é simples, já que usamos apenas as operações~\textsc{Push} e~\textsc{k-th}, e simplesmente ignoramos os elementos que existem após o final da fila.
 
 Sempre assumimos que todas as chamadas de operações são válidas, ou seja, nunca haverá uma chamada para~\func{k-th}{q, k} com~$k$ maior que o tamanho de~$q$, de modo que os elementos após o final da fila nunca serão acessados indevidamente.
 
