@@ -7,3 +7,6 @@ clean:
 
 quali.pdf:
 	latexmk --pdf -interaction=nonstopmode quali.tex
+
+preview:
+	latexmk --pdf -pvc -interaction=nonstopmode quali.tex

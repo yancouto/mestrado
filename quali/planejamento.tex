@@ -8,22 +8,26 @@
 
 A principal fonte de estudo sobre retroatividade é o artigo de Demaine, Iacono e Langerman~\cite{DemaineIL2007}, onde o tópico é inicialmente apresentado. Alguns dos tópicos discutidos são
 
-\begin{description}
-	\item[Resultados gerais] Demonstra-se que retroatividade não é ``fácil'', já que não é possível desenvolver um algoritmo para tornar qualquer estrutura em retroativa.
-	\item[Pilha e deque] A implementação de ambas estruturas é parecida, e usa ABBs modificadas para responder consultas sobre somas acumuladas. Em particular, em uma ABB com apenas +1's e -1's, é necessário saber o maior prefixo de elementos que tem soma~$x$. Já implementei esta estrutura.
-	\item[Union-find] Para implementar tal estrutura, é necessário utilizar uma estrutura de dados chamada Link-Cut Tree.
-	\item[Fila de prioridade] Para esta implementação parcialmente retroativa, usa-se também ABBs modificadas, mas a teoria por trás desta implementação é mais complicada e precisa de mais explicação.
-\end{description}
+\subsubsection*{Resultados gerais}
+	Os autores demonstram que retroatividade não é ``fácil'', já que não é possível desenvolver um algoritmo eficiente para tornar qualquer estrutura em retroativa.
+\subsubsection*{Pilha e deque}
+	A implementação de ambas estruturas é parecida, e usa ABBs modificadas para responder consultas sobre somas acumuladas. Em particular, em uma ABB com apenas $+1$'s e $-1$'s, é necessário saber o maior prefixo de elementos que tem soma~$x$. Já implementei esta estrutura.
+\subsubsection*{Union-find}
+	O artigo descreve uma implementação para a versão retroativa dessa estrutura, na qual é necessário utilizar uma estrutura de dados chamada Link-Cut Tree.
+\subsubsection*{Fila de prioridade}
+	O artigo descreve uma implementação parcialmente retroativa que usa também ABBs modificadas, mas a teoria por trás desta implementação é mais complicada e teremos que despender um tempo maior para compreendê-la e explicá-la totalmente. \\
 
-Estudei todos estes tópicos pelo artigo, mas algumas partes são apenas mencionadas~(principalmente em \textbf{Resultados gerais}) e precisariam ser estudadas mais a fundo caso precisem ser escritas. Para escrever sobre a estrutura de union-find retroativa, seria preciso escrever sobre Link-Cut Tree, uma ED poderosa mas complicada, que precisaria de um capítulo só seu, ou mais, já que ela usa splay trees~\cite{SleatorT1985}, que também podem precisar de explicação.
+Estudei todos estes tópicos pelo artigo, mas algumas partes são apenas mencionadas~(principalmente em \textbf{Resultados gerais}) e precisariam ser estudadas mais a fundo caso venham a ser incluídas na dissertação. Para incluir na dissertação a descrição da estrutura union-find retroativa, seria preciso descrever Link-Cut Trees~\cite{SleatorT1981}, uma ED poderosa mas complicada, que precisaria de um capítulo só seu, ou mais, já que ela usa splay trees~\cite{SleatorT1985}, que também poderiam ser descritas na dissertação.
 
-(EXPLICAR MELHOR OQ QUEREMOS FAZER) % TODO
+A princípio, pretendo descrever na dissertação as versões retroativas de pilhas, deques, filas de prioridade e union-find. Este último tópico, como requer explicação de outras EDs complicadas, pode deixar de ser incluído se os outros tópicos tomarem muito tempo.
 
 \subsection{Preliminares}
 
-Alguns tópicos mais simples precisam ser explicados no início da tese. A solução do Lowest Common Ancestor e Level Ancestor Problem~\cite{BenderM-F2004, Myers83}, por exemplo, são usados na parte de persistência como caixa preta, e ainda precisam ser explicados. Eu conheço estes problemas bem, e já estudei e implementei soluções pra eles diversas vezes, então escrever esta parte não deve demorar.
+Alguns tópicos mais simples precisam ser explicados no início da tese. Algoritmos para os problemas
+Ancestral Comum Mais Profundo e Ancestral de Nível~\cite{BenderM-F2004, Myers83}, % ficou feia a traducao
+por exemplo, são usados na parte de persistência como caixa preta, e ainda precisam ser explicados. Eu conheço estes problemas bem, e já estudei e implementei soluções pra eles diversas vezes, então escrever esta parte não deve demorar.
 
-Se apresentarmos a implementação de pilhas e deques retroativas, pode ser interessante escrever um capítulo sobre~ABBs modificadas, detalhando a implementação das ABBs usadas em filas, pilhas e deques retroativas.
+Se apresentarmos a implementação de pilhas e deques retroativas, como planejamos, pode ser interessante escrever um capítulo sobre~ABBs modificadas, detalhando a implementação das ABBs usadas em filas, pilhas e deques retroativas. Cormen et al.~\cite{CormenAugment} descreve como modificar ABBs para armazenar valores adicionais.
 
 \subsection{Cronograma}
 
@@ -36,10 +40,20 @@ Se apresentarmos a implementação de pilhas e deques retroativas, pode ser inte
 Ativividade & Jan  & Fev  & Mar  & Abr  & Mai  & Jun  & Jul  & Ago  & Set  & Out  & Nov  & Dez  \\
 \hline
 \n{it:lca}  & $\s$ & $\s$ &      &      &      &      &      &      &      &      &      &      \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
 \n{it:abb}  &      & $\s$ & $\s$ &      &      &      &      &      &      &      &      &      \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
 \n{it:deq}  &      &      &      & $\s$ & $\s$ &      &      &      &      &      &      &      \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
 \n{it:pq}   &      &      &      &      &      & $\s$ & $\s$ & $\s$ &      &      &      &      \\
-\n{it:tese} & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ & $\s$ \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
+\n{it:spl}  &      &      &      &      &      &      &      & $\s$ & $\s$ &      &      &      \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
+\n{it:link} &      &      &      &      &      &      &      &      & $\s$ & $\s$ &      &      \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
+\n{it:uf}   &      &      &      &      &      &      &      &      &      &      & $\s$ &      \\
+\arrayrulecolor{gray!80!}\hline\arrayrulecolor{black}
+\n{it:tese} &      &      &      &      &      &      &      &      &      & $\s$ & $\s$ & $\s$ \\
 \hline
 \end{tabular}
 \end{center}
@@ -49,12 +63,15 @@ Ativividade & Jan  & Fev  & Mar  & Abr  & Mai  & Jun  & Jul  & Ago  & Set  & Out
 \noindent 
 {\bf Legenda:}
 \begin{enumerate}
-\item Estudo, implementação e escrita sobre Level Ancestor e Lowest Common Ancestor, usando duas técnicas~\cite{BenderM-F2004, Myers83}. \label{it:lca}
-\item Estudo, implementação e escrita sobre ABBs modificadas, mostrando as técnicas necessárias para implementar filas, pilhas e deques retroativas. \label{it:abb}
-\item Estudo, implementação e escrita sobre pilhas e deques retroativas. \label{it:deq}
-\item Estudo, implementação e escrita sobre filas de prioridades parcialmente retroativas. \label{it:pq}
+\item Estudo, implementação e escrita de um capítulo sobre Ancestral Comum Mais Profundo e Ancestral de Nível, usando duas técnicas~\cite{BenderM-F2004, Myers83}. \label{it:lca}
+\item Estudo, implementação e escrita de um capítulo sobre ABBs modificadas, mostrando as técnicas necessárias para implementar filas, pilhas e deques retroativas~\cite{CormenAugment}. \label{it:abb}
+\item Estudo, implementação e escrita de um capítulo sobre pilhas e deques retroativas~\cite{DemaineIL2007}. \label{it:deq}
+\item Estudo, implementação e escrita de um capítulo sobre filas de prioridades parcialmente retroativas~\cite{DemaineIL2007}. \label{it:pq}
+\item Estudo, implementação e escrita de um capítulo sobre Splay Trees~\cite{SleatorT1985}. \label{it:spl}
+\item Estudo, implementação e escrita de um capítulo sobre Link Cut Trees~\cite{SleatorT1981}. \label{it:link}
+\item Estudo, implementação e escrita de um capítulo sobre union-find retroativo~\cite{DemaineIL2007}. \label{it:uf}
 
-\item Escrita da tese. \label{it:tese}
+\item Finalização da escrita da dissertação. \label{it:tese}
 \end{enumerate}
 
 \end{document}
