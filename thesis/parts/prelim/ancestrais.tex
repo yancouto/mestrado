@@ -1,8 +1,48 @@
 \documentclass[main.tex]{subfiles}
 
+\DeclareMathOperator{\Par}{Parent}
+\DeclareMathOperator{\LA}{LevelAncestor}
+\DeclareMathOperator{\Dep}{Depth}
+\DeclareMathOperator{\LCA}{LowestCommonAncestor}
+\DeclareMathOperator{\argmax}{argmax}
+
 \begin{document}
 
 \chapter{Ancestrais em árvores} \label{cap:ancestrais}
-TODO
+
+\section{Introdução}
+
+Seja~$T \coloneqq (V, E)$ um grafo. Dizemos que~$T$ é uma árvore se é acíclico e conexo. Nesse caso, entre cada par de vértices de~$T$ existe exatamente um caminho. Uma árvore é enraizada quando fixamos algum vértice~${r \in V}$, chamado de raiz.
+
+
+Para cada vértice~${u \in V}$, os \deff{ancestrais} de~$u$ são os vértices no (único) caminho de~$u$ até~$r$. O~$(i-1)$-ésimo ancestral de~$u$ é o~$i$-ésimo vértice nesse caminho, ou seja,~$u$ é o $0$-ésimo ancestral de~$u$. Dizemos que o primeiro ancestral de~$u$, se~$u \neq r$, é o \deff{pai} de~$u$. Defina a função~${\Par: V \rightarrow V}$ tal que~$\Par(u)$ seja o pai do vértice~$u$, para todo~$u \in V \setminus \{r\}$, para o vértice~$r$, pode-se considerar que~$\Par(r) = r$. A \deff{profundidade} de um vértice~$u$ é~$\Dep(u)$, o número de vértices no caminho de~$u$ até~$r$.
+
+O problema do Ancestral de Nível (no inglês, Level Ancestor, abreviado LA), é o problema de encontrar, dados~$u \in V$ e~$k \in \Z$ tal que~$0 \leq k < \Dep(u)$, o~$k$-ésimo ancestral de~$u$, ou seja, o problema de avaliar a função
+$$\LA(u, k) \coloneqq \Par^k(u). $$
+
+O problema do Ancestral Comum de Maior Profundidade (no inglês, Lowest Common Ancestor, abreviado LCA), é o problema de encontrar, dados~$u, v \in V$, o vértice~$w$ de maior profundidade que é ancestral de ambos~$u$ e~$v$, ou seja, o problema de avaliar a função
+$$\LCA(u, v) \coloneqq \argmax\{\Dep(w) : w \in V,\ w \text{ é ancestral de $u$ e $v$}\}. $$
+
+\section{Potências de funções}
+
+Vamos considerar o problema, um pouco mais genérico, de, dada uma função~$f : [n] \rightarrow [n]$ (que pode ser dada por um vetor de tamanho~$n$, por exemplo), construir um algoritmo que, após possivelmente algum pré-processamento sobre o vetor~$f$, responda consultas do tipo: dados~$i \in [n]$ e~$k \in [m] \cup \{0\}$, determinar~$f^k(i)$ de forma eficiente. Se o tempo de processamento é~$\Oh(p(n, m))$ e o tempo para responder cada consulta é~$\Oh(q(n, m))$, dizemos que a complexidade da solução é~$\angles{\Oh(p(n, m), \Oh(q(n, m))}$.
+
+Uma solução simples é não fazer nenhum pré-processamento e sempre realizar as~$k$ iterações para determinar~$f^k(i)$. Esta solução tem complexidade~$\angles{\Oh(1),\Oh(m)}$. Outra solução simples é armazenar a resposta para todas as consultas possíveis em uma matriz~$M \in [n]^{[n] \x ([m] \cup \{0\})}$ tal que~$M[i][k] = f^k(i)$ para todo~$i \in [n]$ e~$k \in [m] \cup \{0\}$. Esta matriz pode ser preenchida usando programação dinâmica em tempo~$\Oh(nm)$, já que sabemos que, se~$k > 0$, então~$f^k(i) = f(f^{k-1}(i))$, ou seja,
+$$M[i][k] = \left\{
+	\begin{array}{ll}
+		f[M[i][k-1]] & \text{ se $k > 0$} \\
+		i & \text{ se $k = 0$,}
+	\end{array}
+	\right.
+$$
+ou seja, podemos preencher~$M$ iterando pelos seus índices em ordem crescente de~$k$. Esta solução tem complexidade~$\angles{\Oh(nm), \Oh(1)}$.
+
+As soluções apresentadas funcionam da seguinte maneira: escolhe-se uma base~$(a_1, \ldots, a_x)$ tal que todo número entre~0 e~$m$ pode ser escrito como soma de zero ou mais destes números, e calcula-se (durante o preprocessamento)~$f^{a_j}(i)$ para todo~$i \in [n]$ e~$j \in [x]$. Dado um número~$k$, escreve-se este como~$k = a_{b_1} + a_{b_2} + \ldots + a_{b_y}$, e após isso calcula-se
+$$f^k(i) = f^{a_{b_1}}(f^{a_{b_2}}(\ldots(f^{a_{b_y}}(i))\ldots)).$$
+Os exemplos eram simples, e no primeiro exemplos escolhemos como base apenas~$(1)$, e o tempo de consulta foi grande, enquanto no segundo exemplo escolhemos~$(1, \ldots, m)$, e o tempo de pré-processamento foi grande.
+
+Escolhendo a base de forma mais inteligente, é possível melhorar a complexidade. Cada número tem uma decomposição (única) em somas de potências de dois, e existem apenas~$\floor{\lg m}$ potências de~2 entre~1 e~$m$.
+
+
 
 \end{document}
