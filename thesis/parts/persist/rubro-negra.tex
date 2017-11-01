@@ -16,7 +16,7 @@ Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garant
 
 %Uma árvore de busca binária é uma árvore enraízada em que cada nó possui um valor, e tem no máximo dois filhos (esquerdo e direito). Para todo nó, o valor de todos os nós em sua subárvore esquerda é menor ou igual ao seu valor, e o valor de todos os nós em sua subárvore direita é maior ou igual ao seu valor.
 
-Uma árvore binária consiste de um nó chamado raiz, que tem ponteiro para até dois outras árvores binárias, chamadas subárvore esquerda e subárvore direita. Uma árvore~\emph{de busca}~binária é uma árvore binária na qual cada nó tem um valor e segue a seguinte propriedade: o valor de todos os nós em sua subárvore esquerda é menor ou igual ao seu valor, e o valor de todos os nós em sua subárvore direita é maior ou igual ao seu valor.
+Uma árvore binária consiste de um nó chamado raiz, que tem ponteiro para até duas outras árvores binárias, chamadas subárvore esquerda e subárvore direita. Uma árvore~\emph{de busca}~binária é uma árvore binária na qual cada nó tem um valor e segue a seguinte propriedade: para cada nó, o valor de todos os nós em sua subárvore esquerda é menor ou igual ao seu valor, e o valor de todos os nós em sua subárvore direita é maior ou igual ao seu valor.
 
 Um nó que não tem algum filho armazena~\keyword{null} no campo correspondente a esse filho. Uma folha é um nó que não tem filhos, e um link nulo é um campo de filho de algum nó que tem valor~\keyword{null}. Na Figura~\ref{fig:arv_bin_ex} estes são as arestas tracejadas.
 
@@ -36,7 +36,7 @@ edge from parent/.append style={-, shorten >= 0, shorten <= 0}
 ed/.style = {densely dashed, shorten >= 5pt}]
 \Tree [.\node[b]{7}; [.\node[b]{5}; [.\node[r]{1}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] [.\node[b]{10}; [.\node[r]{8}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] ]
 \end{tikzpicture}
-\caption{Exemplo de árvore rubro-negra. Como no resto das figuras do capítulo, os nós negros tem fundo cinza e os nós vermelhos tem fundo branco. Nas próximas figuras, o valor de cada nó não é especificado.} \label{fig:arv_bin_ex}
+\caption{Exemplo de árvore rubro-negra. Como no resto das figuras do capítulo, os nós negros têm fundo cinza e os nós vermelhos têm fundo branco. Nas próximas figuras, o valor de cada nó não é especificado.} \label{fig:arv_bin_ex}
 \end{figure}
 
 Uma árvore rubro-negra satisfaz as seguintes propriedades rubro-negras:
@@ -65,7 +65,7 @@ Considerando apenas os nós negros, a árvore é totalmente balanceada (propried
 \newcommand{\cur}{\V{current}}
 
 
-Em uma árvore rubro-negra efêmera (não persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~1, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó.
+Em uma árvore rubro-negra efêmera (não-persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~um, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó.
 
 O ponteiro extra simula o vetor~$\V{changes}$ usado durante a Seção~\ref{sec:nodecopying}, que no caso sempre teria zero ou um elemento.
 
@@ -73,16 +73,16 @@ O ponteiro de volta é armazenado no campo~$\parent$, e é exatamente o ponteiro
 
 Para evitar a necessidade de replicar código muito parecido, vamos armazenar os filhos como um vetor~$\child$ de~duas posições;~$u.\child[0]$ é o filho esquerdo de~$u$, e~$u.\child[1]$ é seu filho direito. Dessa forma, casos simétricos podem ser tratados com o mesmo código. Os campos de um nó serão:
 \begin{itemize}
-\item $\ts$ --- Instante de criação do nó.
-\item $\cp$ --- Cópia do nó (se ele não é ativo).
+\item $\val$ --- O valor armazenado no nó.
 \item $\child$ --- Vetor de filhos.
 \item $\parent$ --- Ponteiro de volta.
 \item $\red$ --- Booleano que indica se o nó é vermelho ou não.
+\item $\ts$ --- Instante de criação do nó.
+\item $\cp$ --- Cópia do nó (se ele não é ativo).
 \item $\extra, \eSide, \eTs$ --- Ponteiro extra, seu lado e instante de modificação.
-\item $\val$ --- O valor armazenado no nó.
 \end{itemize}
 
-Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois ele pode ser tanto um filho esquerdo quanto direito do nó, e se~$\extra$ for nulo, não há como saber qual filho este é comparando seu valor com o do nó. Para indicar se o ponteiro extra foi utilizado, usaremos que~$\eTs = -1$ quando não existe tal ponteiro.
+É necessário armazenar apenas um ponteiro extra por nó, que pode ser de filho esquerdo ou direito. Note que é necessário armazenar~$\eSide$, o lado do ponteiro extra, pois se~$\extra$ for nulo, não há como saber qual filho este é apenas comparando seu valor com o do nó. Para indicar se o ponteiro extra foi utilizado, usaremos que~$\eTs = -1$ quando não existe tal ponteiro.
 
 \section{Operações de acesso} \label{sec:rbacesso}
 
@@ -121,7 +121,7 @@ Vamos apresentar a operação~\textsc{Find}, que retorna o valor buscado, ou~\ke
 	\If{$u = \Null$}
 		\State \Return \Null
 	\Else
-		\State \Return $u.\val$
+		\State \Return $u.\val$ % TODO mudar para u e adaptar o resto
 	\EndIf
 \EndFunction
 
@@ -132,7 +132,7 @@ O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc
 
 \section{Modificação de um campo}
 
-Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação, que serão apresentadas nas próximas seções. No código, usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra, nunca o valor dos nós.
+Vamos apresentar no Código~\ref{lst:rbmodify_copy} as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação, que serão apresentadas nas próximas seções. No código, usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra, nunca o valor dos nós.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -188,19 +188,20 @@ Vamos apresentar as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seç
 \EndFunction
 
 \end{algorithmic}
+\caption{Funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}.} \label{lst:rbmodify_copy}
 \end{algorithm}
 
 Utilizamos que cada nó tem apenas um campo extra e ponteiro de volta para diminuir o código, e o vetor de filhos para evitar duplicação de código. Com estas funções prontas, é possível manter a persistência da estrutura, e nas próximas seções vamos discutir como implementar as operações de inserir e remover um valor de uma árvore rubro-negra.
 
-Note que na linha~\nref{line:copyrb:side} devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois o segundo predicado não funciona quando a ABB pode armazenar valores repetidos, já que~$v$ pode ter~2 filhos com o mesmo valor.
+Note que, na linha~\nref{line:copyrb:side} do código da próxima página, devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois o segundo predicado não funciona quando a ABB pode armazenar valores repetidos, já que~$v$ pode ter~dois filhos com o mesmo valor.
 
 \section{Inserção em ABB}
 
-Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB (efêmera e não rubro-negra). Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente a árvore continua sendo uma ABB válida.
+Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB efêmera e não rubro-negra. Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente a árvore continua sendo uma ABB válida.
 
 Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituímos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda, pela forma como percorremos a árvore.
 
-Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda tem valores menores ou iguais e os nós da subárvore direita tem valores maiores ou iguais ao valor do nó.
+Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda têm valores menores ou iguais e os nós da subárvore direita têm valores maiores ou iguais ao valor do nó.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -227,9 +228,9 @@ Note que é possível existirem valores repetidos na árvore, por isso na defini
 A inserção em uma árvore rubro-negra começa exatamente como a de uma ABB simples, porém pintamos~$x$ de vermelho.
 Se a árvore era vazia,~$x$ é a raiz e apenas a propriedade~1 é violada. Caso contrário, apenas a propriedade~2 pode estar sendo violada, caso o pai de~$x$ seja vermelho. A propriedade~3 sempre continua a valer, pois adicionamos um nó vermelho.
 
-Para arrumar a possível violação da propriedade, vamos fazer um laço com as seguintes invariantes (valem no começo da iteração do laço):
+Para arrumar a possível violação da propriedade~1 ou~2, vamos fazer um laço com as seguintes invariantes (valem no começo da iteração do laço):
 \begin{enumerate}[(A)]
-\item $x$ é vermelho
+\item $x$ é vermelho.
 \item Se~$x$ é a raiz, a propriedade~1 é violada.
 \item Se~$x$ tem pai vermelho, a propriedade~2 é violada.
 \item As propriedades não são violadas por outros nós.
@@ -261,7 +262,7 @@ Rotações são modificações locais de nós de uma ABB que mantém as propried
 \caption{Exemplo de rotação direita e esquerda em uma ABB. Os símbolos~$\alpha,~\beta$ e~$\gamma$ indicam subárvores, possivelmente vazias.} \label{fig:rot_ex}
 \end{figure}
 
-A Figura~\ref{fig:rot_ex} mostra uma rotação genérica. Note que, nos dois lados da figura, com certo abuso de notação, temos~${\alpha \leq u \leq \beta \leq v \leq \gamma}$, isto é, se as propriedades de ABBs são seguidas em um lado da figura, elas continuam a ser respeitadas no outro lado da figura, após a rotação. Dizemos que~$u$ é rotacionado em direção à~$v$ no caso da chamada~\Call{Rotate}{$u, 1$}. % muito abuso de notação?
+A Figura~\ref{fig:rot_ex} mostra uma rotação genérica. Note que, nos dois lados da figura, com certo abuso de notação, temos~${\alpha \leq u \leq \beta \leq v \leq \gamma}$, isto é, se as propriedades de ABBs são seguidas em um lado da figura, elas continuam a ser respeitadas no outro lado da figura, após a rotação. Dizemos que~$u$ é rotacionado em direção a~$v$ no caso da chamada~\Call{Rotate}{$u, 1$}. % muito abuso de notação?
 
 \subsection{Subindo a violação}
 
@@ -269,15 +270,15 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 
 
 \begin{description}
-	\item[Caso 1.] Se~$w$ existe e é vermelho, podemos apenas trocar as cores de~$y$,~$w$ e~$z$ para arrumar a violação de~$x$ (Figura~\ref{fig:rb_ins_caso1}). Todos os caminhos até links nulos que passam por~$z$ tem que passar por~$y$ ou~$w$, e como agora~$z$ é vermelho e~$y$ e~$w$ são negros, o número de nós negros nestes caminhos continuam os mesmos, e então a propriedade~3 se mantém.
+	\item[Caso 1.] $w$ existe e é vermelho. Podemos apenas trocar as cores de~$y$,~$w$ e~$z$ para arrumar a violação de~$x$ (Figura~\ref{fig:rb_ins_caso1}). Todos os caminhos até links nulos que passam por~$z$ têm que passar por~$y$ ou~$w$, e como agora~$z$ é vermelho e~$y$ e~$w$ são negros, o número de nós negros nestes caminhos continuam os mesmos, e então a propriedade~3 se mantém.
 
 	O nó~$x$ não viola mais nenhuma propriedade, mas o nó~$z$ se tornou vermelho e pode ter o pai vermelho ou ser a raiz, logo a próxima iteração deve ter~$x' = z$.
 
-\item[Caso 2.] Caso contrário ($w$ não existe ou é preto), se~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquerdo de~$z$ e~$x$ é filho esquerdo de~$y$), então realizamos uma rotação de~$z$ em direção à~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
+	\item[Caso 2.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquedo de~$z$ e~$x$ é filho esquerdo de~$y$). Então realizamos uma rotação de~$z$ em direção a~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
 
-	Os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, antes da transformação, os caminhos que passam por~$w$ passam por~$z$ e~$w$ (se existir). Após a transformação, os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ apenas por este (se existir) e~$y$. Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
+	Antes da tranformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, e os caminhos que passam por~$w$ passam pelos nós pretos~$z$ e~$w$ (se existir). Após a transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ passam pelos nós pretos~$y$ e $w$ (se existir). Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
 
-\item[Caso 3.] Se~$x$ e~$y$ são filhos de lados diferentes, a rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim transformamos este caso no~caso~2~(se trocamos~$x$ por~$y$).
+	\item[Caso 3.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de lados diferentes. A rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim transformamos este caso no~caso~2~(se trocamos~$x$ por~$y$).
 
 \end{description}
 
@@ -329,11 +330,11 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 \caption{Aplicação do caso~3, assumindo que~$x$ é filho direito. O nó~$w$, se existir, pode ter filhos.} \label{fig:rb_ins_caso3}
 \end{figure}
 
-Se o caso~1 é executado, o laço pode acabar, ou o nó~$x$ diminui de altura, se o caso~2 ou~3 são executados, o laço acaba. Como rotações podem ser feitas em tempo constante (são apenas algumas mudanças de ponteiros), a inserção em uma árvore rubro-negra efêmera de~$n$ nós consome tempo~$\Oh(\lg n)$.
+Se o caso~2 ou~3 é executado, não existe mais violações de propriedade e o laço acaba. Se o caso~1 é executado, trocamos~$x$ por um nó de altura menor (que pode ser a raiz). Logo, o caso~1 ocorre no máximo~$h$ vezes, onde~$h$ é a altura da árvore. Como cada caso consiste apenas de rotações e mudanças de cores, e rotações podem ser feitas em tempo constante (são apenas algumas mudanças de ponteiros), a inserção em uma árvore rubro-negra efêmera de~$n$ nós consome tempo~$\Oh(\lg n)$, já que árvore é balanceada.
 
-\subsection{Implementação e persistência}
+\subsection{Implementação e persistência parcial}
 
-A maior parte das modificações envolvidas em uma inserção são mudanças de cores, que não precisam ser guardadas de forma persistente. Mudança de ponteiros só ocorrem para adicionar o nó~$x$ como filho de outro nó, e em possíveis rotações para tratar os casos~2 e~3. Como discutido, após um caso~2 ou~3 o algoritmo acaba, logo são feitas apenas~$\Oh(1)$ mudanças de ponteiros, e utilizando a persistência por node copying conseguimos consumo de espaço amortizado constante por inserção.
+A maior parte das modificações envolvidas em uma inserção são mudanças de cores, que não precisam ser guardadas de forma persistente. Mudança de ponteiros só ocorrem para adicionar o nó~$x$ como filho de outro nó, e em possíveis rotações para tratar os casos~2 e~3. Como discutido, após um caso~2 ou~3, o algoritmo acaba, logo são feitas apenas~$\Oh(1)$ mudanças de ponteiros, e utilizando a persistência por node copying conseguimos consumo de espaço amortizado constante por inserção.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
