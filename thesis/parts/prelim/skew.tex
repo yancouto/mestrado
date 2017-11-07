@@ -8,8 +8,8 @@
 \newcommand{\NZ}{\operatorname{NZ}}
 \newcommand{\CSB}{\textit{CSB}}
 \renewcommand{\V}{\operatorname{V}}
-\renewcommand{\R}{\operatorname{R}}
-\renewcommand{\J}{\operatorname{J}}
+\newcommand{\R}{\operatorname{R}}
+\newcommand{\J}{\operatorname{J}}
 
 \begin{document}
 
@@ -65,7 +65,7 @@ O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$
 Como cada número tem uma representação única em~CSB, podemos definir uma função~${\R: \mathbb{N} \rightarrow \CSB}$ tal que~$V(\R(x)) = x$ para todo~$x \in \mathbb{N}$.
 
 \begin{lemma}
-	Seja~$a \in \CSB$ tal que~$\V(a) > 0$. Se~$NZ(a) = 1$ então~$V(a_n \ldots a_2 (a_1-1)) = V(a) - 1$, caso contrário~${V(a_n \ldots a_{\NZ(a)+1} (a_{\NZ(a)} - 1) 2 0^{\NZ(a) - 2}) = V(a) - 1$.
+	Seja~$a \in \CSB$ tal que~$\V(a) > 0$. Se~$NZ(a) = 1$ então~$V(a_n \ldots a_2 (a_1-1)) = V(a) - 1$, caso contrário~${V(a_n \ldots a_{\NZ(a)+1} (a_{\NZ(a)} - 1) 2 0^{\NZ(a) - 2}) = V(a) - 1}$.
 \end{lemma}
 \begin{proof}
 	Quando~$\NZ(a) = 1$, vale que~$a_1 \neq 0$, logo~${b \coloneqq a_n \ldots a_2 (a_1-1) \in \CSB}$. Além disso,~${V(a) - V(b) = a_1 - b_1 = 1}$.
