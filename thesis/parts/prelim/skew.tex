@@ -1,0 +1,117 @@
+\documentclass[main.tex]{subfiles}
+
+\newcommand{\Par}{\operatorname{Parent}}
+\newcommand{\LA}{\operatorname{LA}}
+\newcommand{\Dep}{\operatorname{D}}
+\newcommand{\LCA}{\operatorname{LCA}}
+
+\newcommand{\NZ}{\operatorname{NZ}}
+\newcommand{\CSB}{\textit{CSB}}
+\renewcommand{\V}{\operatorname{V}}
+\renewcommand{\R}{\operatorname{R}}
+\renewcommand{\J}{\operatorname{J}}
+
+\begin{document}
+
+\chapter{LA com representação skew binary} \label{cap:skew}
+
+Neste capítulo, apresentamos uma outra solução para o problema do Ancestral de Nível. Esta solução, apesar de um pouco mais complicada, requer processamento que consome espaço e tempo constante por nó adicionado. Está solução é baseada em um artigo de Myers~\cite{Myers83}.
+
+\section{Definição e propriedades}
+
+Um número \deff{skew-binary} de tamanho~$n$ é uma string~${a = a_n a_{n-1} \ldots a_1}$ tal que~${a_i \in \{0, 1, 2\}}$ e~$a_n \neq 0$. O valor de tal número é~${\V(a) = \sum\limits_{i = 1}^n{a_i (2^i - 1)}}$. Note que múltiplas strings podem ter o mesmo valor, por exemplo, ambos~21 e~100 têm valor~7.
+
+Para todo~$a$ tal que~$\V(a) \neq 0$, Defina~$\NZ(a) = \min\{i \in [n] : a_i \neq 0\}$, ou seja, a posição do digito não nulo menos significativo de~$a$. Dizemos que um número skew-binary é \deff{canônico} se todos os seus dígitos são~0 ou~1 exceto, possivelmente, o dígito não nulo menos significativo. Mais formalmente, se~${a_i = 2 \implies i = \NZ(a)}$. Seja~$\CSB$ o conjunto de todos os números skew-binary.
+
+Esta igualdade será útil na prova dos lemas:
+
+\begin{equation} \tag{A} \label{eq:sum2}
+	\sum\limits_{i = l}^r{2^i} = 2^{r+1} - 2^{l}.
+\end{equation}
+
+\begin{lemma} \label{lem:csbdig}
+	Se~$a \in \CSB$ e~$|a| = n$, então~$2^n - 1 \leq \V(a) \leq 2^{n+1}-2$.
+\end{lemma}
+\begin{proof}
+	Considere o número~$b = 10^{n-1}$. Como, por definição,~$a_n \geq 1 = b_n$ e~$a_i \geq 0 = b_i$ para~$i \in [n - 1]$, vale que~$V(b) \geq V(a) = 2^n - 1$.
+
+	Note que
+	\begin{align*}
+	V(a) = \sum\limits_{i = \NZ(a)}^n{a_i (2^i - 1)} &\stackrel{\text{(1)}}{\leq} \left(\sum\limits_{i = \NZ(a) + 1}^n (2^i - 1)\right) + 2 (2^{\NZ(a)} - 1) \\
+	&\stackrel{\text{(2)}}{=} 2^{n+1} - 2^{\NZ(a)+1} - (n - \NZ(a)) + 2^{\NZ(a) + 1} - 2 \\
+	&\stackrel{\text{(3)}}{\leq} 2^{n+1} - 2,
+	\end{align*}
+	onde~(1) vale por que~$a \in \CSB$,~(2) vale por~\eqref{eq:sum2} e~(3) vale pois~$\NZ(a) \leq n$.
+
+\end{proof}
+
+O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$ e~$20^{n-1}$, respectivamente, e também que qualquer representação de~$x$ em CSB usa~$\floor{\lg(x + 1)}$ dígitos.
+
+\begin{theorem} \label{thm:csbbij}
+	Cada número tem uma representação única em CSB. Equivalentemente,~${\V: \CSB \rightarrow \mathbb{N}}$ é uma função bijetora.
+\end{theorem}
+\begin{proof}
+	Vamos provar que~$\V$ é injetora, ou seja, se~${a \neq b}$ então~${\V(a) \neq \V(b)}$. Suponha, sem perda de generalidade, que~$|a| \geq |b|$. Se~$|a| > |b|$, então, pelo~Lema~\ref{lem:csbdig},
+	$$ \V(a) \geq 2^{|a|} - 1 > 2^{|a|} - 2 \geq 2^{|b| + 1} - 2 \geq \V(b). $$
+	Se~$|a| = |b|$, considere~${i^\star = \max\{i \in [n] : a_i \neq b_i\}}$. Assuma, sem perda de generalidade, que~${a_{i^\star} > b_{i^\star}}$. Escreva~${a = \alpha a_{i^\star} \beta}$ e~${b = \alpha b_{i^\star} \gamma}$. Então
+	$$ V(a) - V(b) \stackrel{\text{(1)}}{\geq} (2^{i^\star} - 1) + V(\beta) - V(\gamma) \stackrel{\text{(2)}}{\geq} (2^{i^\star} - 1) - (2^{i^\star} - 2) = 1, $$
+	onde~(1) vale pois~$a_i \geq b_i + 1$,~(2) vale pois~$\V(Y) \geq 0$ e usando o Lema~\ref{lem:csbdig} sobre~$Z$. Isso prova que~$\V(a) \neq \V(b)$, logo~$\V$ é injetora.
+
+	Para provar que~$\V$ é sobrejetora, precisamos provar que, para todo~$x \in \mathbb{N}$, existe~$a \in \CSB$ tal que~$V(a) = x$. Por indução em~$n$, vamos provar que, para todo~$x \leq 2^{n+1} - 2$ existe~$a \in \CSB$ tal que~$V(a) = x$. Se~$n = 0$, então~$a = 0$ é tal que~$V(a) = 0$. Suponha que a hipótese vale para todo~$x \leq 2^n - 2$. Seja~${2^n - 1 \leq y \leq 2^{n+1} - 2}$. Se~$y = 2^{n+1} - 2$, sabemos que~${a = 20^{n-1} \in \CSB}$ é tal que~$V(a) = y$. Caso contrário,~
+	$$y - (2^n - 1) < 2^{n+1} - 2 - (2^n - 1) = 2^n - 1,$$
+	logo existe~$a \in \CSB$ tal que~${V(a) = y - (2^n - 1)}$, mas então~$b = 1a \in \CSB$ e~$V(b) = y$.
+\end{proof}
+
+Como cada número tem uma representação única em~CSB, podemos definir uma função~${\R: \mathbb{N} \rightarrow \CSB}$ tal que~$V(\R(x)) = x$ para todo~$x \in \mathbb{N}$.
+
+\begin{lemma}
+	Seja~$a \in \CSB$ tal que~$\V(a) > 0$. Se~$NZ(a) = 1$ então~$V(a_n \ldots a_2 (a_1-1)) = V(a) - 1$, caso contrário~${V(a_n \ldots a_{\NZ(a)+1} (a_{\NZ(a)} - 1) 2 0^{\NZ(a) - 2}) = V(a) - 1$.
+\end{lemma}
+\begin{proof}
+	Quando~$\NZ(a) = 1$, vale que~$a_1 \neq 0$, logo~${b \coloneqq a_n \ldots a_2 (a_1-1) \in \CSB}$. Além disso,~${V(a) - V(b) = a_1 - b_1 = 1}$.
+
+	Caso contrário,~${a_{\NZ(a)} \neq 0}$, e como o único dígito em~$a$ que pode ser~2 é o~$\NZ(a)$-ésimo dígito, temos que~${b \coloneqq a_n \ldots a_{\NZ(a)+1} (a_{\NZ(a)} - 1) 2 0^{\NZ(a) - 2} \in \CSB}$. Além disso,
+	$$ V(a) - V(b) = (a_{\NZ(a)} - b_{\NZ(a)}) (2^{\NZ(a)} - 1) - 2 (2^{\NZ(a) - 1} - 1) = 2^{\NZ(a)} - 1 - (2^{\NZ(a)} - 2) = 1. $$
+\end{proof}
+
+O lema mostra que subtração por~1 em skew-binary canônico consiste de diminuir em 1 o dígito não nulo menos significativo e, se existir, aumentar para~2 o dígito à direita deste.
+
+\section{Jump pointers}
+
+No problema do Ancestral de Nível, para avaliar~$\LA(k, u)$, temos um nó~$u$ de profundidade~$\Dep(u)$ e queremos determinar seu ancestral~$v$ de profundidade~${\Dep(v) = \Dep(u) - k}$. Na solução apresentada na Subseção~\ref{subsec:pot2}, cada nó tinha um ponteiro para seu $2^x$-ancestral, para todo~${x \in \floor{\lg\Dep(u)}}$, e o nó~$v$ era alcançado a partir de~$u$ pulando as potências de dois distintas da decomposição de~$k$.
+
+Este problema pode ser interpretado de outra forma. Temos um número~$x$ e queremos transformá-lo em~$y \leq x$, a cada passo diminuindo o valor de~$x$. Com esta interpretação, na solução da Subseção~\ref{subsec:pot2}, que tenta transformar~$\Dep(u)$ em~$\Dep(v)$, a partir de cada número podíamos subtrair qualquer potência de dois. Note que diminuir o valor de um número por~$z$ é equivalente a escolher o~$z$-ésimo ancestral de um nó.
+
+Vamos considerar uma solução alternativa para este problema, na qual partir de um número~$x$ podemos ir para os números~$x-1$ ou~$\J(x)$, onde~${\J(x) \coloneqq x - (2^{\NZ(\R(x))} - 1)}$, ou seja, se considerarmos~$\R(x)$, a representação em~skew-binary canônico de~$x$,~$\J(x)$ consiste de diminuir em um o dígito não nulo menos significativo de~$\R(x)$. Por exemplo, se~$x = 13$, então~${\R(x) = 120}$ e~${\J(x) = \V(110) = 10}$.
+
+Considere o seguinte algoritmo, que transforma~$x$ em~$y$ (inicialmente~$x > y$):
+\begin{algorithm}[h]
+\caption{Transformando~$x$ em~$y$ usando~$x-1$ e~$\J(x)$. \label{lst:xysub}}
+\begin{algorithmic}
+	\While{$x \neq y$}
+		\If{$\J(x) \geq y$}
+			\State $x = \J(x)$
+		\Else
+			\State $x = x - 1$
+		\EndIf
+	\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+O algoritmo é guloso no sentido que sempre escolhe usar~$\J$ quando possível (e~${\J(x) \leq x - 1}$). A corretude do algoritmo é clara, já que é sempre possível alcançar~$y$ usando apenas~$x-1$.
+
+\begin{theorem}
+	Em~$\Oh(\lg x)$ passos, o algoritmo no Código~\ref{lst:xysub} termina.
+\end{theorem}
+\begin{proof}
+	Seja~$a \coloneqq \R(x)$ e~$b \coloneqq \R(y)$ e~$n \coloneqq |a|$. Se~$|a| > |b|$, aumente~$b$ adicionando 0s à esquerda. Seja~${i^\star = \max\{i \in [n] : a_i \neq b_i\}}$, e escreva~${a = \alpha a_{i^\star} \beta}$ e~${b = \alpha b_{i^\star} \beta}$. Pela prova do Teorema~\ref{thm:csbbij}, temos que~$a_{i^\star} > b_{i^\star}$ e que~${V(c) > V(b)}$, onde~${c \coloneqq \alpha (b_{i^\star} + 1) 0^{i^\star - 1}}$. Note que~$c_i \leq a_i$ para todo~${i \in [|a|]}$, e~$c$ tem um sufixo de 0s, logo se~$a \neq c$ então~$c_{\NZ(a)} < a_{\NZ(a)}$, logo neste caso podemos diminuir~$a_{\NZ(a)}$ em um, ou seja,~$J(V(a)) \geq V(c)$. Podemos repetir este argumento até que~$a = c$, ou seja~$x = V(c)$. Esta parte realiza no máximo~${\sum\limits_{i = 1}^{i^\star}{a_i} \leq i^\star + 1}$ passos, já que cada dígito é no máximo~1, a menos de um destes que pode ser~2.
+
+	Vamos provar que, se~${a = b_n \ldots b_{i+1} (b_i + 1) 0^{i-1}}$ para algum~$1 \leq i \leq n$, então o algoritmo terminará em no máximo~$2i$ passos. Com isso provado, teremos que o algoritmo realiza mais no máximo~$2i^\star$ passos, logo o algoritmo realiza no máximo~${3i^\star + 1 \leq 3n+1 = \Oh(\lg x)}$ passos.
+
+	A prova será por indução em~$i$. Se~$i = 1$ então~${J(x) = x - 1 = y}$ e o algoritmo termina em um passo.
+
+	Suponha que a hipótese vale para valores menores que~$i$. Seja~${\R(x) = a = b_n \ldots b_{i+1} (b_i + 1) 0^{i-1}}$. Se~${b_j = 0}$ para~${1 \leq j < i}$, então~${J(x) = V(b) = y}$ e o algoritmo termina em um passo. Caso contrário,~asas ~${\R(x - 1) = b_n \ldots b_i 2 0^{i - 1}}$ e, como~${\V(20^{i-1}) \geq \V(b_{i} \ldots b_1)}$, vale que 
+\end{proof}
+
+
+\end{document}
