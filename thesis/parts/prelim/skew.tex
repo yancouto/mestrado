@@ -64,7 +64,7 @@ O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$
 
 Como cada número tem uma representação única em~CSB, podemos definir uma função~${\R: \mathbb{N} \rightarrow \CSB}$ tal que~$V(\R(x)) = x$ para todo~$x \in \mathbb{N}$.
 
-\begin{lemma}
+\begin{lemma} \label{lem:csbsub}
 	Seja~$a \in \CSB$ tal que~$\V(a) > 0$. Se~$NZ(a) = 1$ então~$V(a_n \ldots a_2 (a_1-1)) = V(a) - 1$, caso contrário~${V(a_n \ldots a_{\NZ(a)+1} (a_{\NZ(a)} - 1) 2 0^{\NZ(a) - 2}) = V(a) - 1}$.
 \end{lemma}
 \begin{proof}
@@ -98,20 +98,51 @@ Considere o seguinte algoritmo, que transforma~$x$ em~$y$ (inicialmente~$x > y$)
 \end{algorithmic}
 \end{algorithm}
 
-O algoritmo é guloso no sentido que sempre escolhe usar~$\J$ quando possível (e~${\J(x) \leq x - 1}$). A corretude do algoritmo é clara, já que é sempre possível alcançar~$y$ usando apenas~$x-1$.
+O algoritmo é guloso no sentido que sempre escolhe usar~$\J$ quando possível (e~${\J(x) \leq x - 1}$). A corretude do algoritmo é clara, já que é sempre possível alcançar~$y$ usando apenas~$x-1$, e~$x$ nunca se torna menor que~$y$.
 
-\begin{theorem}
-	Em~$\Oh(\lg x)$ passos, o algoritmo no Código~\ref{lst:xysub} termina.
+\begin{theorem} \label{thm:xysub}
+	O algoritmo no Código~\ref{lst:xysub} termina em~$\Oh(\lg x)$ iterações do~\keyword{while}.
 \end{theorem}
 \begin{proof}
-	Seja~$a \coloneqq \R(x)$ e~$b \coloneqq \R(y)$ e~$n \coloneqq |a|$. Se~$|a| > |b|$, aumente~$b$ adicionando 0s à esquerda. Seja~${i^\star = \max\{i \in [n] : a_i \neq b_i\}}$, e escreva~${a = \alpha a_{i^\star} \beta}$ e~${b = \alpha b_{i^\star} \beta}$. Pela prova do Teorema~\ref{thm:csbbij}, temos que~$a_{i^\star} > b_{i^\star}$ e que~${V(c) > V(b)}$, onde~${c \coloneqq \alpha (b_{i^\star} + 1) 0^{i^\star - 1}}$. Note que~$c_i \leq a_i$ para todo~${i \in [|a|]}$, e~$c$ tem um sufixo de 0s, logo se~$a \neq c$ então~$c_{\NZ(a)} < a_{\NZ(a)}$, logo neste caso podemos diminuir~$a_{\NZ(a)}$ em um, ou seja,~$J(V(a)) \geq V(c)$. Podemos repetir este argumento até que~$a = c$, ou seja~$x = V(c)$. Esta parte realiza no máximo~${\sum\limits_{i = 1}^{i^\star}{a_i} \leq i^\star + 1}$ passos, já que cada dígito é no máximo~1, a menos de um destes que pode ser~2.
+	Seja~$a \coloneqq \R(x)$ e~$b \coloneqq \R(y)$ e~$n \coloneqq |a|$. Se~$|a| > |b|$, aumente~$b$ adicionando 0s à esquerda. Seja~${i^\star = \max\{i \in [n] : a_i \neq b_i\}}$, e escreva~${a = \alpha a_{i^\star} \beta}$ e~${b = \alpha b_{i^\star} \beta}$. Pelo Lema~\ref{lem:csbdig} (e também usado na prova do Teorema~\ref{thm:csbbij}), temos que~$a_{i^\star} > b_{i^\star}$ e que~${V(c) > V(b)}$, onde~${c \coloneqq b_n \ldots b_{i^\star + 1} (b_{i^\star} + 1) 0^{i^\star - 1}}$. Note que~$c_i \leq a_i$ para todo~${i \in [n]}$, e temos que~$\NZ(a) \leq i^\star$. Se~$\NZ(a) < i^\star$ vale que~$a_{\NZ(a)} > 0 = c_{\NZ(a)}$, e se~$\NZ(a) = i^\star$ vale que~${a_{\NZ(a)} = a_{i^\star} \geq b_{i^\star} + 1 = c_{i^\star}}$. Portanto~$a_{\NZ(a)} \geq c_{\NZ(a)}$, com igualdade apenas se~$a = c$, logo se~$a \neq c$ podemos diminuir~$a_{\NZ(a)}$ em um, ou seja,~$J(V(a)) \geq V(c)$. Podemos repetir este argumento até que~$a = c$, ou seja~$x = V(c)$. Esta parte realiza no máximo~${\sum\limits_{i = 1}^{i^\star}{a_i} \leq i^\star + 1}$ iterações, já que cada dígito é no máximo~1, a menos de um destes, que pode ser~2.
 
-	Vamos provar que, se~${a = b_n \ldots b_{i+1} (b_i + 1) 0^{i-1}}$ para algum~$1 \leq i \leq n$, então o algoritmo terminará em no máximo~$2i$ passos. Com isso provado, teremos que o algoritmo realiza mais no máximo~$2i^\star$ passos, logo o algoritmo realiza no máximo~${3i^\star + 1 \leq 3n+1 = \Oh(\lg x)}$ passos.
+	Vamos provar que, se~${a = b_n \ldots b_{i+1} (b_i + 1) 0^{i-1}}$ para algum~$1 \leq i \leq n$, com~$x = \V(a)$ e~$y = \V(b)$, então o algoritmo terminará em no máximo~$2i$ iterações. Com isso provado, começando de~${c = b_n \ldots b_{i^\star + 1} (b_{i^\star} + 1) 0^{i^\star - 1}}$, o algoritmo realiza no máximo~$2i^\star$ iterações adicionais, logo o algoritmo realiza no máximo~${3i^\star + 1 \leq 3n+1 = \Oh(\lg x)}$ iterações no total, e o teorema estará provado.
 
-	A prova será por indução em~$i$. Se~$i = 1$ então~${J(x) = x - 1 = y}$ e o algoritmo termina em um passo.
+	A prova será por indução em~$i$. Se~$i = 1$ então~${J(x) = x - 1 = y}$ e o algoritmo termina em uma iteração.
 
-	Suponha que a hipótese vale para valores menores que~$i$. Seja~${\R(x) = a = b_n \ldots b_{i+1} (b_i + 1) 0^{i-1}}$. Se~${b_j = 0}$ para~${1 \leq j < i}$, então~${J(x) = V(b) = y}$ e o algoritmo termina em um passo. Caso contrário,~asas ~${\R(x - 1) = b_n \ldots b_i 2 0^{i - 1}}$ e, como~${\V(20^{i-1}) \geq \V(b_{i} \ldots b_1)}$, vale que 
+	Suponha que a hipótese vale para valores menores que~$i$. Se~${\NZ(b) \geq i}$, ou seja,~$b$ tem um sufixo de pelo menos~$i^\star - 1$ valores 0, ou seja~${a = b_n \ldots b_{i^\star + 1} (b_{i^\star} + 1) b_{i^\star - 1} \ldots b_1}$, e então se diminuirmos~1 de~$a_{i^\star}$ temos~$b$, ou seja,~${\J(\V(a)) = \V(b)}$, e o algoritmo termina em uma iteração.
+	Caso contrário,~$\J(\V(a)) < \V(b)$, e então~$x = x - 1$ é executado. Pelo Lema~\ref{lem:csbsub},~${\R(x - 1) = b_n \ldots b_i 2 0^{i-2}}$, e é claro que~${\V(20^{i-2}) \geq \V(b_{i-1} \ldots b_1)}$. Considere o valor de~$b_{i-1}$:
+	\begin{itemize}
+		\item se~$b_{i-1} = 2$, então~$x - 1 = y$ e o algoritmo termina, gastando uma iteração;
+		\item se~$b_{i-1} = 1$, então podemos aplicar a hipótese de indução (para~$i-1$) e temos que o algoritmo gasta no máximo~$2(i - 1) + 1 < 2i$ iterações;
+		\item se~$b_{i-1} = 0$, então~$\J(x - 1) > y$ e~$\R(\J(x - 1)) = b_n \ldots b_i 1 0^{i-2}$, logo podemos aplicar a hipótese de indução (para~$i-1$) e temos que o algoritmo gasta no máximo~$2(i-1) + 2 = 2i$ iterações.
+	\end{itemize}
 \end{proof}
 
+\begin{figure}
+\begin{tikzpicture}
+	%\draw (0, 1/10) node{x\ \ \ \ CSB\ \ };
+	\draw (0, 3/4) node{\ \ x\ \ };
+	\draw (0, 0) node{\ CSB\ };
+	%\draw (0, 0) grid (20, 10);
+	\draw (-.5, 1/3) -- (16.5, 1/3);
+	\foreach \i/\x/\csb in {1/59/11120, 2/56/11110, 3/53/11100, 4/46/11000, 5/45/10200, 6/44/10120, 7/41/10110, 8/40/10102}
+	{
+		\draw (\i+\i, 3/4) node{\ \x\ \ };
+		\draw (\i+\i, 0) node(c\i){\csb};
+	}
+	\foreach \i/\j in {1/2, 2/3, 3/4, 6/7}
+	{
+		\draw (c\i.south) edge[bend right,->, shorten >=3pt, shorten <=3pt] node[below]{\scriptsize $x = \J(x)$} (c\j.south);
+	}
+	\foreach \i/\j in {4/5, 5/6, 7/8}
+	{
+		\draw (c\i.south) edge[bend right,->, shorten >=3pt, shorten <=3pt] node[below]{\scriptsize $x = x - 1$} (c\j.south);
+	}
+\end{tikzpicture}
+\caption{Exemplo do algoritmo do Código~\ref{lst:xysub} aplicado sobre~$x = 59$ e~$y = 40$.} \label{fig:exxysub}
+\end{figure}
+
+A Figura~\ref{fig:exxysub} mostra um exemplo de aplicação do algoritmo no Código~\ref{lst:xysub}. A transformação de~$x = 59$ até~$x = 46$ corresponde à primeira parte da prova do Teorema~\ref{thm:xysub}, e o resto corresponde à segunda.
 
 \end{document}
