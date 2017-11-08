@@ -82,12 +82,12 @@ No problema do Ancestral de Nível, para avaliar~$\LA(k, u)$, temos um nó~$u$ d
 
 Este problema pode ser interpretado de outra forma. Temos um número~$x$ e queremos transformá-lo em~$y \leq x$, a cada passo diminuindo o valor de~$x$. Com esta interpretação, na solução da Subseção~\ref{subsec:pot2}, que tenta transformar~$\Dep(u)$ em~$\Dep(v)$, a partir de cada número podíamos subtrair qualquer potência de dois. Note que diminuir o valor de um número por~$z$ é equivalente a escolher o~$z$-ésimo ancestral de um nó.
 
-Vamos considerar uma solução alternativa para este problema, na qual partir de um número~$x$ podemos ir para os números~$x-1$ ou~$\J(x)$, onde~${\J(x) \coloneqq x - (2^{\NZ(\R(x))} - 1)}$, ou seja, se considerarmos~$\R(x)$, a representação em~skew-binary canônico de~$x$,~$\J(x)$ consiste de diminuir em um o dígito não nulo menos significativo de~$\R(x)$. Por exemplo, se~$x = 13$, então~${\R(x) = 120}$ e~${\J(x) = \V(110) = 10}$.
+Vamos considerar uma solução alternativa para este problema, na qual partir de um número~$x$ positivo podemos ir para os números~$x-1$ ou~$\J(x)$, onde~${\J(x) \coloneqq x - (2^{\NZ(\R(x))} - 1)}$, ou seja, se considerarmos~$\R(x)$, a representação em~skew-binary canônico de~$x$,~$\J(x)$ consiste de diminuir em um o dígito não nulo menos significativo de~$\R(x)$. Por exemplo, se~$x = 13$, então~${\R(x) = 120}$ e~${\J(x) = \V(110) = 10}$.
 
 Considere o seguinte algoritmo, que transforma~$x$ em~$y$ (inicialmente~$x > y$):
 \begin{algorithm}[h]
 \caption{Transformando~$x$ em~$y$ usando~$x-1$ e~$\J(x)$. \label{lst:xysub}}
-\begin{algorithmic}
+\begin{algorithmic}[1]
 	\While{$x \neq y$}
 		\If{$\J(x) \geq y$}
 			\State $x = \J(x)$
@@ -144,5 +144,79 @@ O algoritmo é guloso no sentido que sempre escolhe usar~$\J$ quando possível (
 \end{figure}
 
 A Figura~\ref{fig:exxysub} mostra um exemplo de aplicação do algoritmo no Código~\ref{lst:xysub}. A transformação de~$x = 59$ até~$x = 46$ corresponde à primeira parte da prova do Teorema~\ref{thm:xysub}, e o resto corresponde à segunda.
+
+\newcommand{\jmp}{\mathit{jump}}
+Portanto, é possível usar a mesma ideia para resolver o problema do Ancestral de Nível. Suponha que todo vértice~$u$ tenha um campo~$u.\jmp$ que armazene seu ancestral com profundidade~$\J(\Dep(u))$. Então, de forma análoga ao algoritmo do Código~\ref{lst:xysub}, podemos resolver o problema do Ancestral de Nível como no Código~\ref{lst:laskew}. A corretude é clara e o consumo de tempo~$\Oh(\lg\Dep(u))$ segue diretamente do Teorema~\ref{thm:xysub}.
+
+\begin{algorithm}
+\caption{Algoritmo para Ancestral de Nível usando a representação skew-binary.} \label{lst:laskew}
+\begin{algorithmic}[1]
+	\Function{LevelAncestor}{$k, u$}
+		\State $y = \Dep(u) - k$
+		\While{$\Dep(u) \neq y$}
+			\If{$\Dep(u.\jmp) \geq y$}
+				\State $u = u.\jmp$
+			\Else
+				\State $u = \Par(u)$
+			\EndIf
+		\EndWhile
+		\State \Return $u$
+	\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\section{Computando Jump pointers}
+
+A seção anterior apresentou uma solução para o problema do Ancestral de Nível que consome tempo logarítmo, porém, assumimos que cada nó~$u$ tinha um campo~$u.\jmp$ com seu~$\J(\Dep(u))$-ésimo ancestral. Nesta seção, detalharemos como encontrar tal ancestral para cada nó.
+
+\begin{theorem} \label{thm:csbj+1}
+	Seja~$a \in \CSB$. Se~$a$ não contém nenhum dígito dois, ou seja, se~$a_{\NZ(a)} \neq 2$, então~$\J(\V(a) + 1) = \J(\V(a))$. Caso contrário,~$\J(\V(a) + 1) = \J(\J(\V(a))$.
+\end{theorem}
+\begin{proof}
+	Suponha que~$a_{\NZ(a)} \neq 2$. Note que~$b \coloneqq a_n \ldots a_2 (a_1 + 1)$ é um número em skew-binary tal que~${\V(b) = \V(a) + 1}$, e, já que~$a$ não tem dígito~2, vale que~${b \in \CSB}$. Obviamente~${\NZ(b) = 1}$, logo~${\J(\V(a) + 1) = \J(\V(b)) = \V(b) - 1 = \V(a)}$.
+
+	Caso contrário,~${a_{\NZ(a)} = 2}$. Considere~${b \coloneqq a_n \ldots a_{\NZ(a) + 2} (a_{\NZ(a) + 1} + 1) 0^{\NZ(a)}}$, pelo Lema~\ref{lem:csbsub} vale que~${R(V(b) - 1) = a}$, logo~${V(b) = V(a) + 1}$. Note que \vspace{-2ex}
+	\[
+	\begin{array}{ll}
+		\J(\V(b))     &= a_n \ldots a_{\NZ(a) + 1} 0^{\NZ(a)}, \\
+		\J(\V(a))     &= a_n \ldots a_{\NZ(a) + 1} 10^{\NZ(a)-1},\text{ e} \\
+		\J(\J(\V(a))) &= a_n \ldots a_{\NZ(a) + 1} 0^{\NZ(a)}. \\
+	\end{array}
+	\]
+	Portanto,~$\J(V(a) + 1) = \J(\J(\V(a)))$.
+\end{proof}
+
+Pelo Teorema~\ref{thm:csbj+1}, é fácil calcular~$\J(x)$ a partir dos valores~$\J$ calculados para valores menores que~$x$, se soubermos identificar se~$\R(x - 1)$ tem algum dígito~2.
+
+\begin{proposition} \label{prop:csbjj}
+	Seja~$a \in \CSB$ tal que~$\V(a) \neq 0$. Então \vspace{-2ex}
+	$${a_{\NZ(a)} = 2 \iff \J(\V(a)) \neq 0 \text{ e } \V(a) - \J(\V(a)) = \J(\V(a)) - \J(\J(\V(a))).}$$
+\end{proposition}
+\begin{proof}
+	Seja~$b \coloneqq \R(\J(\V(a)))$ e~${c \coloneqq \R(\J(\J(a)))}$. Lembre que~$\J(\V(a)) = \V(a) - (2^{\NZ(a)} - 1)$.
+
+	Se~$a_{\NZ(a)} = 2$, então~$\NZ(b) = \NZ(a)$ (e~$\V(b) \neq 0$), logo segue que~$$\V(a) - \J(\V(a)) = 2^{\NZ(a)} - 1 = 2^{\NZ(b)} - 1 = \V(b) - \J(\V(b)) = \J(\V(a)) - \J(\J(\V(a))).$$
+
+	Já se~$a_{\NZ(a)} = 1$, então se~$\J(\V(a)) \neq 0$ vale que~$\NZ(b) > \NZ(a)$, logo segue que~$$\V(a) - \J(\V(a)) = 2^{\NZ(a)} - 1 < 2^{\NZ(b)} - 1 = \V(b) - \J(\V(b)) = \J(\V(a)) - \J(\J(\V(a))).$$
+\end{proof}
+
+A Proposição~\ref{prop:csbjj} nos dá uma maneira de verificar se a representação skew-binary de~$x$ tem algum dígito~2, se já tivermos calculado os valores de~$\J$ para números menores ou iguais a~$x$.
+
+\renewcommand{\root}{\mathit{root}}
+\begin{algorithm}
+\caption{Adicionando uma folha à árvore com raiz~$r$.} \label{lst:addleafskew}
+\begin{algorithmic}[1]
+	\Function{AddLeaf}{$u$}
+		\State $v = \Par(u)$
+		\If{$v.\jmp \neq r \textbf{ and } \Dep(v) - \Dep(v.\jmp) = \Dep(v.\jmp) - \Dep(v.\jmp.\jmp)$} \label{lst:addleafskew:if}
+			\State $u.\jmp = v.\jmp.\jmp$
+		\Else
+			\State $u.\jmp = v$
+		\EndIf
+	\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+O Código~\ref{lst:addleafskew} mostra como adicionar uma folha de forma online à árvore, da mesma forma como no Código~\ref{lst:lapot2}. Nesse caso, porém, o consumo de tempo e espaço é constante. A corretude segue diretamente do Teorema~\ref{thm:csbj+1} e da Proposição~\ref{prop:csbjj}, já que a comparação da linha~\nref{lst:addleafskew:if} verifica as condição dadas pela proposição e o~\keyword{if} computa o campo~$\jmp$ (equivalente à função~$\J$) como no teorema. Note que a raiz~$r$ tem profundidade~0 e seu campo~$\jmp$ não é usado.
 
 \end{document}

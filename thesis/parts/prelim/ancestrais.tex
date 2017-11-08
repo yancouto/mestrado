@@ -15,9 +15,9 @@
 Seja~$T \coloneqq (V, E)$ um grafo. Dizemos que~$T$ é uma árvore se é acíclico e conexo. Nesse caso, entre cada par de vértices de~$T$ existe exatamente um caminho. Uma árvore é enraizada quando fixamos algum vértice~${r \in V}$, chamado de raiz. Para propósitos de implementação e sem perda de generalidade, supomos que~$V = \{1, 2, \ldots, |V|\}$.
 
 
-Para cada vértice~${u \in V}$, os \deff{ancestrais} de~$u$ são os vértices no (único) caminho de~$u$ até~$r$. O~$(i-1)$-ésimo ancestral de~$u$ é o~$i$-ésimo vértice nesse caminho, ou seja,~$u$ é o $0$-ésimo ancestral de~$u$. Dizemos que o primeiro ancestral de~$u$, se~$u \neq r$, é o \deff{pai} de~$u$. Defina a função~${\Par: V \rightarrow V}$ tal que~$\Par(u)$ seja o pai do vértice~$u$, para todo~$u \in V \setminus \{r\}$, para o vértice~$r$, pode-se considerar que~$\Par(r) = r$. A \deff{profundidade} de um vértice~$u$ é~$\Dep(u)$, o número de vértices no caminho de~$u$ até~$r$.
+Para cada vértice~${u \in V}$, os \deff{ancestrais} de~$u$ são os vértices no (único) caminho de~$u$ até~$r$. O~$(i-1)$-ésimo ancestral de~$u$ é o~$i$-ésimo vértice nesse caminho, ou seja,~$u$ é o $0$-ésimo ancestral de~$u$. Dizemos que o primeiro ancestral de~$u$, se~$u \neq r$, é o \deff{pai} de~$u$. Defina a função~${\Par: V \rightarrow V}$ tal que~$\Par(u)$ seja o pai do vértice~$u$, para todo~$u \in V \setminus \{r\}$, para o vértice~$r$, pode-se considerar que~$\Par(r) = r$. A \deff{profundidade} de um vértice~$u$ é~$\Dep(u)$, o número de arestas no caminho de~$u$ até~$r$.
 
-O problema do Ancestral de Nível (no inglês, Level Ancestor, abreviado LA), é o problema de encontrar, dados~$u \in V$ e~$k \in \Z$ tal que~$0 \leq k < \Dep(u)$, o~$k$-ésimo ancestral de~$u$, ou seja, o problema de avaliar a função
+O problema do Ancestral de Nível (no inglês, Level Ancestor, abreviado LA), é o problema de encontrar, dados~$u \in V$ e~$k \in \Z$ tal que~$0 \leq k \leq \Dep(u)$, o~$k$-ésimo ancestral de~$u$, ou seja, o problema de avaliar a função
 $$\LA(k, u) \coloneqq \Par^k(u). $$
 
 O problema do Ancestral Comum de Maior Profundidade (no inglês, Lowest Common Ancestor, abreviado LCA), é o problema de encontrar, dados~$u, v \in V$, o vértice~$w$ de maior profundidade que é ancestral de ambos~$u$ e~$v$, ou seja, o problema de avaliar a função
