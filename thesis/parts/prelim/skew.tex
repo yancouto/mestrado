@@ -170,7 +170,7 @@ Portanto, é possível usar a mesma ideia para resolver o problema do Ancestral 
 A seção anterior apresentou uma solução para o problema do Ancestral de Nível que consome tempo logarítmo, porém, assumimos que cada nó~$u$ tinha um campo~$u.\jmp$ com seu~$\J(\Dep(u))$-ésimo ancestral. Nesta seção, detalharemos como encontrar tal ancestral para cada nó.
 
 \begin{theorem} \label{thm:csbj+1}
-	Seja~$a \in \CSB$. Se~$a$ não contém nenhum dígito dois, ou seja, se~$a_{\NZ(a)} \neq 2$, então~$\J(\V(a) + 1) = \J(\V(a))$. Caso contrário,~$\J(\V(a) + 1) = \J(\J(\V(a))$.
+	Seja~$a \in \CSB$. Se~$a$ não contém nenhum dígito dois, ou seja, se~$a_{\NZ(a)} \neq 2$, então~$\J(\V(a) + 1) = \V(a)$. Caso contrário,~$\J(\V(a) + 1) = \J(\J(\V(a))$.
 \end{theorem}
 \begin{proof}
 	Suponha que~$a_{\NZ(a)} \neq 2$. Note que~$b \coloneqq a_n \ldots a_2 (a_1 + 1)$ é um número em skew-binary tal que~${\V(b) = \V(a) + 1}$, e, já que~$a$ não tem dígito~2, vale que~${b \in \CSB}$. Obviamente~${\NZ(b) = 1}$, logo~${\J(\V(a) + 1) = \J(\V(b)) = \V(b) - 1 = \V(a)}$.
