@@ -6,6 +6,7 @@ addons:
     apt:
         packages:
             - doxygen
+            - python-pygments
 env:
     global:
         - MAKEFLAGS="-j"
@@ -15,9 +16,10 @@ before_install:
     - tlmgr install babel-portuges
     - tlmgr install courier
     - tlmgr install lm
+    - tlmgr install luaotfload
 script:
     - cd thesis && texliveonfly main.tex && cd ..
-    - make NO_VALGRIND=true
+    - make full NO_VALGRIND=true
 deploy:
     provider: pages
     skip_cleanup: true

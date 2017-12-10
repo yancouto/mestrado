@@ -11,3 +11,6 @@
 **/*.blg
 **/*.fdb_latexmk
 **/*.fls
+**/*.nav
+**/*.snm
+**/*.vrb

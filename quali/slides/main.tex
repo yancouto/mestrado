@@ -1,0 +1,47 @@
+\documentclass[10pt, compress]{beamer}
+
+\usetheme{m}
+
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+\usepackage{minted}
+
+\usemintedstyle{trac}
+
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usetikzlibrary{matrix,backgrounds, decorations.pathreplacing, automata, arrows}
+
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}} % \pgfkeysalso doesn't change the path
+}}
+\tikzset{
+  invisible/.style={opacity=0},
+  visible on/.style={alt={#1{}{invisible}}},
+  alt/.code args={<#1>#2#3}{%
+    \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+  },
+  blink/.style={onslide={<#1> mLightBrown}},
+  appear/.style={visible on=<#1->, blink=#1}
+}
+
+\newcommand{\Oh}{\mathcal{O}}
+
+
+\title{Persistência e retroatividade em estruturas de dados}
+\subtitle{Yan Soares Couto}
+\date{2017}
+\author{Orientadora: Cristina Gomes Fernandes}
+\institute{Instituto de Matemática e Estatística}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]
+  \frametitle{definição}
+	LALAL
+\end{frame}
+
+\end{document}
