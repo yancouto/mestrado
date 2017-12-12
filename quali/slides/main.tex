@@ -2,15 +2,19 @@
 
 \usetheme{m}
 
+\usepackage[portuguese]{babel}
+\usepackage{../../thesis/code}
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
 \usepackage{minted}
+\newcommand{\V}[1]{\mathit{#1}}
 
 \usemintedstyle{trac}
 
 \usepackage{tikz}
 \usepackage{tikz-qtree}
-\usetikzlibrary{matrix,backgrounds, decorations.pathreplacing, automata, arrows}
+\usetikzlibrary{matrix,backgrounds, decorations.pathreplacing, automata, arrows, positioning}
+\tikzset{ edge from parent path = {(\tikzparentnode) -- (\tikzchildnode)}}
 
 \tikzset{onslide/.code args={<#1>#2}{%
   \only<#1>{\pgfkeysalso{#2}} % \pgfkeysalso doesn't change the path
@@ -25,8 +29,6 @@
   appear/.style={visible on=<#1->, blink=#1}
 }
 
-\newcommand{\Oh}{\mathcal{O}}
-
 
 \title{Persistência e retroatividade em estruturas de dados}
 \subtitle{Yan Soares Couto}
@@ -40,8 +42,218 @@
 \maketitle
 
 \begin{frame}[fragile]
-  \frametitle{definição}
-	LALAL
+  \frametitle{Persistência}
+
+	Uma ED é persistente se, ao realizar uma operação sobre ela, não perdemos sua versão anterior.
+	\vfill
+
+	\begin{center}
+	\begin{minipage}{0.2\linewidth}
+	\begin{tikzpicture}[sibling distance=15pt]
+		\Tree [.0
+			[.1 [.2 3 [.4 5 ] ] ]
+			6
+		]
+	\end{tikzpicture}
+	\end{minipage}
+	\begin{minipage}{0.78\linewidth}
+	\begin{table}
+	\centering
+	\begin{subalgorithm}{0.5\linewidth}
+		\begin{algorithmic}
+			\State $p_0 =$ \func{Stack}{}
+			\State $p_1 =$ \func{Push}{p_0, 5}
+			\State $p_2 =$ \func{Push}{p_1, 7}
+			\State $p_3 =$ \func{Push}{p_2, 6}
+			\State $p_4 =$ \func{Pop}{p_2}
+			\State \func{Top}{p_3}
+			\State $p_5 =$ \func{Push}{p_4, 9}
+			\State \func{Top}{p_4}
+			\State $p_6 =$ \func{Push}{p_0, 5}
+		\end{algorithmic}
+	\end{subalgorithm}
+	\begin{subalgorithm}{0.27\linewidth}
+		\begin{algorithmic}
+			\State $p_0:$
+			\State $p_1:$ 5
+			\State $p_2:$ 5 7
+			\State $p_3:$ 5 7 6
+			\State $p_4:$ 5
+			\State Retorna 6
+			\State $p_5:$ 5 9
+			\State Retorna 5
+			\State $p_6:$ 5
+		\end{algorithmic}
+	\end{subalgorithm}
+	\end{table}
+	\end{minipage}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Pilha persistente}
+
+	Uma pilha implementada usando lista ligada é automaticamente persistente.
+	\vfill
+
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[sibling distance=25pt, nodes={draw, minimum size=6mm}, edge from parent/.append style={<-, shorten <= 5pt, shorten >= 5pt}, level distance=40pt]
+			\Tree [.\node[minimum size=6mm](root){};
+				[.\node(p14){5}; [.\node(p2){7}; [.\node(p3){6}; ] ] \node(p5){9}; ]
+				\node(p6){5};
+			]
+			\draw (root.south west) edge (root.north east);
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root]{$p_0$} edge (root);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of p14,yshift=12pt]{$p_1$} edge (p14);
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of p14]{$p_4$} edge (p14);
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of p2]{$p_2$} edge (p2);
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of p3]{$p_3$} edge (p3);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of p5]{$p_5$} edge (p5);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of p6]{$p_6$} edge (p6);
+
+		\end{tikzpicture}
+		\caption{Arborescência criada pela sequência de operações do slide anterior.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{k-ésimo elemento}
+	Determinar o k-ésimo elemento da pilha é equivalente a encontrar o k-ésimo ancestral de um nó da árvore.
+	\vfill
+
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[nodes={draw, circle, minimum size=5mm}, sibling distance=25pt, edge from parent/.append style={<-, shorten <= 2pt, shorten >= 2pt}, level distance=35pt]
+			\Tree [.\node(v1){}; [.\node(v2){}; [.\node(v3){}; [.\node(v4){}; [.\node(v5){}; ] ] [.\node(v6){}; [.\node(v7){}; ] ] ] [.\node(v8){}; ] [.\node(v9){}; ] ] [.\node(v10){}; [.\node(v11){}; ] ] ]
+
+			\tikzstyle{p2}=[->, shorten >= 2pt, shorten <= 2pt, dashed, >=stealth]
+			\tikzstyle{p4}=[->, shorten >= 2pt, shorten <= 2pt, dotted, >=stealth]
+
+			\draw[p2] (v3) edge[out=90,in=180] (v1);
+			\draw[p2] (v4) edge[out=10,in=200] (v2);
+			\draw[p2] (v5) edge[out=130,in=190] (v3);
+			\draw[p4] (v5) edge[out=150,in=160] (v1);
+			\draw[p2] (v8) edge[out=70,in=270] (v1);
+			\draw[p2] (v9) edge[out=60,in=-40] (v1);
+			\draw[p2] (v11) edge[out=30,in=20] (v1);
+			\draw[p4] (v7) edge[out=0,in=-10] (v1);
+			\draw[p2] (v6) edge[out=80,in=220] (v2);
+			\draw[p2] (v7) edge[out=50,in=-15] (v3);
+		\end{tikzpicture}
+		\caption{Exemplo de árvore com jump pointers.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Fila usando pilha}
+
+	Uma fila pode ser representada usando uma pilha e um tamanho.
+	\vfill
+
+	$Q = (P, n)$
+	\vfill
+
+	$\func{Enqueue}{Q, x} \rightarrow \func{Push}{P, x}$
+	\vfill
+	$\func{Dequeue}{Q} \rightarrow n = n - 1$
+	\vfill
+	$\func{K-th}{Q, k} \rightarrow \func{K-th}{P, k}$
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Deque persistente}
+
+	É possível implementar uma deque usando a mesma ideia da implementação da pilha.
+	\vfill
+
+	\only<1>{
+	\begin{table}
+		\centering
+
+		\begin{subalgorithm}{0.69\textwidth}
+			\begin{algorithmic}
+
+				\State $(\V{first}_0, \V{last}_0) = \Call{Deque}{\null}$
+				\State $(\V{first}_1, \V{last}_1) = \Call{PushBack}{(\V{first}_0,\V{last}_0), 3}$
+				\State $(\V{first}_2, \V{last}_2) = \Call{PushBack}{(\V{first}_1,\V{last}_1), 4}$
+				\State $(\V{first}_3, \V{last}_3) = \Call{PushFront}{(\V{first}_2,\V{last}_2), 2}$
+				\State $(\V{first}_4, \V{last}_4) = \Call{PushFront}{(\V{first}_3,\V{last}_3), 1}$
+				\State $(\V{first}_5, \V{last}_5) = \Call{PopBack}{(\V{first}_3,\V{last}_3)}$
+				\State $(\V{first}_6, \V{last}_6) = \Call{PopBack}{(\V{first}_5,\V{last}_5)}$
+				\State $(\V{first}_7, \V{last}_7) = \Call{PushFront}{(\V{first}_6,\V{last}_6), 9}$
+				\State $(\V{first}_8, \V{last}_8) = \Call{PopFront}{(\V{first}_6,\V{last}_6)}$
+				\State $(\V{first}_9, \V{last}_9) = \Call{PushFront}{(\V{first}_8,\V{last}_8), 6}$
+
+			\end{algorithmic}
+		\end{subalgorithm} \vrule
+		\begin{subalgorithm}{0.3\textwidth}
+			\begin{algorithmic}
+
+				\State $\Rightarrow$
+				\State $\Rightarrow$ 3
+				\State $\Rightarrow$ 3 4
+				\State $\Rightarrow$ 2 3 4
+				\State $\Rightarrow$ 1 2 3 4
+				\State $\Rightarrow$ 2 3
+				\State $\Rightarrow$ 2
+				\State $\Rightarrow$ 9 2
+				\State $\Rightarrow$
+				\State $\Rightarrow$ 6
+
+			\end{algorithmic}
+		\end{subalgorithm}
+		\caption{Exemplo de uso de uma deque persistente.} \label{ex:deque}
+	\end{table}}
+
+	\only<2>{
+		Uma deque é representada pelo caminho entre 2 nós.
+		\vfill
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[sibling distance=40pt, nodes={draw, minimum size=6mm}, edge from parent/.append style={<-, shorten <= 5pt, shorten >= 5pt}, level distance=40pt, level 3/.style={sibling distance=80pt}, level 1/.style={sibling distance=80pt}, scale=0.8]
+
+			\Tree [.\node[minimum size=6mm](root){};
+			[.\node(v3){3}; [.\node(v2){2}; \node(v1){1}; [.\node(v9){9}; ] ] \node(v4){4}; ]
+			\node(v6){6};
+			]
+
+			\draw (root.south west) edge (root.north east);
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root,yshift=12pt]{$\V{first}_0$} edge (root);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root,yshift=12pt]{$\V{last}_0$} edge (root);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3,yshift=12pt]{$\V{first}_1$} edge (v3);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3,yshift=12pt]{$\V{last}_1$} edge (v3);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v3]{$\V{first}_2$} edge (v3);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=12pt]{$\V{last}_2$} edge (v4);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=12pt]{$\V{first}_3$} edge (v2);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4]{$\V{last}_3$} edge (v4);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v1]{$\V{first}_4$} edge (v1);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v4,yshift=-12pt]{$\V{last}_4$} edge (v4);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2]{$\V{first}_5$} edge (v2);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v3]{$\V{last}_5$} edge (v3);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v2,yshift=-12pt]{$\V{first}_6$} edge (v2);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2,yshift=12pt]{$\V{last}_6$} edge (v2);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v9]{$\V{first}_7$} edge (v9);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v2]{$\V{last}_7$} edge (v2);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of root]{$\V{first}_8$} edge (root);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of root]{$\V{last}_8$} edge (root);
+
+			\draw[->, shorten >= 10pt] node[draw=none, left = 1cm of v6]{$\V{first}_9$} edge (v6);
+			\draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v6]{$\V{last}_9$} edge (v6);
+
+		\end{tikzpicture}
+		\caption{Arborescência criada pela sequência de operações do exemplo.}
+	\end{figure}}
 \end{frame}
 
 \end{document}

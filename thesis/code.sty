@@ -1,4 +1,4 @@
-\usepackage{listings}
+\usepackage{listings, caption}
 \captionsetup[algorithm]{labelsep=colon}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
@@ -7,6 +7,7 @@
 
 \usepackage{makerobust}
 \MakeRobustCommand{\Call} % Call inside Call is now ok
+\providecommand{\func}[2]{\mbox{\textsc{#1}$(#2)$}}
 
 %% Ruler
 \newcommand*{\algrule}[1][\algorithmicindent]{%

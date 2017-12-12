@@ -18,7 +18,6 @@ before_install:
     - tlmgr install lm
     - tlmgr install luaotfload
 script:
-    - cd thesis && texliveonfly main.tex && cd ..
     - make full NO_VALGRIND=true
 deploy:
     provider: pages
