@@ -14,7 +14,7 @@ Diferente das definições do Capítulo~\ref{cap:deque1_persist}, usaremos que a
 
 \section{Representação}
 
-Para implementar uma deque de forma persistente, não podemos usar a representação usual com lista ligada, como usamos para a pilha. Isso pois, no caso da deque, é necessário uma lista duplamente ligada, e então para adicionar um elemento é necessário \emph{mudar} campos de nós já existentes da lista, o que não resulta numa implementação como aconteceu com a pilha.
+A implementação usual de uma deque usando lista ligada utiliza uma lista duplamente ligada, e então para adicionar um elemento é necessário \emph{mudar} campos de nós já existentes da lista, o que não resulta numa implementação persistente como ocorreu com a pilha.
 
 Para conseguirmos manter a implementação funcional, mudaremos como uma deque é representada, com um esquema de representação recursiva. Para facilitar a descrição, é necessário deixar claro o conjunto de elementos que a deque pode armazenar. Seja~$T$ esse conjunto, ou seja, operações de~\textsc{Push} recebem elementos de~$T$ como argumento e operações de~\textsc{Pop} retornam elementos desse conjunto.
 
@@ -104,7 +104,7 @@ Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center
 \end{algorithm}
 
 Devido à própria recursividade da definição da estrutura, recursão é muito útil para lidar com esta estrutura.
-Assumimos sempre que todas as operações chamadas são válidas, ou seja,~\func{Front}{d} e~\func{Back}{d} são chamadas apenas quando~$d$ não é vazia, e consequentemente não nula. Veja o Código~\ref{lst:deque_acesso}.
+Assumimos sempre que todas as operações chamadas são válidas, ou seja,~\func{Front}{d} e~\func{Back}{d} são chamadas apenas quando~$d$ não é vazia, e consequentemente não nula. Veja o Código~\ref{lst:deque_acesso}. Para questões de implementação, os elementos de~$T \x T$ são representados como um par com campos~$\V{first}$ e~$\V{second}$, ou seja, se~$a, b \in T$ então~$(a, b) \in T \x T$ e vale que~$(a, b).\V{first} = a$ e~$(a, b).\V{second} = b$.
 
 Vamos analisar a função~\func{Front}{d}. Pela maneira como definimos a deque, se~$\V{prefix}$ não é nulo então ele é um prefixo de~$d$, logo seu primeiro elemento é a resposta de~\func{Front}{d}. Se não, se~$\V{center}$ não é nulo, como não guardamos deques vazias, este tem algum elemento. O valor retornado é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos do tipo~$T \times T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$. Caso contrário, o único elemento da deque é~$d.\V{suffix}$ e o valor retornado também é correto. Note que nesse caso~$d$ tem apenas um elemento.
 Portanto, a função~\func{Front}{d} funciona corretamente.
