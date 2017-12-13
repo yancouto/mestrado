@@ -493,4 +493,85 @@
 
 \end{frame}
 
+\begin{frame}[fragile]
+	\frametitle{Técnicas Gerais - Offline}
+	Se as operações são todas conhecidas de antemão, é possível resolver o problema com uma busca em profundidade na árvore de versões.
+	\vfill
+
+	\centering
+	\begin{tikzpicture}[
+	nodes = {draw, minimum size = 7mm},
+	edge from parent path = {(\tikzparentnode) -- (\tikzchildnode)},
+	sibling distance=20pt,
+	n/.style = {draw=none},
+	gr/.style = {color=gray},
+	edge from parent/.append style={-, shorten >= 0, shorten <= 0}
+			]
+	\Tree
+	[.\node(v0){\Call{Stack}{\null}};
+		[.\node(v1){\Call{Push}{5}};
+			[.\node(v2){\Call{Push}{7}};
+				\node(v3){\Call{Push}{6}};
+				[.\node(v4){\Call{Pop}{\null}};
+					\node(v5){\Call{Push}{9}};
+				]
+			]
+		]
+		\node(v6){\Call{Push}{5}};
+	]
+
+		\node[gr, above of = v3, xshift=-2.5em, yshift=0.5em](v3t){\Call{Top}{\null}};
+		\draw[gr, -, shorten >= 2pt, shorten <= 2pt, dashed] (v3t) -- (v3);
+		\node[gr, above of = v4, xshift=2.5em, yshift=0.5em](v4t){\Call{Top}{\null}};
+		\draw[gr, -, shorten >= 2pt, shorten <= 2pt, dashed] (v4t) -- (v4);
+	\end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Técnicas Gerais - Implementação Funcional}
+	Para implementar uma estrutura de forma funcional, nunca devemos modificar um nó depois de criá-lo.
+	\vfill
+
+	\tikzset{
+	nodes={circle, minimum size=6mm, draw},
+	n/.style = {draw=none},
+	b/.style = {fill=gray!40},
+	be/.style = {color=gray},
+	edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt},
+	sibling distance=20pt,
+	level distance=25pt,
+	}
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}
+			\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+		\end{tikzpicture}
+		\begin{tikzpicture}
+			\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+			\node[above of = a, b](al){$a'$};
+			\draw[->, be] (al) -- (b);
+			\draw[->, be] (al) -- (c);
+		\end{tikzpicture}
+		\begin{tikzpicture}
+			\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+			\node[above of = a, b](al){$a'$};
+			\node[above of = b, b](bl){$b'$};
+			\draw[->, be] (al) -- (bl);
+			\draw[->, be] (al) -- (c);
+			\draw[->, be] (bl) to[out=230,in=90] (d);
+		\end{tikzpicture}
+		\begin{tikzpicture}
+			\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[b](f){$f$}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
+			\node[above of = a, b](al){$a'$};
+			\node[above of = b, b](bl){$b'$};
+			\draw[->, be] (al) -- (bl);
+			\draw[->, be] (al) -- (c);
+			\draw[->, be] (bl) to[out=230,in=90] (d);
+			\draw[->, be] (bl) to[out=320,in=90] (f);
+		\end{tikzpicture}
+	\end{figure}
+
+\end{frame}
+
 \end{document}
