@@ -1,3 +1,4 @@
+\errorcontextlines=200
 \documentclass[10pt, compress]{beamer}
 
 \usetheme{m}
@@ -8,8 +9,9 @@
 \usepackage[scale=2]{ccicons}
 \usepackage{minted}
 \newcommand{\V}[1]{\mathit{#1}}
-
+\algrenewcommand\algorithmicindent{1em}
 \usemintedstyle{trac}
+\newcommand{\Oh}{\mathcal{O}}
 
 \usepackage{tikz}
 \usepackage{tikz-qtree}
@@ -254,6 +256,241 @@
 		\end{tikzpicture}
 		\caption{Arborescência criada pela sequência de operações do exemplo.}
 	\end{figure}}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Deque recursiva - Estrutura}
+
+	Uma deque de elementos de~$T$ é composta de:
+	\begin{itemize}
+		\item Um prefixo de até um elemento de~$T$
+		\item Uma deque de elementos de~$T \times T$
+		\item Um sufixo de até um elemento de~$T$
+	\end{itemize}
+
+	\tikzset{drawnode1/.style={row 2 column #1/.style={nodes={draw}}}}
+	\tikzset{drawnode2/.style={row 3 column #1/.style={nodes={draw}}}}
+	\tikzset{drawnode3/.style={row 4 column #1/.style={nodes={draw}}}}
+
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[
+				array/.style={matrix of nodes,nodes={draw=none, minimum size=4mm, anchor=center}, nodes in empty cells, row sep=1cm},
+			drawnode1/.list={1, 9, 17},
+			drawnode2/.list={2, 3, 9, 15, 16},
+			drawnode3/.list={4, 5, 6, 7, 9, 11, 12, 13, 14},
+			row 2/.style={row sep=0cm}
+		]
+
+			\matrix[array] (array) {
+				$\V{prefix}$ &  &  &  & & & & & $\V{center}$ &  & & & & &  &  & $\V{suffix}$ \\[-1cm]
+			2 &  &  &  & & & & &  &  & & & & &  &  &  \\
+			&  &  &  & & & & &  & & & & &  & 7 & 8 &  \\
+			& & & 3 & 4 & 5 & 6 &  &  &  &  &  &  &  & & & \\
+		};
+
+			\draw[dashed] (array-2-9.south west) -- (array-3-2.north west);
+			\draw[dashed] (array-2-9.south east) -- (array-3-16.north east);
+			\draw[dashed] (array-3-9.south west) -- (array-4-4.north west);
+			\draw[dashed] (array-3-9.south east) -- (array-4-14.north east);
+
+			%\draw (root.south west) edge (root.north east);
+			\newcommand{\dnull}[1] { \path[draw] (#1.south west) -- (#1.north east); }
+
+			\foreach \p in {2-17, 3-2, 3-3, 4-9, 4-11, 4-12, 4-13, 4-14} {\dnull{array-\p}}
+
+			\node[left of=array-2-1, xshift=-.2cm]{Nível 1};
+			\node[left of=array-3-1, xshift=-.2cm]{Nível 2};
+			\node[left of=array-4-1, xshift=-.2cm]{Nível 3};
+
+
+		\end{tikzpicture}
+		\caption{Deque com elementos (2, 3, 4, 5, 6, 7, 8)}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Deque recursiva - Acesso}
+
+	O acesso, e todas as outras operações, são feitos de forma recursiva.
+	\vfill
+
+	\begin{algorithmic}[1]
+	\Function{Front}{$d$}
+		\If{$d.\V{prefix} \neq \Null$}
+			\State \Return $d.\V{prefix}$
+		\ElsIf{$d.\V{center} = \Null$}
+			\State \Return $d.\V{suffix}$
+		\Else
+			\State \Return \func{Front}{d.\V{center}}$.\V{first}$
+		\EndIf
+	\EndFunction
+	\end{algorithmic}
+
+	\vfill
+	As funções do tipo~\textsc{Back} são simétricas às do tipo~\textsc{Front}.
+\end{frame}
+
+\begin{frame}[fragile]
+	\only<1>{\frametitle{Deque recursiva - Inserção}}
+	\only<2>{\frametitle{Deque recursiva - Remoção}}
+
+	Para as operações de modificação, nunca modificamos um nó existente.
+	\vfill
+
+	Pelo mesmo motivo que a pilha, a implementação é persistente.
+	\vfill
+
+	\only<1>{
+	\begin{algorithmic}[1]
+	\Function{PushFront}{$d, x$}
+		\If{$d = \Null$}
+			\State \Return \New \func{Node}{x, \Null, \Null} \label{line:dm:puf1}
+		\ElsIf{$d.\V{prefix} = \Null$} \label{line:dm:puf2}
+			\State \Return \New \func{Node}{x, d.\V{center}, d.\V{suffix}}\label{line:dm:puf2_1}
+		\Else
+			{\State \small\Return\!\New\!\func{Node}{\Null, \Call{PushFront}{d.\V{center}, (x, d.\V{prefix})}, d.\V{suffix}}}
+		\EndIf
+	\EndFunction
+	\end{algorithmic}
+	}
+
+	\only<2>{
+	\begin{algorithmic}[1]
+	\Function{PopFront}{$d$}
+		\If{$d.\V{prefix} \neq \Null \And d.\V{center} = \Null \And d.\V{suffix} = \Null$}
+			\State \Return $(d.\V{prefix}, \Null)$
+		\ElsIf{$d.\V{prefix} \neq \Null$}
+			\State \Return $(d.\V{prefix}, \New \textsc{Node}({\Null, d.\V{center}, d.\V{suffix}}) )$
+		\ElsIf{$d.\V{center} = \Null$}
+			\State \Return $(d.\V{suffix}, \Call{Deque}{\null})$
+		\Else
+			\State $(x, c) = \Call{PopFront}{d.\V{center}}$
+			\State \Return $(x.\V{first}, \New \Call{Node}{x.second, c, d.\V{suffix}})$
+		\EndIf
+	\EndFunction
+	\end{algorithmic}
+	}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Deque recursiva - K-ésimo}
+
+	Similar a decompor um número em soma de potências de dois.
+	\vfill
+
+	\begin{algorithmic}[1]
+		\Function{k-th}{$d, k$}
+			\If{$k = 1 \And d.\V{prefix} \neq \Null$} 
+				\State \Return $d.\V{prefix}$\label{line:kth:if1}
+			\EndIf
+			\If{$k = d.\V{size} \And d.\V{suffix} \neq \Null$}
+				\State \Return $d.\V{suffix}$ \label{line:kth:if2}
+			\EndIf
+			\If{$d.\V{prefix} \neq \Null$} 
+				\State $k = k - 1$ \label{line:kth:if3}
+			\EndIf
+			\If{$k$ is odd}
+				\State \Return $\Call{k-th}{d.\V{center}, \left\lceil\frac{k}{2}\right\rceil}.\V{first}$
+			\Else
+				\State \Return $\Call{k-th}{d.\V{center}, \left\lceil\frac{k}{2}\right\rceil}.\V{second}$
+			\EndIf
+		\EndFunction
+	\end{algorithmic}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Contadores binários redundantes regulares}
+
+	Um contador binário é \alert{redundante} se cada dígito pode ser 0, 1 ou 2.
+	\vfill
+
+	Um contador binário redundante é \alert{regular} se tem 0s entre os 2s e entre o primeiro 2 e o começo.
+	\vfill
+
+	É possível adicionar 1 a um contador binário redundante regular mudando~$\Oh(1)$ dígitos.
+	\vfill
+
+	\begin{figure}
+	\centering
+
+	\begin{tikzpicture}[
+	array/.style={matrix of nodes,nodes={draw, minimum size=5mm, anchor=center}, nodes in empty cells},
+	column 1/.style={nodes={draw=none}},
+	row 1/.style={nodes={draw=none}},
+	row 2 column 6/.style={nodes={draw=none}}
+	]
+
+	\matrix[array] (array) {
+		   &        & $i$ & & &  & & $i$  \\
+	Caso 1\ \  & \ldots & 2 & 0/1 & \ldots & \hspace{.8cm}$\Rightarrow$\hspace{.8cm} &
+				 \ldots & 0 & 1/2 & \ldots  \\
+	 };
+	\end{tikzpicture}
+
+	\begin{tikzpicture}[
+	array/.style={matrix of nodes,nodes={draw, minimum size=5mm, anchor=center}, nodes in empty cells},
+	column 1/.style={nodes={draw=none}},
+	row 1/.style={nodes={draw=none}},
+	row 2 column 7/.style={nodes={draw=none}}
+	]
+
+	\matrix[array] (array) {
+		   &        & $i$ & & & $j$ & & & $i$ & & & $j$ \\
+	Caso 2\ \  & \ldots & 2 & 0 & \ldots & 2 & \hspace{.8cm}$\Rightarrow$\hspace{.8cm} &
+				 \ldots & 0 & 1 & \ldots & 2  \\
+	 };
+	\end{tikzpicture}
+
+	\begin{tikzpicture}[
+	array/.style={matrix of nodes,nodes={draw, minimum size=5mm, anchor=center}, nodes in empty cells},
+	column 1/.style={nodes={draw=none}},
+	row 1/.style={nodes={draw=none}},
+	row 2 column 9/.style={nodes={draw=none}}
+	]
+
+	\matrix[array] (array) {
+	 & & $i$ & & & & & $j$ & & & $i$ & & & & & $j$ \\
+	Caso 3\ \  & \ldots & 2 & 1 & \ldots & 0 & \ldots & 2 & \hspace{.8cm}$\Rightarrow$\hspace{.8cm} &
+				 \ldots & 0 & 2 & \ldots & 0 & \ldots & 2 \\
+	 };
+	\end{tikzpicture}
+
+	\caption{Casos possíveis.}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Deque de Kaplan e Tarjan}
+
+	Baseada na deque recursiva, usando a ideia de contadores binários redundantes regulares.
+	\vfill
+
+	Os prefixos e sufixos são ``sub-deques'' de até 5 elementos.
+	\vfill
+
+	Implementação mais complicada (muita análise de casos).
+	\vfill
+
+	\begin{figure}
+	\centering
+
+	\begin{tikzpicture}[
+	array/.style={matrix of nodes,nodes={draw, minimum size=5mm, anchor=center}, nodes in empty cells},
+	row 1/.style={nodes={draw=none}},
+	column 1/.style={nodes={draw=none}},
+	]
+
+	\matrix[array] (array) {
+		Dígito\ \  & 2 & 1 & 0 & 0 & 1 & 2 \\
+		Elementos na deque\ \  & 0 & 1 & 2 & 3 & 4 & 5 \\
+	 };
+	\end{tikzpicture}
+	\end{figure}
+
 \end{frame}
 
 \end{document}
