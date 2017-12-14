@@ -137,11 +137,11 @@
 			\draw[p2] (v4) edge[out=10,in=200] (v2);
 			\draw[p2] (v5) edge[out=130,in=190] (v3);
 			\draw[p4] (v5) edge[out=150,in=160] (v1);
-			\draw[p2] (v8) edge[out=70,in=270] (v1);
-			\draw[p2] (v9) edge[out=60,in=-40] (v1);
+			\draw[p2] (v8) edge[out=70,in=250] (v1);
+			\draw[p2] (v9) edge[out=80,in=-70] (v1);
 			\draw[p2] (v11) edge[out=30,in=20] (v1);
 			\draw[p4] (v7) edge[out=0,in=-10] (v1);
-			\draw[p2] (v6) edge[out=80,in=220] (v2);
+			\draw[p2] (v6) edge[out=80,in=240] (v2);
 			\draw[p2] (v7) edge[out=50,in=-15] (v3);
 		\end{tikzpicture}
 		\caption{Exemplo de árvore com jump pointers.}
@@ -701,7 +701,7 @@
 	\end{tikzpicture}
 \end{frame}
 
-\plain{}{\alert{Planejamento \\[1ex] \hline \\[1ex] Retroatividade}}
+\plain{} {\alert{Planejamento \\[-1ex] \hrulefill \\[-1ex]  Retroatividade} }
 
 \begin{frame}[fragile]
 	\frametitle{Resultados Gerais}
@@ -747,7 +747,7 @@
 	\vfill
 
 	\begin{tikzpicture}
-		\draw (0, 0) edge[->] node[middway,left]{Valor} (0, 5);
+		\draw (0, 0) edge[->] node[midway,left]{Valor} (0, 5);
 		\draw (0, 0) edge[->] node[midway,below]{Tempo} (10, 0);
 		\draw (5, 5) -- (10, 5);
 		\draw (1.5, 3.5) -- (10, 3.5);
@@ -791,6 +791,75 @@
 		\Tree [.\node[orange]{a}; \edge[orange] node[auto]{3}; [.\node[orange]{b}; \edge node[auto]{2}; e \edge[orange] node[auto]{1}; \node[orange]{f}; ]  \edge node[auto]{5}; [.c \edge node[auto]{4}; [.d ] ] ];
 	\end{tikzpicture}
 	\end{center}
+\end{frame}
+
+\plain{} {\alert{Planejamento \\[-1ex] \hrulefill \\[-1ex]  Preliminares}}
+
+\begin{frame}[fragile]
+	\frametitle{Ancestrais em árvores}
+
+	Duas técnicas para encontrar Ancestral Comum Mais Profundo e Ancestral de Nível.
+	\vfill
+
+	\begin{figure}
+		\centering
+		\begin{minipage}{0.49\textwidth}
+		\begin{tikzpicture}[nodes={draw, circle, minimum size=5mm}, sibling distance=25pt, edge from parent/.append style={<-, shorten <= 2pt, shorten >= 2pt}, level distance=35pt, scale=.6]
+			\Tree [.\node(v1){}; [.\node(v2){}; [.\node(v3){}; [.\node(v4){}; [.\node(v5){}; ] ] [.\node(v6){}; [.\node(v7){}; ] ] ] [.\node(v8){}; ] [.\node(v9){}; ] ] [.\node(v10){}; [.\node(v11){}; ] ] ]
+
+			\tikzstyle{p2}=[->, shorten >= 2pt, shorten <= 2pt, dashed, >=stealth]
+			\tikzstyle{p4}=[->, shorten >= 2pt, shorten <= 2pt, dotted, >=stealth]
+
+			\draw[p2] (v3) edge[out=90,in=180] (v1);
+			\draw[p2] (v4) edge[out=10,in=200] (v2);
+			\draw[p2] (v5) edge[out=130,in=190] (v3);
+			\draw[p4] (v5) edge[out=150,in=160] (v1);
+			\draw[p2] (v8) edge[out=70,in=250] (v1);
+			\draw[p2] (v9) edge[out=80,in=-70] (v1);
+			\draw[p2] (v11) edge[out=30,in=20] (v1);
+			\draw[p4] (v7) edge[out=0,in=-10] (v1);
+			\draw[p2] (v6) edge[out=80,in=240] (v2);
+			\draw[p2] (v7) edge[out=50,in=-15] (v3);
+		\end{tikzpicture}
+		\end{minipage}
+		\begin{minipage}{0.5\textwidth}
+		\begin{tikzpicture}[nodes={draw, circle, minimum size=5mm}, sibling distance=25pt, edge from parent/.append style={<-, shorten <= 2pt, shorten >= 2pt}, level distance=35pt, scale=.6]
+			\Tree [.\node(v1){}; [.\node(v2){}; [.\node(v3){}; [.\node(v4){}; [.\node(v5){}; ] ] [.\node(v6){}; [.\node(v7){}; ] ] ] [.\node(v8){}; ] [.\node(v9){}; ] ] [.\node(v10){}; [.\node(v11){}; ] ] ]
+
+			\tikzstyle{p2}=[->, shorten >= 2pt, shorten <= 2pt, dashed, >=stealth]
+			\tikzstyle{p4}=[->, shorten >= 2pt, shorten <= 2pt, dotted, >=stealth]
+
+			\draw[p2] (v2) edge[bend left] (v1);
+			\draw[p2] (v4) edge[in=170,out=90] (v1);
+			\draw[p2] (v10) edge[bend right] (v1);
+			\draw[p2] (v11) edge[bend right] (v10);
+			\draw[p2] (v9) edge[bend right] (v2);
+			\draw[p2] (v3) edge[bend left] (v2);
+			\draw[p2] (v8) edge[bend left] (v2);
+			\draw[p2] (v5) edge[bend left] (v4);
+			\draw[p2] (v7) edge[bend right] (v6);
+			\draw[p2] (v6) edge[in=-90,out=10] (v1);
+
+		\end{tikzpicture}
+		\end{minipage}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{ABBs modificadas}
+
+	Explicar ABBs usadas em fila, pilha e deque retroativas.
+	\vfill
+
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[every tree node/.style={draw, circle}, sibling distance=25pt]
+			\Tree [.9 [.5 [.3 1 1 ] 1 ] [.3 1 1 ] ];
+		\end{tikzpicture}
+		\caption{ABB que armazena o tamanho da subárvore em cada nó.}
+	\end{figure}
+
 \end{frame}
 
 \plain{}{\alert{Obrigado}}
