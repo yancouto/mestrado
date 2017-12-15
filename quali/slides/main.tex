@@ -363,7 +363,7 @@
 		\ElsIf{$d.\V{prefix} \neq \Null$}
 			\State \Return $(d.\V{prefix}, \New \textsc{Node}({\Null, d.\V{center}, d.\V{suffix}}) )$
 		\ElsIf{$d.\V{center} = \Null$}
-			\State \Return $(d.\V{suffix}, \Call{Deque}{\null})$
+			\State \Return $(d.\V{suffix}, \Null)$
 		\Else
 			\State $(x, c) = \Call{PopFront}{d.\V{center}}$
 			\State \Return $(x.\V{first}, \New \Call{Node}{x.second, c, d.\V{suffix}})$
@@ -576,7 +576,7 @@
 \begin{frame}[fragile]
 	\frametitle{Técnicas gerais - Fat node}
 
-	É possível conseguir persistencia parcial trocando cada campo de cada objeto por um vetor de pares.
+	É possível conseguir persistência parcial trocando cada campo de cada objeto por um vetor de pares.
 	\vfill
 	$(i, v)$ --- A $i$-ésima operação de modificação alterou aquele campo para o valor~$v$.
 	\vfill
@@ -605,9 +605,9 @@
 	\vfill
 	Armazenamos um vetor de ponteiros extras em cada nó, e um vetor de ponteiros de volta.
 	\vfill
-	Ao fazer uma modificação a um vértice, copiamos ele e atualizamos os ponteiros que apontam pra ele.
+	Ao fazer uma modificação a um vértice, o copiamos e atualizamos todos os nós com ponteiros que apontam para ele.
 	\vfill
-	Se não houver espaço nos ponteiros extras, copiamos estes nós recursivamente.
+	Se não houver espaço nos ponteiros extras de algum destes nós, o copiamos recursivamente.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -708,7 +708,7 @@
 	Não é possível tornar qualquer estrutura em retroativa de forma eficiente.
 	\vfill
 
-	Se fosse, poderiamos avaliar um polinômio em um ponto de forma rápida.
+	Se fosse, poderíamos avaliar um polinômio em um ponto de forma rápida.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -740,7 +740,7 @@
 \begin{frame}[fragile]
 	\frametitle{Fila de prioridade}
 
-	A ``vida'' de um elemento em uma fila de prioridade é uma semireta ou um \raisebox{\depth}{\rotatebox{180}{L}}.
+	A ``vida'' de um elemento em uma fila de prioridade é uma semirreta ou um \raisebox{\depth}{\rotatebox{180}{L}}.
 	\vfill
 
 	Essas retas não se intersectam.
