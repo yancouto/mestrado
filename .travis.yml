@@ -18,7 +18,7 @@ before_install:
     - tlmgr install lm
     - tlmgr install luaotfload
 script:
-    - make full NO_VALGRIND=true
+    - make full NO_VALGRIND=true NO_QUALI=true
 deploy:
     provider: pages
     skip_cleanup: true
