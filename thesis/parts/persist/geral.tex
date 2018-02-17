@@ -134,7 +134,7 @@ Então, é possível transformar qualquer estrutura ligada em totalmente persist
 
 \section{Implementação funcional} \label{sec:implfuncional}
 
-A técnica que usamos nas estruturas apresentadas até agora é tornar a implementação funcional, ou seja, nunca modificar nenhum campo de um nó já criado. Esse tipo de implementação é bastante ligada a linguagens funcionais, e implementações desta forma vão de pilhas a ABBBs~\cite{HoodMelville,KaplanT1999,Myers82,Myers83,Myers84}.
+A técnica que usamos nas estruturas apresentadas até agora é tornar a implementação funcional, ou seja, nunca modificar nenhum campo de um nó já criado. Esse tipo de implementação é bastante ligada a linguagens funcionais, e implementações desta forma vão de pilhas a ABBBs~\cite{HoodMelville,KaplanT1999,Myers83,Myers84}.
 
 Se for possível implementar a estrutura desta forma, ela se torna totalmente persistente. De fato, se temos os nós de entrada da versão~$i$, e nenhum nó foi modificado, os nós que podem ser acessados a partir desses são exatamente os mesmos de quando a versão~$i$ foi criada, independente de versões criadas posteriormente. Logo, apenas armazenando os nós de entrada (e não apagando nenhum nó), tornamos nossa estrutura totalmente persistente.
 

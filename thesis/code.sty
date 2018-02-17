@@ -9,6 +9,11 @@
 \MakeRobustCommand{\Call} % Call inside Call is now ok
 \providecommand{\func}[2]{\mbox{\textsc{#1}$(#2)$}}
 
+\newcommand{\retval}[1]{$\longrightarrow$ #1}
+\newcommand{\funcAPI}[2]{\mbox{\underline{\textsc{#1}}$(#2)$}}
+\newcommand{\funcAPIr}[3]{\mbox{\underline{\textsc{#1}}$(#2)$\retval{#3}}}
+\newcommand{\type}[1]{\colon \text{#1}}
+
 %% Ruler
 \newcommand*{\algrule}[1][\algorithmicindent]{%
   \makebox[#1][l]{%
@@ -69,5 +74,8 @@
 \algtext*{Indent}
 \algtext*{EndIndent}
 
+
 \newcommand{\pluseq}{\mathbin{{\tiny +}{=}}}
 
+% Used for API functions for the DS
+\newcommand{\API}[1]{\textsc{\underline{#1}}}
