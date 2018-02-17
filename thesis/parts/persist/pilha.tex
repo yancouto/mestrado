@@ -14,10 +14,10 @@ Para manipular estruturas persistentes, é conveniente que, ao chamar uma opera�
 		\\ Devolve uma cópia da pilha~$p$ com o valor~$x$ inserido em seu fim.
 	\item \funcAPI{Pop}{p}
 		\\ Devolve uma cópia da pilha~$p$ com seu último elemento removido.
-	\item \funcAPI{Top}{p}
-		\\ Devolve o último elemento da pilha~$p$.
 	\item \funcAPI{Size}{p}
 		\\ Devolve o número de elementos na pilha~$p$.
+	\item \funcAPI{Top}{p}
+		\\ Devolve o último elemento da pilha~$p$.
 	\item \funcAPI{k-th}{p, k}
 		\\ Devolve o $k$-ésimo elemento da pilha~$p$.
 \end{itemize}
@@ -181,62 +181,80 @@ A Tabela~\ref{tab:pilha_persist} mostra o consumo de tempo e espaço de uma pilh
 	& Representação Binária & Skew-Binary \\ \hline
 	\funcAPI{Stack}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Push}{p, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{Pop}{p, x} & $\Oh(1)$ & $\Oh(1)$ \\
-	\funcAPI{Top}{p, x} & $\Oh(1)$ & $\Oh(1)$ \\
-	\funcAPI{Size}{p, x} & $\Oh(1)$ & $\Oh(1)$ \\
-	\funcAPI{k-th}{p, x} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
+	\funcAPI{Pop}{p} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{Top}{p} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{Size}{p} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{k-th}{p, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Consumo de tempo e espaço da implementação de uma pilha de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho atual da pilha. \label{tab:pilha_persist}} % TODO esta junto com o exemplo que não devia ser table
+	\caption{Consumo de tempo e espaço da implementação de uma pilha de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho atual da pilha. \label{tab:pilha_persist}}
 \end{table}
 
 \section{Filas persistentes}
 
-Filas são estruturas quase tão simples quanto pilhas. Elas também são listas, e permitem inserções no começo e remoções no final. Mais precisamente, permitem as seguintes operações:
+Filas são estruturas quase tão simples quanto pilhas. Elas também são listas, e permitem inserções no final e remoções no começo. Mais precisamente, filas de acesso aleatório permitem as seguintes operações:
 
 \begin{itemize}
-	\item \funcAPI{Queue}{} --- Devolve uma fila vazia.
-	\item \funcAPI{Enqueue}{q, x} --- Devolve uma fila igual a~$q$ com o valor~$x$ inserido no seu começo.
-	\item \funcAPI{Last}{q} --- Devolve o último elemento da fila~$q$.
-	\item \funcAPI{k-th}{q, k} --- Devolve o~\mbox{$k$-ésimo} elemento da fila~$q$.
-	\item \funcAPI{Dequeue}{q} --- Devolve uma fila igual a~$q$ com seu último elemento removido.
+	\item \funcAPI{Queue}{}
+		\\ Devolve uma fila vazia.
+	\item \funcAPI{Enqueue}{q, x}
+		\\ Devolve uma cópia da fila~$q$ com o valor~$x$ inserido em seu fim.
+	\item \funcAPI{Dequeue}{q}
+		\\ Devolve uma cópia da fila~$q$ com seu primeiro elemento removido.
+	\item \funcAPI{First}{q}
+		\\ Devolve o primeiro elemento da fila~$q$.
+	\item \funcAPI{k-th}{q, k}
+		\\ Devolve o~\mbox{$k$-ésimo} elemento da fila~$q$.
 \end{itemize}
 
-É possível, como com pilhas, implementar uma fila usando lista ligada. A lista torna-se uma árvore quando se adiciona a persistência. É necessário também, para cada versão, armazenar o tamanho atual da fila, ou seja, a fila deixa de ser apenas um nó da árvore e passa a ser um objeto que contém um nó e um inteiro. Seria então necessário usar~Level Ancestor na operação~\funcAPI{k-th}{q, k} ou~\funcAPI{Last}{q}.
+É possível, como com pilhas, implementar uma fila usando lista ligada. A lista torna-se uma árvore quando se adiciona a persistência. Seria então necessário usar a solução para o problema do~Ancestral de Nível nas operações~\funcAPI{k-th}{q, k} e~\funcAPI{Last}{q}.
 
-Utilizaremos, entretanto, as próprias funções de pilha para implementar uma fila. Uma fila é representada por um par em que o primeiro elemento é uma pilha e o segundo é o tamanho da fila. No pseudocódigo, usaremos que~$(p,s)$ cria um par ordenado contendo a pilha~$p$ e um inteiro~$s$, e todo par tem os campos~$\V{stack}$ e~$\V{size}$ contendo cada um de seus elementos.
+Utilizaremos, entretanto, as próprias funções de pilha para implementar uma fila. Uma fila é representada por um par em que o primeiro elemento é uma pilha e o segundo é o número de elementos que já foram removidos da fila. No pseudocódigo, usaremos que~$(p,\,r)$ cria um par ordenado contendo a pilha~$p$ e um inteiro~$r$, e todo par tem os campos~$\V{stack}$ e~$\V{rem}$ contendo cada um de seus elementos.
 Assumimos que criar pares, e devolvê-los por função, consome tempo constante.
 
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Function{Queue}{\null}
-    \State \Return $(\Null,\,0)$
+\Function{\underline{Queue}}{\null}
+	\State \Return $(\Null,\,0)$
 \EndFunction
 
-\Function{Enqueue}{$q, x$}
-    \State \Return $(\Call{Push}{q.\V{stack}, x},\,q.\V{size} + 1)$
+\Function{\underline{Enqueue}}{$q, x$}
+	\State \Return $(\Call{Push}{q.\V{stack}, x},\,q.\V{rem})$
 \EndFunction
 
-\Function{k-th}{$q, k$}
-    \State \Return $\Call{k-th}{q.\V{stack}, k}$ \Comment{Função homônima da pilha}
+\Function{\underline{Dequeue}}{$q$}
+	\State \Return $(q.\V{stack},\,q.\V{rem} + 1)$
 \EndFunction
 
-\Function{Last}{$q$}
-    \State \Return $\Call{k-th}{q.\V{stack}, q.\V{size}}$ \Comment{Função homônima da pilha}
+\Function{\underline{First}}{$q$}
+	\State \Return $\funcAPI{k-th}{q.\V{stack}, q.\V{rem} + 1}$ \Comment{Função homônima da pilha}
 \EndFunction
 
-\Function{Dequeue}{$q$}
-    \State \Return $(q.\V{stack},\,q.\V{size} - 1)$
+\Function{\underline{k-th}}{$q, k$}
+	\State \Return $\funcAPI{k-th}{q.\V{stack}, q.\V{rem} + k}$ \Comment{Função homônima da pilha}
 \EndFunction
 
 \end{algorithmic}
-\caption{Fila persistente.} \label{lst:eila}
+\caption{Fila de acesso aleatório persistente.} \label{lst:fila}
 \end{algorithm}
 
-O Código~\ref{lst:fila} mostra a implementação das operações da fila. A correção segue diretamente da correção das funções para pilha. De fato, podendo acessar qualquer elemento de uma pilha, implementar uma fila é simples, já que usamos apenas as operações~\textsc{Push} e~\textsc{k-th}, e simplesmente ignoramos os elementos que existem após o final da fila.
+O Código~\ref{lst:fila} mostra a implementação das operações da fila. A correção segue diretamente da correção das funções para pilha. De fato, podendo acessar qualquer elemento de uma pilha, implementar uma fila é simples, já que usamos apenas as operações~\textsc{Push} e~\textsc{k-th}, e simplesmente ignoramos os elementos que existem antes do começo da fila.
 
-Sempre assumimos que todas as chamadas de operações são válidas, ou seja, nunca haverá uma chamada para~\funcAPI{k-th}{q, k} com~$k$ maior que o tamanho de~$q$, de modo que os elementos após o final da fila nunca serão acessados indevidamente.
+%Sempre assumimos que todas as chamadas de operações são válidas, ou seja, nunca haverá uma chamada para~\funcAPI{k-th}{q, k} com~$k$ maior que o tamanho de~$q$, de modo que os elementos antes do começo da fila nunca serão acessados indevidamente.
 
-Desde que a implementação da pilha seja persistente, a implementação da fila é persistente pois nunca modifica nenhum par, apenas cria novos objetos. As funções~\textsc{Queue} e~\textsc{Dequeue} consomem tempo e espaço constante. As funções~\textsc{Enqueue}, \textsc{Last} e~\textsc{k-th} consomem tempo~$\Oh(\lg n)$, onde~$n$ é o número de versões anteriores a~$q$, e~\textsc{Enqueue} também consome espaço~$\Oh(\lg n)$.
+Desde que a implementação da pilha seja persistente, a implementação da fila é persistente pois nunca modifica nenhum par, apenas cria novos objetos. A Tabela~\ref{tab:fila_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
+
+\begin{table} \centering
+\begin{tabular}{|l|c|c|}
+	\hline
+	& Representação Binária & Skew-Binary \\ \hline
+	\funcAPI{Queue}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{Enqueue}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{Dequeue}{q} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{First}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
+	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Consumo de tempo e espaço da implementação de uma fila de acesso aleatório persistente, usando cada uma das implementações de pilha persistente, onde~$n$ é o tamanho atual da fila. \label{tab:fila_persist}}
+\end{table}
 
 \end{document}
