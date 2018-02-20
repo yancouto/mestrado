@@ -129,7 +129,7 @@ Para adicionar um elemento no início da deque, criamos uma nova folha conectada
 
 Para remover um elemento do começo, alteramos apenas~$\V{first}$ para apontar para o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$; para remover um elemento do final, alteramos~$\V{last}$ para apontara para o penúltimo elemento do caminho de~$\V{first}$ para~$\V{last}$. Como fazer essas operações será discutido nas próximas seções. Na Figura~\ref{fig:deque_ex1} ao remover o último elemento da deque~$(\V{first}_5, \V{last}_5)$ obtemos a deque~$(\V{first}_6, \V{last}_6)$.
 
-Devemos ter uma representação especial para deques vazias, por exemplo o valor~\keyword{null} em~$\V{first}$ e~$\V{last}$. Ao remover um elemento de uma deque com um único elemento (quando~$\V{first}=\V{last}$), retornamos este nó vazio; e para adicionar algum elemento à deque vazia basta criamos e retornamos um novo nó que aponta para~\keyword{null}. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em que a raiz é~\keyword{null}, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha_persist}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
+Devemos ter uma representação especial para deques vazias, por exemplo o valor~\keyword{null} em~$\V{first}$ e~$\V{last}$. Ao remover um elemento de uma deque com um único elemento (quando~$\V{first}=\V{last}$), devolvemos este nó vazio; e para adicionar algum elemento à deque vazia basta criamos e devolvemos um novo nó que aponta para~\keyword{null}. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em que a raiz é~\keyword{null}, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha_persist}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
 
 \section{Acesso e inserção}
 
@@ -173,7 +173,7 @@ Uma deque é representada por um par ordenado de nós. Usaremos~$(a, b)$ para cr
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:deque1_ops1} mostra a implementação das operações mais simples. A função~$\Call{Swap}{d}$ retorna o inverso da deque~$d$ (basta trocar seus dois vértices), e é usada para diminuir a necessidade de duplicar código entre as operações~\API{\textsc{PushFront}} e~\API{\textsc{PushBack}}, assim como~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}.
+O Código~\ref{lst:deque1_ops1} mostra a implementação das operações mais simples. A função~$\Call{Swap}{d}$ devolve o inverso da deque~$d$ (basta trocar seus dois vértices), e é usada para diminuir a necessidade de duplicar código entre as operações~\API{\textsc{PushFront}} e~\API{\textsc{PushBack}}, assim como~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}.
 
 As implementações dadas são funcionais e mantêm a propriedade que os elementos de uma deque são os valores dos nós no caminho de seu campo~$\V{first}$ para~$\V{last}$.
 
@@ -228,6 +228,22 @@ Para implementar a operação~\funcAPI{k-th}{d, k}, é necessário comparar~$k-1
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:deque1_ops3} faz exatamente o que discutido, e portanto corretamente retorna o $k$-ésimo elemento da deque, se~$k$ é válido, ou seja, está entre~1 e o tamanho da deque.
+O Código~\ref{lst:deque1_ops3} faz exatamente o que discutido, e portanto corretamente devolve o $k$-ésimo elemento da deque, se~$k$ é válido, ou seja, está entre~1 e o tamanho da deque. A Tabela~\ref{tab:deque1_persist} mostra o consumo de tempo e espaço da implementação discutida nesse capítulo, usando o Ancestral de Nível do Capítulo~\ref{cap:ancestrais} e~\ref{cap:skew}.
+
+\begin{table} \centering
+\begin{tabular}{|l|c|c|}
+	\hline
+	& Representação Binária & Skew-Binary \\ \hline
+	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushFront}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushBack}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{Front}{q} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{Back}{q} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{PopFront}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
+	\funcAPI{PopBack}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
+	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Consumo de tempo e espaço da implementação de uma deque de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho atual da deque. \label{tab:deque1_persist}}
+\end{table}
 
 \end{document}
