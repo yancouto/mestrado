@@ -11,7 +11,7 @@ Para manipular estruturas persistentes, é conveniente que, ao chamar uma opera�
 	\item \funcAPI{Stack}{}
 		\\ Devolve uma pilha vazia.
 	\item \funcAPI{Push}{p, x}
-		\\ Devolve uma cópia da pilha~$p$ com o valor~$x$ inserido em seu fim.
+		\\ Devolve uma cópia da pilha~$p$ com o valor~$x$ inserido no seu fim.
 	\item \funcAPI{Pop}{p}
 		\\ Devolve uma cópia da pilha~$p$ com seu último elemento removido.
 	\item \funcAPI{Size}{p}
@@ -22,7 +22,7 @@ Para manipular estruturas persistentes, é conveniente que, ao chamar uma opera�
 		\\ Devolve o $k$-ésimo elemento da pilha~$p$.
 \end{itemize}
 
-As operações são o meio com o qual o ``usuário'' lida com a ED, no resto do capítulo descreveremos como implementar tais operações. Para deixar clara a notação, operações são \underline{sublinhadas} e funções auxiliares (que usamos para nos ajudar a implementar as operações) não são.
+As operações são o meio com o qual o ``usuário'' lida com a ED, no resto do capítulo descreveremos como implementar tais operações. Para deixar clara a notação, operações são \API{sublinhadas} e funções auxiliares (que usamos para nos ajudar a implementar as operações) não são.
 
 Na literatura, é usual chamar o último elemento de uma pilha de~\emph{topo}, porém, como a operação~\API{k-th} necessita que os elementos tenham uma ordem e sentido, deixamos claro na descrição das operações qual é o primeiro e o último elemento.
 
@@ -46,11 +46,11 @@ O Código~\ref{lst:pilhapersist} mostra a implementação de tal pilha persisten
 \caption{Pilha persistente.} \label{lst:pilhapersist}
 \begin{algorithmic}[1]
 
-\Function{\underline{Stack}}{\null}
+\Function{\API{Stack}}{\null}
 	\State \Return \Null
 \EndFunction
 
-\Function{\underline{Size}}{p}
+\Function{\API{Size}}{p}
 	\If{$p = \Null$}
 		\State \Return $0$
 	\Else
@@ -58,15 +58,15 @@ O Código~\ref{lst:pilhapersist} mostra a implementação de tal pilha persisten
 	\EndIf
 \EndFunction
 
-\Function{\underline{Push}}{$p, x$}
+\Function{\API{Push}}{$p, x$}
 	\State \Return \New \func{Node}{x, p, \funcAPI{Size}{p} + 1}
 \EndFunction
 
-\Function{\underline{Top}}{$p$}
+\Function{\API{Top}}{$p$}
 	\State \Return $p.\V{val}$
 \EndFunction
 
-\Function{\underline{Pop}}{$p$}
+\Function{\API{Pop}}{$p$}
 	\State \Return $p.\V{next}$
 \EndFunction
 
@@ -200,6 +200,8 @@ Filas são estruturas quase tão simples quanto pilhas. Elas também são listas
 		\\ Devolve uma cópia da fila~$q$ com o valor~$x$ inserido em seu fim.
 	\item \funcAPI{Dequeue}{q}
 		\\ Devolve uma cópia da fila~$q$ com seu primeiro elemento removido.
+	\item \funcAPI{Size}{q}
+		\\ Devolve o número de elementos na fila~$q$.
 	\item \funcAPI{First}{q}
 		\\ Devolve o primeiro elemento da fila~$q$.
 	\item \funcAPI{k-th}{q, k}
@@ -214,23 +216,27 @@ Assumimos que criar pares, e devolvê-los por função, consome tempo constante.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Function{\underline{Queue}}{\null}
+\Function{\API{Queue}}{\null}
 	\State \Return $(\Null,\,0)$
 \EndFunction
 
-\Function{\underline{Enqueue}}{$q, x$}
+\Function{\API{Enqueue}}{$q, x$}
 	\State \Return $(\Call{Push}{q.\V{stack}, x},\,q.\V{rem})$
 \EndFunction
 
-\Function{\underline{Dequeue}}{$q$}
+\Function{\API{Dequeue}}{$q$}
 	\State \Return $(q.\V{stack},\,q.\V{rem} + 1)$
 \EndFunction
 
-\Function{\underline{First}}{$q$}
+\Function{\API{Size}}{$q$}
+	\State \Return $\funcAPI{Size}{q.\V{stack}} - q.\V{rem}$ \Comment{Função homônima da pilha}
+\EndFunction
+
+\Function{\API{First}}{$q$}
 	\State \Return $\funcAPI{k-th}{q.\V{stack}, q.\V{rem} + 1}$ \Comment{Função homônima da pilha}
 \EndFunction
 
-\Function{\underline{k-th}}{$q, k$}
+\Function{\API{k-th}}{$q, k$}
 	\State \Return $\funcAPI{k-th}{q.\V{stack}, q.\V{rem} + k}$ \Comment{Função homônima da pilha}
 \EndFunction
 
@@ -251,6 +257,7 @@ Desde que a implementação da pilha seja persistente, a implementação da fila
 	\funcAPI{Queue}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Enqueue}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Dequeue}{q} & $\Oh(1)$ & $\Oh(1)$ \\
+	\funcAPI{Size}{q} & $\Oh(1)$ & $\Oh(1)$ \\
 	\funcAPI{First}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
 	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
