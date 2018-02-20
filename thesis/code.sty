@@ -55,13 +55,13 @@
 \DeclareCaptionSubType*{algorithm}
 \renewcommand\thesubalgorithm{\thetable\alph{subalgorithm}}
 
-\let\And\undefined
-\let\Or\undefined
+\algnewcommand{\algorithmicand}{\textbf{ and }}
+\algnewcommand{\algorithmicor}{\textbf{ or }}
 
 \algrenewcommand\algorithmicthen{:}
 \algrenewcommand\algorithmicdo{:}
-\algnewcommand\And{\textbf{ and }}
-\algnewcommand\Or{\textbf{ or }}
+\algnewcommand\AND{\algorithmicand}
+\algnewcommand\Or{\algorithmicor}
 \algnewcommand\New{\textbf{new }}
 \algnewcommand\To{\textbf{ to }}
 \algnewcommand\DownTo{\textbf{ down to }}

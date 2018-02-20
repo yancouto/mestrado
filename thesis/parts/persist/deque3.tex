@@ -371,9 +371,9 @@ Logo, não existe situação em que a execução da função~\textsc{FixDeques} 
 
 \Function{Digit}{$a, \V{last}$}
     \State $\V{digit} = [2, 1, 0, 0, 1, 2]$ \Comment{$\V{digit}[i] = $ dígito de uma sub-deque com~$i$ elementos}
-    \If{$a.\V{prefix}.\Call{Size}{\null} = 0 \And \V{last}$}
+    \If{$a.\V{prefix}.\Call{Size}{\null} = 0 \AND \V{last}$}
         \State \Return $\V{digit}[a.\V{suffix}.\Call{Size}{\null}]$
-    \ElsIf{$a.\V{suffix}.\Call{Size}{\null} = 0 \And \V{last}$}
+    \ElsIf{$a.\V{suffix}.\Call{Size}{\null} = 0 \AND \V{last}$}
         \State \Return $\V{digit}[a.\V{prefix}.\Call{Size}{\null}]$
     \Else
         \State \Return $\max(\V{digit}[a.\V{prefix}.\Call{Size}{\null}], \V{digit}[a.\V{suffix}.\Call{Size}{\null}])$
@@ -384,10 +384,10 @@ Logo, não existe situação em que a execução da função~\textsc{FixDeques} 
 \Function{Fix}{$a$}
     \If{$a.\V{child} \neq \Null$} \label{line:fix:p1b}
         \State $b = \Call{Copy}{a.\V{child}}$
-        \State $\V{last} = [a.\V{next} = \Null \And b.\V{child} = \Null]$
+        \State $\V{last} = [a.\V{next} = \Null \AND b.\V{child} = \Null]$
     \ElsIf{$a.\V{next} \neq \Null$}
         \State $b = \Call{Copy}{a.\V{next}}$
-        \State $\V{last} = [b.\V{next} = \Null \And b.\V{child} = \Null]$
+        \State $\V{last} = [b.\V{next} = \Null \AND b.\V{child} = \Null]$
     \Else
         \State $b = \New \Call{Node}{\{\}, \Null, \{\}}$  \label{line:fix:p1e}
         \State $last = \True$
@@ -410,19 +410,19 @@ Logo, não existe situação em que a execução da função~\textsc{FixDeques} 
         \State $b = \Null$  \label{line:fix:p2e}
     \Else \Comment{Caso 2}  \label{line:fix:p3b}
         \State $\Call{FixDeques}{a.\V{prefix}, a.\V{suffix}, b.\V{prefix}, b.\V{suffix}}$
-        \If{${b.\V{prefix}}.\Call{Size}{\null} = 0 \And {b.\V{suffix}}.\Call{Size}{\null} = 0 \And \V{last}$} \label{line:fix:if_empty}
+        \If{${b.\V{prefix}}.\Call{Size}{\null} = 0 \AND {b.\V{suffix}}.\Call{Size}{\null} = 0 \AND \V{last}$} \label{line:fix:if_empty}
             \State $b = \Null$  \label{line:fix:p3e}
         \EndIf
     \EndIf
     
-    \If{$b \neq \Null \And \Call{Digit}{b, \V{last}} = 1$}
+    \If{$b \neq \Null \AND \Call{Digit}{b, \V{last}} = 1$}
         \If{$a.\V{child} = \Null$} \Comment{Nível $i + 1$ tinha dígito diferente de~1.} \label{line:fix:next_a_bb}
             \State $a.\V{next} = b.\V{next}$
             \State $b.\V{next} = \Null$ \label{line:fix:next_a_be}
         \EndIf
         \State $a.\V{child} = b$ \label{line:fix:child_a_b}
     \Else
-        \If{$b \neq \Null \And a.\V{child} \neq \Null$} \label{line:fix:next_b_ab}
+        \If{$b \neq \Null \AND a.\V{child} \neq \Null$} \label{line:fix:next_b_ab}
             \State $b.\V{next} = a.\V{next}$  \label{line:fix:next_b_ae}
         \EndIf
         \State $a.\V{next} = b$ \label{line:fix:child_b_ab}
@@ -460,9 +460,9 @@ Com a função~\textsc{Fix} implementada, é fácil implementar as operações d
 \begin{algorithmic}[1]
 
 \Function{Check}{$a$}
-    \If{$\Call{Digit}{a, [a.\V{child} = \Null \And a.\V{next} = \Null]} = 2$}
+    \If{$\Call{Digit}{a, [a.\V{child} = \Null \AND a.\V{next} = \Null]} = 2$}
         \State $\Call{Fix}{a}$
-    \ElsIf{$a.\V{next} {\,\neq\,} \Null \And \Call{Digit}{a.\V{next}, [a.\V{next}.\V{child} {\,=\,} \Null \And a.\V{next}.\V{next} {\,=\,} \Null]} = 2$}
+    \ElsIf{$a.\V{next} {\,\neq\,} \Null \AND \Call{Digit}{a.\V{next}, [a.\V{next}.\V{child} {\,=\,} \Null \AND a.\V{next}.\V{next} {\,=\,} \Null]} = 2$}
         \State $a.\V{next} = \Call{Copy}{a.\V{next}}$
         \State $\Call{Fix}{a.\V{next}}$
     \EndIf

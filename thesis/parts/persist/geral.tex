@@ -249,7 +249,7 @@ O acesso a um campo de um nó em uma dada versão pode ser feito como no Código
 \Function{Access}{$u, \V{field}, \V{version}$}
 	\State $\V{value} = u.\V{field}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
-		\If{$\V{field} = \V{field}' \And \V{version} \geq \V{version}'$}
+		\If{$\V{field} = \V{field}' \AND \V{version} \geq \V{version}'$}
 			\State $\V{value} = \V{value}'$
 		\EndIf
 	\EndFor

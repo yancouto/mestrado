@@ -94,7 +94,7 @@ Para acessar o campo de um nó na versão~$\version$, ou na versão corrente, us
 
 \Require $u$ deve ser um nó associado à versão~$\version$.
 \Function{Child}{$u, \side, \version$}
-	\If{$u.\eTs \neq -1 \And u.\eSide = \side \And \version \geq u.\eTs$}
+	\If{$u.\eTs \neq -1 \AND u.\eSide = \side \AND \version \geq u.\eTs$}
 		\State \Return $u.\extra$
 	\EndIf
 	\State \Return $u.\child[\side]$
@@ -115,7 +115,7 @@ Vamos apresentar a operação~\textsc{Find}, que retorna o valor buscado, ou~\ke
 
 \Function{Find}{$x, \version$}
 	\State $u = \roots[\version]$
-	\While{$u \neq \Null \And x \neq u.\val$}
+	\While{$u \neq \Null \AND x \neq u.\val$}
 	\State $u = \Call{Child}{u, [x > u.\val], \version}$ \label{line:findrb:iver}
 	\EndWhile
 	\If{$u = \Null$}
@@ -355,13 +355,13 @@ A maior parte das modificações envolvidas em uma inserção são mudanças de 
 		\State \Call{Modify}{$v, [\val > v.\val], x$}
 	\EndIf \label{line:insrb:inse}
 	\LineComment{Arrumando a possível violação causada pelo nó~$x$.}
-	\While{$x.\red \And x.\parent \neq \Null \And x.\parent.\red$} \label{line:insrb:loopb}
+	\While{$x.\red \AND x.\parent \neq \Null \AND x.\parent.\red$} \label{line:insrb:loopb}
 		\State $y = x.\parent$ \label{line:insrb:xyzwb}
 		\State $z = y.\parent$
 		\State $\V{sideX} = [\Call{Child}{y, 1} = x]$
 		\State $\V{sideY} = [\Call{Child}{z, 1} = y]$ \label{line:insrb:xyzwe}
 		\State $w = \Call{Child}{z, \Not\ \V{sideY}}$
-		\If{$w \neq \Null \And w.\red$} \Comment{Caso 1.} \label{line:insrb:c1b}
+		\If{$w \neq \Null \AND w.\red$} \Comment{Caso 1.} \label{line:insrb:c1b}
 			\State $z.\red = \True$
 			\State $y.\red = \False$
 			\State $w.\red = \False$
@@ -514,7 +514,7 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da proprieda
 
 \Function{Transplant}{$u, x$}
 	\State $x = \Call{Active}{x}$
-	\If{$x \neq \Null \And x.\parent \neq \Null$} \Comment{Removendo link para~$x$, se houver.}
+	\If{$x \neq \Null \AND x.\parent \neq \Null$} \Comment{Removendo link para~$x$, se houver.}
 		\State \Call{Modify}{$x.\parent, [\Call{Child}{x.\parent, 1} = x], \Null$}
 	\EndIf
 	\State $u = \Call{Active}{u}$ \label{line:rmrb:activeu}
@@ -536,7 +536,7 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da proprieda
 	\State $u = \Call{Find}{\val}$ \label{line:rmrb:find}
 	\State $v = u.\parent$
 	\If{$\Call{Child}{u, 1} = \Null$} \label{line:rmrb:if1}
-		\State $\V{needFix} = (v \neq \Null \And \Not\ u.\red \And \Call{Child}{u, 0} = \Null)$
+		\State $\V{needFix} = (v \neq \Null \AND \Not\ u.\red \AND \Call{Child}{u, 0} = \Null)$
 		\State \Call{Transplant}{$u, \Call{Child}{u, 0}$}
 		\If{$\V{needFix}$}
 			\State \Call{AddBlack}{$v, [\Call{Child}{v, 1} = \Null]$} \label{line:rmrb:addblack1}
@@ -548,7 +548,7 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da proprieda
 		\Else
 			\State $y = x.\parent$
 		\EndIf
-		\State $\V{needFix} = (\Not\ x.\red \And \Call{Child}{x, 1} = \Null)$
+		\State $\V{needFix} = (\Not\ x.\red \AND \Call{Child}{x, 1} = \Null)$
 		\State \Call{Transplant}{$x, \Call{Child}{x, 1}$}
 		\State \Call{Transplant}{$u, x$}
 		\For{$\side \in \{0, 1\}$} \label{line:rmrb:cpchild}
@@ -702,7 +702,7 @@ Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanç
 		\EndIf
 		\State $z_x = \Call{Child}{z, \side}$
 		\State $z_z = \Call{Child}{z, \Not\ \side}$
-		\If{$(z_x = \Null \Or \Not\ z_x.\red) \And (z_z = \Null \Or \Not\ z_z.\red)$} \Comment{Caso 1.}
+		\If{$(z_x = \Null \Or \Not\ z_x.\red) \AND (z_z = \Null \Or \Not\ z_z.\red)$} \Comment{Caso 1.}
 			\State $z.\red = \True$
 			\If{$y = \roots[\cur] \Or y.\red$}
 				\State $y.\red = \False$
@@ -712,7 +712,7 @@ Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanç
 				\State $y = y.\parent$
 			\EndIf
 		\Else
-			\If{$z_x \neq \Null \And z_x.\red$} \Comment{Arrumando caso~3 para caso~2.}
+			\If{$z_x \neq \Null \AND z_x.\red$} \Comment{Arrumando caso~3 para caso~2.}
 				\State \Call{Swap}{$z.\red, z_x.\red$}
 				\State \Call{Rotate}{$z, \side$}
 				\State $y = \Call{Active}{y}$

@@ -4,21 +4,21 @@
 
 \chapter{Deque Recursiva} \label{cap:deque2_persist}
 
-Neste capítulo, apresentaremos um implementação persistente desta estrutura, em que cada operação leva tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o tamanho atual da deque, ou seja, com a mesma complexidade que a implementação do capítulo anterior. A implementação é discutida em~\cite{Kaplan2001} e serve como base para a implementação discutida no Capítulo~\ref{cap:deque3_persist}.
+Neste capítulo, apresentaremos um implementação persistente desta estrutura. A implementação é discutida por Kaplan~\cite{Kaplan2001} e serve como base para a implementação discutida no Capítulo~\ref{cap:deque3_persist}.
 
-Diferente das definições do Capítulo~\ref{cap:deque1_persist}, usaremos que a função~\textsc{Pop} retorna o elemento removido, assim como a nova deque. Isso é usado para facilitar a implementação da função~\textsc{Pop}.
-\begin{itemize}
-	\item \func{PopFront}{d} --- Retorna o primeiro elemento de~$d$, e uma deque igual a~$d$, mas sem este elemento.
-	\item \func{PopFront}{d} --- Retorna o último elemento de~$d$, e uma deque igual a~$d$, mas sem este elemento.
-\end{itemize}
+%Diferente das definições do Capítulo~\ref{cap:deque1_persist}, usaremos que a função~\textsc{Pop} devolve o elemento removido, assim como a nova deque. Isso é usado para facilitar a implementação da função~\textsc{Pop}.
+%\begin{itemize}
+%	\item \func{PopFront}{d} --- Retorna o primeiro elemento de~$d$, e uma deque igual a~$d$, mas sem este elemento.
+%	\item \func{PopFront}{d} --- Retorna o último elemento de~$d$, e uma deque igual a~$d$, mas sem este elemento.
+%\end{itemize}
 
 \section{Representação}
 
-A implementação usual de uma deque usando lista ligada utiliza uma lista duplamente ligada, e então para adicionar um elemento é necessário \emph{mudar} campos de nós já existentes da lista, o que não resulta numa implementação persistente como ocorreu com a pilha.
+A implementação usual de uma deque usando lista ligada utiliza uma lista duplamente ligada, e então para adicionar um elemento é necessário \emph{mudar} campos de nós já existentes da lista, o que não resulta numa implementação persistente como ocorreu com a pilha. Uma solução é fazer como na implementação do Capítulo~\ref{cap:deque1_persist}, que transforma esta lista em uma arborescência. Neste capítulo, trataremos isto de outra forma.
 
-Para conseguirmos manter a implementação funcional, mudaremos como uma deque é representada, com um esquema de representação recursiva. Para facilitar a descrição, é necessário deixar claro o conjunto de elementos que a deque pode armazenar. Seja~$T$ esse conjunto, ou seja, operações de~\textsc{Push} recebem elementos de~$T$ como argumento e operações de~\textsc{Pop} retornam elementos desse conjunto.
+Para conseguirmos manter a implementação funcional, mudaremos como uma deque é representada, com um esquema de representação recursiva. Para facilitar a descrição, é necessário deixar claro o conjunto de elementos que a deque pode armazenar. Seja~$T$ esse conjunto, ou seja, operações de~\API{Push} recebem elementos de~$T$ como argumento e operações de~\API{Pop} devolvem elementos desse conjunto.
 
-Uma deque persistente que armazena elementos do conjunto~$T$ é um nó com três campos opcionais:~$\V{prefix}, \V{center}$, e $\V{suffix}$. Um campo ser opcional significa que ele pode não estar presente. Nesse caso dizemos que ele assume o valor~\keyword{null}. Os campos~$\V{prefix}$ e~$\V{suffix}$ armazenam valores de~$T$, e o campo~$\V{center}$ armazena uma deque persistente que armazena elementos do conjunto~$T \times T$, ou seja, pares ordenados de~$T$.
+Uma deque persistente que armazena elementos do conjunto~$T$ é um nó com três campos opcionais:~$\V{prefix}, \V{center}$, e $\V{suffix}$; além de um campo obrigatório~$\V{size}$. Um campo ser opcional significa que ele pode não estar presente. Quando não estiver presente, o campo assume o valor~\keyword{null}. Os campos~$\V{prefix}$ e~$\V{suffix}$ armazenam valores de~$T$, o campo~$\V{center}$ armazena uma deque persistente que armazena elementos do conjunto~$T \times T$, ou seja, pares ordenados de~$T$, e o campo~$\V{size}$ armazena o tamanho da deque.
 
 %Explicação alternativa
 %Seja~$d$ uma deque persistente que armazena elementos do tipo~$T$. Se $d = \keyword{null}$, então $d$ é uma deque vazia. Caso contrário,~$d$ é uma tripla~$(\V{prefix}(d), \V{center}(d), \V{suffix}(d))$, onde~$\V{preffix}(d)$ e~$\V{suffix}(d)$ são elementos de~$T$ ou~\keyword{null}, e~$\V{center}(d)$ é uma deque persistente que armazena elementos de~$T \times T$, ou seja, pares ordenados de~$T$.
@@ -65,157 +65,162 @@ $\V{prefix}$ &  &  &  & & & & & $\V{center}$ &  & & & & &  &  & $\V{suffix}$ \\[
 
 Como indicado pelos nomes,~$\V{prefix}$ armazena um prefixo da sequência de elementos que é a deque,~$\V{suffix}$ representa um sufixo, e~$\V{center}$ os elementos do meio. A Figura~\ref{fig:deque_ex} mostra uma possível deque persistente, cuja sequência é~$(2,3,4,5,6,7,8)$. Note que os campos~\keyword{null} são ignorados.
 
-Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center}$ guarda uma deque vazia, o número máximo de níveis nessa estrutura é~$\lg n$, onde~$n$ é o número de elementos na deque, já que no~$i$-ésimo nível cada elemento~$\V{front}$ e~$\V{back}$ guarda~$2^{i-1}$ elementos.
+Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center}$ guarda uma deque vazia, o número máximo de níveis nessa estrutura é~$\lg n$, onde~$n$ é o número de elementos na deque, já que no~$i$-ésimo nível cada elemento~$\V{prefix}$ e~$\V{suffix}$ armazena~$2^{i-1}$ elementos.
 
 
 \section{Operações de acesso}
 
 
 \begin{algorithm}
-\caption{\textsc{Front} e \textsc{Back} para uma deque.} \label{lst:deque_acesso}
+\caption{Operações de acesso para uma deque persistente.} \label{lst:deque_acesso}
 \begin{algorithmic}[1]
 
-\Function{Deque}{\null}
-    \State \Return \Null
+\Function{\API{Deque}}{\null}
+	\State \Return \Null
 \EndFunction
 
-\Function{Front}{$d$}
-    \If{$d.\V{prefix} \neq \Null$}
-        \State \Return $d.\V{prefix}$
-    \ElsIf{$d.\V{center} = \Null$}
-        \State \Return $d.\V{suffix}$
-    \Else
-        \State \Return \func{Front}{d.\V{center}}$.\V{first}$
-    \EndIf
+\Function{\API{Front}}{$d$}
+	\If{$d.\V{prefix} \neq \Null$}
+		\State \Return $d.\V{prefix}$
+	\ElsIf{$d.\V{center} = \Null$}
+		\State \Return $d.\V{suffix}$
+	\Else
+		\State \Return \funcAPI{Front}{d.\V{center}}$.\V{first}$
+	\EndIf
 \EndFunction
 
-\Function{Back}{$d$}
-    \If{$d.\V{suffix} \neq \Null$}
-        \State \Return $d.\V{suffix}$
-    \ElsIf{$d.\V{center} = \Null$}
-        \State \Return $d.\V{prefix}$
-    \Else
-        \State \Return \func{Back}{d.\V{center}}$.\V{second}$
-    \EndIf
+\Function{\API{Back}}{$d$}
+	\If{$d.\V{suffix} \neq \Null$}
+		\State \Return $d.\V{suffix}$
+	\ElsIf{$d.\V{center} = \Null$}
+		\State \Return $d.\V{prefix}$
+	\Else
+		\State \Return \funcAPI{Back}{d.\V{center}}$.\V{second}$
+	\EndIf
 \EndFunction
+
+% Não decidi se isso vai ser uma operação da deque
+%\Function{\API{Size}}{$d$}
+%	\If{$d = \Null$}
+%		\State \Return $0$
+%	\Else
+%		\State \Return $d.\V{size}$
+%	\EndIf
+%\EndFunction
 
 
 \end{algorithmic}
 \end{algorithm}
 
-Devido à própria recursividade da definição da estrutura, recursão é muito útil para lidar com esta estrutura.
-Assumimos sempre que todas as operações chamadas são válidas, ou seja,~\func{Front}{d} e~\func{Back}{d} são chamadas apenas quando~$d$ não é vazia, e consequentemente não nula. Veja o Código~\ref{lst:deque_acesso}. Para questões de implementação, os elementos de~$T \x T$ são representados como um par com campos~$\V{first}$ e~$\V{second}$, ou seja, se~$a, b \in T$ então~$(a, b) \in T \x T$ e vale que~$(a, b).\V{first} = a$ e~$(a, b).\V{second} = b$.
+Devido à forma recusiva como a estrutura foi definida, recursão é muito útil para lidar com esta estrutura.
+Assumimos sempre que todas as operações chamadas são válidas, ou seja,~\funcAPI{Front}{d} e~\funcAPI{Back}{d} são chamadas apenas quando~$d$ não é vazia, e consequentemente seu valor não é~\keyword{null}. Veja o Código~\ref{lst:deque_acesso}. Para questões de implementação, os elementos de~$T \x T$ são representados como um par com campos~$\V{first}$ e~$\V{second}$, ou seja, se~$a, b \in T$ então~$(a, b) \in T \x T$ e vale que~$(a, b).\V{first} = a$ e~$(a, b).\V{second} = b$.
 
-Vamos analisar a função~\func{Front}{d}. Pela maneira como definimos a deque, se~$\V{prefix}$ não é nulo então ele é um prefixo de~$d$, logo seu primeiro elemento é a resposta de~\func{Front}{d}. Se não, se~$\V{center}$ não é nulo, como não guardamos deques vazias, este tem algum elemento. O valor retornado é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos do tipo~$T \times T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$. Caso contrário, o único elemento da deque é~$d.\V{suffix}$ e o valor retornado também é correto. Note que nesse caso~$d$ tem apenas um elemento.
-Portanto, a função~\func{Front}{d} funciona corretamente.
+Vamos analisar a operação~\funcAPI{Front}{d}. Pela maneira como definimos a deque, se~$\V{prefix}$ não é nulo então ele é um prefixo de~$d$, logo este é a resposta de~\funcAPI{Front}{d}. Se não, se~$\V{center}$ não é nulo, como não guardamos deques vazias, este tem algum elemento. O valor devolvido é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos do tipo~$T \times T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$. Caso contrário, o único elemento da deque é~$d.\V{suffix}$ e o valor devolvido também é correto.
+Portanto, a função~\funcAPI{Front}{d} funciona corretamente.
 
-Note que~\func{Back}{d} é simétrica a~\func{Front}{d}. Basta trocar~$\V{prefix}$ com~$\V{suffix}$ e~$\V{first}$ com~$\V{second}$, o mesmo ocorrerá com as outras operações, pela simetria da estrutura. Então nas próximas seções apenas a versão para~\textsc{Front} de~\textsc{Push} e~\textsc{Pop} será detalhada.
+Note que~\funcAPI{Back}{d} é simétrica a~\funcAPI{Front}{d}. Basta trocar~$\V{prefix}$ com~$\V{suffix}$ e~$\V{first}$ com~$\V{second}$, o mesmo ocorrerá com as outras operações, pela simetria da estrutura. Então nas próximas seções apenas a versão~\textsc{Front} de~\API{Push} e~\API{Pop} será detalhada.
 
-Ambas as funções consomem tempo~$\Oh(\lg n)$, onde~$n$ é o tamanho da deque, e não modificam a estrutura.
+Ambas as funções apresentadas consomem tempo~$\Oh(\lg n)$, onde~$n$ é o tamanho da deque, e não modificam a estrutura.
 
 \section{Operações de modificação}
 
 Ao adicionar um elemento~$x$ no início da deque~$d$, se~$d.\V{prefix}$ for nulo, podemos colocar~$x$ no campo~$\V{prefix}$, e então a deque continua válida e com~$x$ no início. Se~$d.\V{prefix}$ não for nulo, podemos juntá-lo com~$x$ e então inserir o par~$(x, d.\V{prefix})$ em~$d.center$, e tornar~$d.\V{prefix}$ nulo, assim a deque continua válida e com~$x$ no início.
 
-Analogamente, ao remover um elemento do início de~$d$, se~$d.\V{prefix}$ não for nulo, podemos remover esse elemento, caso contrário, podemos remover um elemento de~$d.\V{center}$ e colocar apenas o segundo elemento em~$d.\V{prefix}$, já que os elementos de~$d.\V{center}$ são pares, removendo assim o primeiro elemento da deque.
+Analogamente, ao remover um elemento do início de~$d$, se~$d.\V{prefix}$ não for nulo, podemos remover esse elemento, caso contrário, podemos remover um elemento de~$d.\V{center}$ e colocar apenas o segundo elemento em~$d.\V{prefix}$, já que os elementos de~$d.\V{center}$ são pares, removendo assim o primeiro elemento da deque. Note que precisamos do elemento removido, então usaremos uma função auxiliar~\func{PopFrontAux}{d} que retorna um par com o primeiro elemento de~$d$ e uma cópia de~$d$ sem este elemento.
 
 Se fizermos as operações desta forma, estaremos mudando a estrutura, que não será funcional. Note que apenas mudamos um prefixo dos níveis, e cada nível consiste de apenas um número constante de dados (se considerarmos que os pares são na verdade ponteiros para pares).
-Assim, se apenas copiarmos todos os nós que iremos modificar, mantemos a estrutura funcional. Assumimos que~\mbox{\keyword{new} \func{Node}{p, c, s}} retorna um nó como discutido, com~$\V{prefix}, \V{center}$ e~$\V{suffix}$ inicializados com~$p, c$ e~$s$, respectivamente. Veja o Código~\ref{lst:deque_mod}.
+Assim, se apenas copiarmos todos os nós que iremos modificar, mantemos a estrutura funcional. Assumimos que~\mbox{\keyword{new} \func{Node}{\V{pr}, \V{ct}, \V{sf}, \V{sz}}} devolve um nó como discutido, com~$\V{prefix}$,~$\V{center}$,~$\V{suffix}$ e~$\V{size}$ inicializados com~$\V{pr}$,~$\V{ct}$,~$\V{sf}$ e~$\V{sz}$, respectivamente. Veja o Código~\ref{lst:deque_mod}.
 
 \begin{algorithm}
 \caption{Operações de modificação para uma deque.} \label{lst:deque_mod}
 \begin{algorithmic}[1]
 
-\Function{PushFront}{$d, x$}
-    \If{$d = \Null$}
-        \State \Return \New \func{Node}{x, \Null, \Null} \label{line:dm:puf1}
-    \ElsIf{$d.\V{prefix} = \Null$} \label{line:dm:puf2}
-        \State \Return \New \func{Node}{x, d.\V{center}, d.\V{suffix}}\label{line:dm:puf2_1}
-    \Else
-        \State \Return \New \func{Node}{\Null, \Call{PushFront}{d.\V{center}, (x, d.\V{prefix})}, d.\V{suffix}} \label{line:dm:puf3}
-    \EndIf
+\Function{\API{PushFront}}{$d, x$}
+	\If{$d = \Null$}
+		\State \Return \New \func{Node}{x, \Null, \Null, 1} \label{line:dm:puf1}
+	\ElsIf{$d.\V{prefix} = \Null$} \label{line:dm:puf2}
+		\State \Return \New \func{Node}{x, d.\V{center}, d.\V{suffix}, d.\V{size} + 1}\label{line:dm:puf2_1}
+	\Else
+		\State \Return \New \func{Node}{\Null, \funcAPI{PushFront}{d.\V{center}, (x, d.\V{prefix})}, d.\V{suffix}, d.\V{size} + 1} \label{line:dm:puf3}
+	\EndIf
 \EndFunction
 
-\Function{PopFront}{$d$}
-    \If{$d.\V{prefix} \neq \Null \And d.\V{center} = \Null \And d.\V{suffix} = \Null$} \label{line:dm:pof0}
-        \State \Return $(d.\V{prefix}, \Null)$
-    \ElsIf{$d.\V{prefix} \neq \Null$} \label{line:dm:pof1}
-        \State \Return $(d.\V{prefix}, \New \Call{Node}{\Null, d.\V{center}, d.\V{suffix}})$ \label{line:dm:pof1_2}
-    \ElsIf{$d.\V{center} = \Null$}
-        \State \Return $(d.\V{suffix}, \Call{Deque}{\null})$ \label{line:dm:pof2}
-    \Else
-        \State $(x, c) = \Call{PopFront}{d.\V{center}}$
-        \State \Return $(x.\V{first}, \New \Call{Node}{x.second, c, d.\V{suffix}})$ \label{line:dm:pof3}
-    \EndIf
+\Function{\API{PopFront}}{$d$}
+	\State \Return $\Call{PopFrontAux}{d}.\V{second}$
+\EndFunction
+
+
+\Function{PopFrontAux}{$d$}
+	\If{$d.\V{prefix} \neq \Null \AND d.\V{center} = \Null \AND d.\V{suffix} = \Null$} \label{line:dm:pof0}
+		\State \Return $(d.\V{prefix}, \funcAPI{Deque}{})$
+	\ElsIf{$d.\V{prefix} \neq \Null$} \label{line:dm:pof1}
+		\State \Return $(d.\V{prefix}, \New \Call{Node}{\Null, d.\V{center}, d.\V{suffix}, d.\V{size} - 1})$ \label{line:dm:pof1_2}
+	\ElsIf{$d.\V{center} = \Null$}
+		\State \Return $(d.\V{suffix}, \funcAPI{Deque}{\null})$ \label{line:dm:pof2}
+	\Else
+		\State $(x, c) = \Call{PopFrontAux}{d.\V{center}}$
+		\State \Return $(x.\V{first}, \New \Call{Node}{x.second, c, d.\V{suffix}, d.\V{size} - 1})$ \label{line:dm:pof3}
+	\EndIf
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
 
 \begin{proposition}
-A função~\func{PushFront}{d, x} funciona corretamente, retornando uma deque composta de~$d$ com~$x$ inserido em seu começo, sem modificar~$d$.
+A operação~\funcAPI{PushFront}{d, x} funciona corretamente, devolvendo uma cópia de~$d$ com~$x$ inserido em seu início, sem modificar~$d$.
 \end{proposition}
 
 \begin{proof}
 A prova será feita por indução no número de níveis da estrutura recursiva da deque.
 
-A base se dá quando~$d$ é nulo, nesse caso a deque é vazia e a linha~\nref{line:dm:puf1} retorna uma deque com~$x$ em seu campo~$\V{prefix}$ e os outros campos nulos. Assuma então que o teorema vale para todas as deques com número de níveis menor que~$d$.
+A base se dá quando~$d$ é nulo, nesse caso a deque é vazia e a linha~\nref{line:dm:puf1} devolve uma deque com~$x$ em seu campo~$\V{prefix}$ e os outros campos nulos. Assuma então que a proposição vale para todas as deques com número de níveis menor que~$d$.
 
 Se~$d.\V{prefix}$ é nulo, podemos armazenar~$x$ nessa posição e teremos adicionado~$x$ como primeiro elemento. Como não podemos modificar os campos de~$d$, criamos um novo nó com campo~$\V{prefix}$ como~$x$ e os outros campos iguais aos de~$d$. Esse caso é então tratado corretamente nas no~\keyword{if} das linhas~\nref{line:dm:puf2} e~\nref{line:dm:puf2_1}.
 
-Caso contrário, juntamos~$x$ e~$d.\V{prefix}$ em um par e o adicionamos recursivamente no começo de~$d.\V{center}$. Indutivamente, como a deque~$d.\V{center}$ tem menos níveis que~$d$, a hipótese de indução vale e a função funciona nesse caso.
+Caso contrário, juntamos~$x$ e~$d.\V{prefix}$ em um par e o adicionamos recursivamente no começo de~$d.\V{center}$. Como a deque~$d.\V{center}$ tem menos níveis que~$d$, a hipótese de indução vale e a operação funciona nesse caso.
 \end{proof}
 
-De maneira simétrica temos que a função~\func{PushBack}{d, x} também funciona. Veremos a seguir, de forma similar, que~\func{PopFront}{d} também funciona, e consequentemente também~\func{PopBack}{d}.
+De maneira simétrica temos que a operação~\funcAPI{PushBack}{d, x} também está correta. Provaremos a seguir que~\func{PopFrontAux}{d} funciona corretamente, e portanto~\funcAPI{PopFront}{d} também, já que apenas devolve a deque devolvida por~\func{PopFrontAux}{d}. Consequentemente,~\funcAPI{PopBack}{d} está correta.
 
 \begin{proposition}
-A função~\func{PopFront}{d} funciona corretamente, retornando, sem modificar~$d$, o primeiro elemento de~$d$ e uma deque composta de~$d$ sem este elemento.
+A função~\func{PopFrontAux}{d} funciona corretamente, devolvendo, sem modificar~$d$, o primeiro elemento de~$d$ e uma cópia de~$d$ sem este elemento.
 \end{proposition}
 
 \begin{proof}
 A prova também será feita por indução no número de níveis da estrutura da deque.
 
-    Se~$d.\V{prefix}$ não é nulo, basta remover e retornar este elemento. Se~$d.\V{prefix}$ era o único nó da estrutura, o resto dela é vazio e portanto deve ser representado com~\keyword{null}. Este caso é tratado na linha~\nref{line:dm:pof0}. Caso contrário, o~\keyword{if} das linhas~\nref{line:dm:pof1} e~\nref{line:dm:pof1_2} trata isso corretamente, retornando~$d.\V{prefix}$ e criando um novo nó que não tem esse campo, sem modificar~$d$.
+    Se~$d.\V{prefix}$ não é nulo, basta remover e devolver este elemento, assim como uma cópia da deque sem ele. Se~$d.\V{prefix}$ era o único nó da estrutura, devolve-se uma deque vazia. Este caso é tratado na linha~\nref{line:dm:pof0}. Caso contrário, o~\keyword{if} das linhas~\nref{line:dm:pof1} e~\nref{line:dm:pof1_2} devolve~$d.\V{prefix}$ e cria um novo nó que não tem esse campo, sem modificar~$d$, portanto trata corretamente este caso.
 
-Caso contrário, se~$d.\V{center}$ é nulo, sabemos que~$d$ é uma deque com apenas um elemento, armazenado em~$d.\V{suffix}$, pois sabemos que~\func{PopFront}{d} não é chamada se~$d$ é vazia. A linha~\nref{line:dm:pof2} trata corretamente esse caso, retornando~$d.\V{suffix}$ e uma nova deque vazia.
+Caso contrário, se~$d.\V{center}$ é nulo, sabemos que~$d$ é uma deque com apenas um elemento, armazenado em~$d.\V{suffix}$, pois sabemos que~\func{PopFrontAux}{d} não é chamada se~$d$ é vazia. A linha~\nref{line:dm:pof2} trata corretamente esse caso, devolvendo~$d.\V{suffix}$ e uma nova deque vazia. A base da indução, quando a deque tem um nível, sempre satisfaz um destes casos, logo é tratada corretamente.
 
-No último caso, usamos~\func{PopFront}{d.\V{center}}, que está correta pois~$d.\V{center}$ tem menos níveis que~$d$, para remover recursivamente o primeiro elemento de~$d.\V{center}$. Esse elemento é um par de elementos de~$d$. Retornamos o primeiro elemento do par, que é o primeiro elemento de~$d$, e colocamos o segundo elemento no campo~$\V{prefix}$, removendo assim o primeiro elemento da deque. Também é necessário substituir~$\V{center}$ pela nova deque retornada pela chamada recursiva. A linha~\nref{line:dm:pof3} retorna então um novo nó com os campos corretos.
+No último caso, usamos~\func{PopFrontAux}{d.\V{center}}, que está correta pois~$d.\V{center}$ tem menos níveis que~$d$, para remover recursivamente o primeiro elemento de~$d.\V{center}$. Esse elemento é um par de elementos de~$d$. Retornamos o primeiro elemento do par, que é o primeiro elemento de~$d$, e colocamos o segundo elemento no campo~$\V{prefix}$, removendo assim o primeiro elemento da deque. Também é necessário substituir~$\V{center}$ pela nova deque devolvida pela chamada recursiva. A linha~\nref{line:dm:pof3} devolve então um novo nó com os campos corretos.
 \end{proof}
 
-Ambas funções consomem tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o tamanho da deque, pois apenas percorrem a estrutura dos nós, que tem altura~$\Oh(\lg n)$, e realizam operações que consomem tempo e espaço constante por nível. Usando essas funções, temos uma deque persistente.
+Ambas operações consomem tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o tamanho da deque, pois apenas percorrem a estrutura dos nós, que tem altura~$\Oh(\lg n)$, e realizam operações que consomem tempo e espaço constante por nível.
 
 \section{Acesso a outros elementos}
 
-Nas seções anteriores apresentamos uma deque persistente, com as operações descritas no início do capítulo. Ela permite acesso e remoção aos elementos das extremidades. Vamos agora apresentar como permitir também acesso a qualquer elemento da deque, ou seja, vamos implementar a seguinte operação de acesso:
-
-\begin{itemize}
-    \item \func{k-th}{d, k} --- Retorna o~$k$-ésimo elemento da deque~$d$.
-\end{itemize}
-
-Para facilitar a implementação dessa operação, em cada nó vamos armazenar um campo adicional: o número de elementos que essa deque contém. Esse valor ficará armazenado no campo~$\V{size}$. É muito simples modificar os códigos anteriores para armazenarem esse valor. Basta modificar~\mbox{\textbf{new} \textsc{Node}} para receber um quarto argumento, que será armazenado em~$\V{size}$.
-
-Então, nas funções~\func{PopFront}{d, x} e~\func{PopBack}{d, x}, mudamos todas as ocorrências de~\mbox{\textbf{new} \func{Node}{\ldots}} por~\mbox{\textbf{new} \func{Node}{\ldots, d.\V{size} - 1}}, e nas funções~\func{PushFront}{d} e~\func{PushBack}{d} mudamos para~\mbox{\textbf{new} \func{Node}{\ldots, d.\V{size} + 1}}, exceto quando~$d$ é nulo, caso em que inicializamos o nó com tamanho~$1$.
-Com essas mudanças feitas, a implementação da função fica como no Código~\ref{lst:deque_kth}.
+Para tornar a deque de acesso aleatório, resta implementar~\funcAPI{k-th}{d, k}. Veja o Código~\ref{lst:deque_kth}.
 
 \begin{algorithm}
 \caption{Implementação de~\func{k-th}{d, k}.} \label{lst:deque_kth}
 \begin{algorithmic}[1]
 
-\Function{k-th}{$d, k$}
-    \If{$k = 1 \And d.\V{prefix} \neq \Null$} 
-        \State \Return $d.\V{prefix}$\label{line:kth:if1}
-    \EndIf
-    \If{$k = d.\V{size} \And d.\V{suffix} \neq \Null$}
-        \State \Return $d.\V{suffix}$ \label{line:kth:if2}
-    \EndIf
-    \If{$d.\V{prefix} \neq \Null$} 
-        \State $k = k - 1$ \label{line:kth:if3}
-    \EndIf
-    \If{$k$ is odd}
-        \State \Return $\Call{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}}.\V{first}$
-    \Else
-        \State \Return $\Call{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}}.\V{second}$
-    \EndIf
+\Function{\API{k-th}}{$d, k$}
+	\If{$k = 1 \AND d.\V{prefix} \neq \Null$} 
+		\State \Return $d.\V{prefix}$\label{line:kth:if1}
+	\EndIf
+	\If{$k = d.\V{size} \AND d.\V{suffix} \neq \Null$}
+		\State \Return $d.\V{suffix}$ \label{line:kth:if2}
+	\EndIf
+	\If{$d.\V{prefix} \neq \Null$} 
+		\State $k = k - 1$ \label{line:kth:if3}
+	\EndIf
+	\If{$k$ is odd}
+		\State \Return $\funcAPI{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}}.\V{first}$
+	\Else
+		\State \Return $\funcAPI{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}}.\V{second}$
+	\EndIf
 \EndFunction
 
 \end{algorithmic}
@@ -223,15 +228,31 @@ Com essas mudanças feitas, a implementação da função fica como no Código~\
 
 
 \begin{proposition}
-A função~\func{k-th}{d, k} retorna o~$k$-ésimo elemento de~$d$, para~$k \leq d.\V{size}$.
+A função~\func{k-th}{d, k} devolve o~$k$-ésimo elemento de~$d$, para~$k \leq d.\V{size}$.
 \end{proposition}
 
 \begin{proof}
 As linhas~\nref{line:kth:if1} e~\nref{line:kth:if2} tratam o caso em que estamos buscando, respectivamente, o primeiro e o último elemento, e esses estão no prefixo ou sufixo. Caso contrário, o~$k$-ésimo elemento está em~$d.\V{center}$ e a linha~\nref{line:kth:if3} arruma~$k$ para indicar qual elemento de~$d.\V{center}$ deve ser buscado, já que, se~$d.\V{prefix}$ é não nulo, temos que encontrar o~$(k-1)$-ésimo elemento dos que estão em~$d.\V{center}$.
 
-Como~$d.\V{center}$ é uma deque de pares, usamos~\func{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}} para encontrar o~$\ceil*{\frac{k}{2}}$-ésimo par desta deque, pois o primeiro par guarda os elementos 1 e 2, o segundo guarda os elementos 3 e 4, e assim por diante. Se~$k$ é ímpar, queremos o primeiro elemento desse par, senão o segundo. De fato, se~$k$ é ímpar, o par tem os elementos com índice~$k$ e~$k+1$, se não tem os elementos com índice~$k-1$ e~$k$.
+Como~$d.\V{center}$ é uma deque de pares, usamos~\funcAPI{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}} para encontrar o~$\ceil*{\frac{k}{2}}$-ésimo par desta deque, pois o primeiro par guarda os elementos 1 e 2, o segundo guarda os elementos 3 e 4, e assim por diante. Se~$k$ é ímpar, queremos o primeiro elemento desse par, senão o segundo. De fato, se~$k$ é ímpar, o par tem os elementos com índice~$k$ e~$k+1$, se não tem os elementos com índice~$k-1$ e~$k$.
 \end{proof}
 
-A função consome tempo~$\Oh(\lg n)$, onde~$n$ é o tamanho da deque, pois este é o número máximo de níveis da estrutura recursiva.
+A operação consome tempo~$\Oh(\lg n)$, onde~$n$ é o tamanho da deque, pois este é o número máximo de níveis da estrutura recursiva. A Tabela~\ref{tab:deque2_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
+
+\begin{table} \centering
+\begin{tabular}{|l|c|c|}
+	\hline
+	& Tempo/Espaço \\ \hline
+	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushFront}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ \\
+	\funcAPI{PushBack}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ \\
+	\funcAPI{Front}{q} & $\Oh(\lg n)$ \\
+	\funcAPI{Back}{q} & $\Oh(\lg n)$ \\
+	\funcAPI{PopFront}{q} & $\Oh(\lg n) / \Oh(\lg n)$ \\
+	\funcAPI{PopBack}{q} & $\Oh(\lg n) / \Oh(\lg n)$ \\
+	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Consumo de tempo e espaço da implementação deste capítulo, onde~$n$ é o tamanho atual da deque. \label{tab:deque2_persist}}
+\end{table}
 
 \end{document}
