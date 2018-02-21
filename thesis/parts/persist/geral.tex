@@ -11,9 +11,7 @@ Nos capítulos anteriores, discutimos como tornar persistentes estruturas de dad
 
 Para tomar uma abordagem tão geral, é necessário definir formalmente o conceito de estrutura de dados.  Usaremos o modelo de~\deff{estruturas ligadas}, no qual uma estrutura de dados é um conjunto de \emph{nós}, ou \emph{objetos}, cada um contendo um número constante de campos. Cada campo pode armazenar um valor (um inteiro ou booleano, por exemplo) ou um ponteiro para outro nó. Ponteiros também podem armazenar o valor especial~\keyword{null}.  Acesso à estrutura é dado por um número constante de~\deff{nós de entrada}.
 
-% XXX Preciso assumir que todos os nós são do mesmo tipo?
-
-Uma pilha implementada com lista ligada, como no Capítulo~\ref{cap:pilha_persist}, é uma estrutura desse tipo, onde o primeiro elemento da lista é o nó de entrada. A estrutura recursiva para deques do Capítulo~\ref{cap:deque2_persist} também é dessa forma, e tem nós de dois tipos: os nós da estrutura e nós que são os pares. O nó de entrada também é o primeiro nó da estrutura.  Uma árvore de busca binária também é deste tipo, já que cada nó tem dois ponteiros (para o filho esquerdo e direito), e um valor; e a raiz é o nó de entrada.  A estrutura para deque do Capítulo~\ref{cap:deque1_persist} não é deste tipo, pois o preprocessamento para o LA armazena em cada nó um vetor de tamanho~$\floor{\lg d}$, onde~$d$ é a altura do nó.
+Uma pilha implementada com lista ligada, como no Capítulo~\ref{cap:pilha_persist}, é uma estrutura desse tipo, onde o primeiro elemento da lista é o nó de entrada. A estrutura recursiva para deques do Capítulo~\ref{cap:deque2_persist} também é dessa forma, e tem nós de dois tipos: os nós da estrutura e nós que são os pares. O nó de entrada também é o primeiro nó da estrutura.  Uma árvore de busca binária também é deste tipo, já que cada nó tem dois ponteiros (para o filho esquerdo e direito), e um valor; e a raiz é o nó de entrada. A estrutura para resolver o problema do Ancentral de Nível no Capítulo~\ref{cap:ancestrais} não é deste tipo, pois o preprocessamento armazena em cada nó um vetor de tamanho~$\floor{\lg d}$, onde~$d$ é a altura do nó.
 
 Vamos formalizar também as definições de operações de acesso e modificação. Uma~\deff{operação de acesso} produz um~\deff{conjunto de acessos}. No início da operação, este conjunto está vazio.  A cada passo, chamado de~\deff{passo de acesso}, adiciona-se um nó a este conjunto. O nó adicionado deve ser um nó de entrada ou deve ser indicado por um ponteiro em algum nó já no conjunto de acessos. O tempo consumido por uma operação de acesso é o número de passos de acesso. Operações também retornam valores, calculados usando seu conjunto de acessos.
 
@@ -40,9 +38,9 @@ Note que, apesar de estarmos tratando apenas de estruturas ligadas, a versão pe
 
 \section{Off-line}
 
-Em geral, estamos interessados em implementações on-line das estruturas persistentes, ou seja, uma operação deve ser completada para se ter acesso à próxima, porém, vamos considerar o caso off-line, em que todas as~$m+a$ operações são conhecidas de antemão. Obteremos uma implementação totalmente persistente que não faz nenhuma suposição adicional sobre a estrutura de dados, não aumenta assintoticamente o tempo consumido pelas operações, e gasta apenas~$\Oh(1)$ de espaço adicional por passo de modificação, que é o melhor que pode-se esperar.
+Em geral, estamos interessados em implementações on-line das estruturas persistentes, ou seja, uma operação deve ser completada para se ter acesso à próxima, porém, vamos considerar o caso off-line, em que todas as~$m+a$ operações são conhecidas de antemão. Obteremos uma implementação totalmente persistente que não faz nenhuma suposição adicional sobre a estrutura de dados, não aumenta assintoticamente o tempo consumido pelas operações, e gasta apenas~$\Oh(1)$ de espaço adicional por passo de modificação, que é o melhor que pode-se esperar. A versão original desta solução foi dada por meu amigo, Arthur Nascimento, enquanto discutiamos sobre como implementar uma deque persistente.
 
-Inicialmente, constrói-se a árvore de versões. O vértice~$v_i$ representa a versão~$i$. Neste deve-se armazenar, além da lista de adjacência~($v_k$ tal que~$i \rightarrow k$), a operação de modificação que criou a versão~$i$ (seus parâmetros), e uma lista das operações de acesso que são feitas na versão~$i$. Isso pode ser feito em tempo~$\Oh(m+a)$, ou seja, em tempo proporcional ao número de operações.
+Inicialmente, constrói-se a árvore de versões. O vértice~$v_i$ representa a versão~$i$. Neste deve-se armazenar, além da lista de adjacência~($v_k$ tal que~$i \rightarrow k$), a operação de modificação que criou a versão~$i$ (seus parâmetros), e uma lista das operações de acesso que são feitas na versão~$i$. Isso pode ser feito em tempo e espaço~$\Oh(m+a)$, ou seja, proporcional ao número de operações.
 A Figura~\ref{fig:vertree_ex} mostra a árvore de versões do exemplo de pilha do Capítulo~\ref{cap:pilha_persist}.
 
 \tikzset{
@@ -87,7 +85,7 @@ Após montar a árvore de versões, realizamos uma busca em profundidade (DFS) n
 
 Dessa forma, no passo~3, podemos acessar os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a eles terminar, a versão da estrutura será a versão~$i$, e no passo~4 de~$v_i$ basta reverter as mudanças feitas nessa versão.
 
-Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um objeto, guardamos uma tripla~$(\V{obj}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do objeto~$\V{obj}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma.
+Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um objeto, guardamos uma tripla~$(\V{obj}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do objeto~$\V{obj}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma, por exemplo, usando um objeto para armazenar os nós de entrada.
 
 Como não impusemos restrições nas operações de mudança, elas podem modificar um mesmo campo muitas vezes. Logo, é necessário que o valor original seja restaurado, e não um valor intermediário. Para isso, desfazemos as mudanças na ordem inversa que foram feitas, usando uma pilha.
 
@@ -130,7 +128,7 @@ A linha~\nref{line:off:opac} aplica as operações de acesso da versão~$i$. O~\
 Dessa forma, as chamadas da função~\textsc{DFS} para todos os filhos de~$v_i$ funcionam corretamente, e por isso as operações de acesso de todos os descendentes de~$v_i$ são realizadas. Por último, o~\keyword{while} da linha~\nref{line:off:while} desfaz as mudanças feitas na versão~$i$ e retorna a estrutura para a versão~$j$, completando a prova.
 \end{proof}
 
-Então, é possível transformar qualquer estrutura ligada em totalmente persistente, de forma off-line, com aumento no consumo de tempo de~$\Oh(M+A)$ e de espaço~$\Oh(M)$.
+Então, é possível transformar qualquer estrutura ligada em totalmente persistente, de forma off-line, com aumento no consumo de tempo de~$\Oh(M+A)$ e de espaço~$\Oh(M + a)$.
 
 \section{Implementação funcional} \label{sec:implfuncional}
 
@@ -138,7 +136,7 @@ A técnica que usamos nas estruturas apresentadas até agora é tornar a impleme
 
 Se for possível implementar a estrutura desta forma, ela se torna totalmente persistente. De fato, se temos os nós de entrada da versão~$i$, e nenhum nó foi modificado, os nós que podem ser acessados a partir desses são exatamente os mesmos de quando a versão~$i$ foi criada, independente de versões criadas posteriormente. Logo, apenas armazenando os nós de entrada (e não apagando nenhum nó), tornamos nossa estrutura totalmente persistente.
 
-Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha_persist}, onde nunca é necessário alterar nenhum nó. Quando a estrutura não funciona dessa forma, é possível tentar ``forçar'' isso, copiando os nós que seriam modificados (e seus ancestrais). A estrutura recursiva de deque do Capítulo~\ref{cap:deque2_persist} faz isso, copiando todos os nós acessados durante um~\textsc{Push} ou~\textsc{Pop}.
+Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha_persist}, onde nunca é necessário alterar nenhum nó. Quando a estrutura não funciona dessa forma, é possível tentar ``forçar'' isso, copiando os nós que seriam modificados (e seus ancestrais). A estrutura recursiva de deque do Capítulo~\ref{cap:deque2_persist} faz isso, copiando todos os nós acessados durante um~\API{Push} ou~\API{Pop}.
 
 Para fazer isso em uma estrutura qualquer, supomos que, sempre que adicionamos um nó~$u$ ao conjunto de acessos, todos seus ancestrais já estão neste conjunto. Ao adicionar esse nó, na verdade adicionamos uma cópia~$u'$ dele, e para todo nó~$v$ no conjunto de acessos que tem um ponteiro para~$u$, trocamos este ponteiro por~$u'$.
 
