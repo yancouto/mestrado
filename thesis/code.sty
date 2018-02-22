@@ -7,12 +7,12 @@
 
 \usepackage{makerobust}
 \MakeRobustCommand{\Call} % Call inside Call is now ok
-\providecommand{\func}[2]{\mbox{\textsc{#1}$(#2)$}}
+\providecommand{\func}[2]{\mbox{\textsc{#1}\ensuremath{(#2)}}}
 
-\newcommand{\retval}[1]{$\longrightarrow$ #1}
+\newcommand{\retval}[1]{\ensuremath{\longrightarrow} #1}
 \newcommand{\API}[1]{\textsc{\underline{#1}}}
-\newcommand{\funcAPI}[2]{\mbox{\API{#1}$(#2)$}}
-\newcommand{\funcAPIr}[3]{\mbox{\API{#1}$(#2)$\retval{#3}}}
+\newcommand{\funcAPI}[2]{\mbox{\API{#1}\ensuremath{(#2)}}}
+\newcommand{\funcAPIr}[3]{\mbox{\API{#1}\ensuremath{(#2)}\retval{#3}}}
 \newcommand{\type}[1]{\colon \text{#1}}
 
 %% Ruler
