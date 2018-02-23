@@ -732,16 +732,27 @@ Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanç
 			\State \Call{Rotate}{$y, \Not\ \side$}
 			\State \Break
 		\EndIf
-
 	\EndWhile
 \EndFunction
-
-
 \end{algorithmic}
 \caption{Implementação de~\textsc{AddBlack}.} \label{lst:addblack}
 \end{algorithm}
 
 A implementação da função~\textsc{AddBlack} no Código~\ref{lst:addblack} segue os casos descritos nesta seção. É necessário cuidado ao modificar a cor de um nó, já que é necessário fazer essa modificação na versão mais atual do nó. Por isso, na aplicação dos casos, as mudanças de cores são feitas antes das rotações (que podem gerar cópias dos nós), e após as rotações as versões mais novas de cada nó são atualizadas.
+
+A primeira coluna da Tabela~\ref{tab:arb_comp} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
+
+
+\begin{table} \centering
+\begin{tabular}{|l|c|c|}
+	\hline
+	& Node copying & Funcional \\ \hline
+	\funcAPI{Insert}{\V{value}} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ \\
+	\funcAPI{Remove}{\V{value}} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ \\
+	\funcAPI{Find}{\V{value}} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Comparação do consumo de tempo e espaço da solução implementada neste capítulo e de uma implementação funcional, feita como indicado na Seção~\ref{sec:implfuncional}, onde~$n$ é o tamanho da ABB. Note que a implementação deste capítulo é parcialmente persistente, enquanto a implementação funcional é totalmente persistente.} \label{tab:arb_comp}
+\end{table}
 
 
 \end{document}

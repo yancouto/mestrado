@@ -506,4 +506,38 @@ Note que as operações~\API{PushFront} e~\API{PopFront} copiam o topo da deque,
 
 Os~\keyword{if}s das operações~\API{PopFront} e~\API{Front} checam os casos degenerados, já que, como a estrutura é regular, se uma das sub-deques de~$a$ é vazia então~$a$ é tanto o topo quanto o último nível da estrutura.
 
+A operação~\funcAPI{k-th}{d, k} não foi implementada, mas pode ser feita de forma similar, embora um pouco mais complicada, ao Código~\label{lst:deque_kth}. A Tabela~\ref{tab:deque3_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo. A Tabela~\ref{tab:deque_persist_comp} compara o consume de tempo e espaço de todas as deques persistentes apresentadas neste trabalho.
+
+\begin{table} \centering
+\begin{tabular}{|l|c|}
+	\hline
+	& Tempo/Espaço \\ \hline
+	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushFront}{q, x} & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushBack}{q, x} & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{Front}{q} & $\Oh(1)$ \\
+	\funcAPI{Back}{q} & $\Oh(1)$ \\
+	\funcAPI{PopFront}{q} & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PopBack}{q} & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Consumo de tempo e espaço da implementação deste capítulo, onde~$n$ é o tamanho da deque. \label{tab:deque3_persist}}
+\end{table}
+
+\begin{table} \centering
+\begin{tabular}{|l|c|c|c|c|}
+	\hline
+	& Representação binária & Skew-binary & Recursiva & Kaplan e Tarjan  \\ \hline
+	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushFront}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PushBack}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{Front}{q} & $\Oh(1)$ & $\Oh(1)$ & $\Oh(\lg n)$ & $\Oh(1)$ \\
+	\funcAPI{Back}{q} & $\Oh(1)$ & $\Oh(1)$ & $\Oh(\lg n)$ & $\Oh(1)$ \\
+	\funcAPI{PopFront}{q} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{PopBack}{q}  & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
+	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Comparação do consumo de tempo e espaço das deques implementadas nos Capítulos~\ref{cap:deque1_persist},~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}, onde~$n$ é o tamanho da deque. \label{tab:deque_persist_comp}}
+\end{table}
+
 \end{document}

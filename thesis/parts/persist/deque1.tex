@@ -233,17 +233,17 @@ O Código~\ref{lst:deque1_ops3} faz exatamente o que discutido, e portanto corre
 \begin{table} \centering
 \begin{tabular}{|l|c|c|}
 	\hline
-	& Representação Binária & Skew-Binary \\ \hline
+	& Representação binária & Skew-binary \\ \hline
 	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{PushFront}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{PushBack}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Front}{q} & $\Oh(1)$ & $\Oh(1)$ \\
 	\funcAPI{Back}{q} & $\Oh(1)$ & $\Oh(1)$ \\
-	\funcAPI{PopFront}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
-	\funcAPI{PopBack}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
+	\funcAPI{PopFront}{q} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(1)$ \\
+	\funcAPI{PopBack}{q} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(1)$ \\
 	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Consumo de tempo e espaço da implementação de uma deque de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho atual da deque. \label{tab:deque1_persist}}
+	\caption{Consumo de tempo e espaço da implementação de uma deque de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho da deque. \label{tab:deque1_persist}}
 \end{table}
 
 \end{document}
