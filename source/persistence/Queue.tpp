@@ -4,18 +4,20 @@ namespace persistence {
 
 namespace queue {
 
-template<class T> Queue<T>::Queue() : size(0) {}
-template<class T> Queue<T>::Queue(Stack<T> st, int sz) : stack(st), size(sz) {}
+template<class T> Queue<T>::Queue() : rem(0) {}
+template<class T> Queue<T>::Queue(Stack<T> st, int rm) : stack(st), rem(rm) {}
 
-template<class T> const T& Queue<T>::Last() const { return K_th(size - 1); }
+template<class T> const T& Queue<T>::First() const { return K_th(1); }
 
-template<class T> const T& Queue<T>::K_th(int k) const { return stack.K_th(k); }
+template<class T> const T& Queue<T>::K_th(int k) const { return stack.K_th(k + rem); }
+
+template<class T> int Queue<T>::Size() const { return stack.Size() - rem; }
 
 template<class T> Queue<T> Queue<T>::Enqueue(const T& x) const {
-	return Queue<T>(stack.Push(x), size + 1);
+	return Queue<T>(stack.Push(x), rem);
 }
 
-template<class T> Queue<T> Queue<T>::Dequeue() const { return Queue<T>(stack, size - 1); }
+template<class T> Queue<T> Queue<T>::Dequeue() const { return Queue<T>(stack, rem + 1); }
 
 } // namespace queue
 
