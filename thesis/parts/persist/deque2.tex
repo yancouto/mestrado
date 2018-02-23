@@ -112,7 +112,7 @@ Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center
 \end{algorithmic}
 \end{algorithm}
 
-Devido à forma recusiva como a estrutura foi definida, recursão é muito útil para lidar com esta estrutura.
+Devido à forma recursiva como a estrutura foi definida, recursão é muito útil para lidar com esta estrutura.
 Assumimos sempre que todas as operações chamadas são válidas, ou seja,~\funcAPI{Front}{d} e~\funcAPI{Back}{d} são chamadas apenas quando~$d$ não é vazia, e consequentemente seu valor não é~\keyword{null}. Veja o Código~\ref{lst:deque_acesso}. Para questões de implementação, os elementos de~$T \x T$ são representados como um par com campos~$\V{first}$ e~$\V{second}$, ou seja, se~$a, b \in T$ então~$(a, b) \in T \x T$ e vale que~$(a, b).\V{first} = a$ e~$(a, b).\V{second} = b$.
 
 Vamos analisar a operação~\funcAPI{Front}{d}. Pela maneira como definimos a deque, se~$\V{prefix}$ não é nulo então ele é um prefixo de~$d$, logo este é a resposta de~\funcAPI{Front}{d}. Se não, se~$\V{center}$ não é nulo, como não guardamos deques vazias, este tem algum elemento. O valor devolvido é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos do tipo~$T \times T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$. Caso contrário, o único elemento da deque é~$d.\V{suffix}$ e o valor devolvido também é correto.

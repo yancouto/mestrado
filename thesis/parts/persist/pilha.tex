@@ -113,7 +113,7 @@ Vamos considerar a sequência de operações no Exemplo~\ref{ex:pilha}. Na esque
 \caption{Exemplo de uso de uma pilha persistente.} \label{ex:pilha}
 \end{example}
 
-Em uma pilha efêmera (não-persistente) adicionamos apenas elementos no começo da lista ligada, mas no caso da pilha persistente podemos adicionar nós em outros pontos, e na verdade a estrutura resultante é uma arborescência, ou seja, uma árvore enraizada onde as arestas apontam para a raiz, considerando que o apontador da raiz é~\keyword{null}. Note que, como discutido anteriormente, a partir de cada nó podemos apenas acessar uma lista, se considerarmos seus campos~\code{next}.
+Em uma pilha efêmera (não persistente) adicionamos apenas elementos no começo da lista ligada, mas no caso da pilha persistente podemos adicionar nós em outros pontos, e na verdade a estrutura resultante é uma arborescência, ou seja, uma árvore enraizada onde as arestas apontam para a raiz, considerando que o apontador da raiz é~\keyword{null}. Note que, como discutido anteriormente, a partir de cada nó podemos apenas acessar uma lista, se considerarmos seus campos~\code{next}.
 
 A Figura~\ref{fig:pilha_ex1} mostra a arborescência criada para a sequência de operações do Exemplo~\ref{ex:pilha}. Em cada nó é indicado o valor armazenado naquele nó, e a flecha saindo de cada nó indica seu campo~$\V{next}$. Os valores~$p_0, \ldots, p_6$ apontam para os seus nós correspondentes. Note que é possível que~${p_i = p_j}$ para~${i \neq j}$. Isso ocorre no exemplo, onde~$p_4 = p_1$. Isso não ocorre sempre que as pilhas têm os mesmos valores; perceba que~$p_1 \neq p_6$, apesar destas duas pilhas terem os mesmos elementos na mesma ordem.
 
@@ -170,7 +170,7 @@ Se assumimos que a função~${\New \func{Node}{x, \V{nx}, \V{sz}}}$ também cham
 	\State \Return $\Call{LevelAncestor}{p, p.\V{size} - k}.\V{val}$
 \EndFunction
 \end{algorithmic}
-\caption{Implementação de~\funcAPI{k-th}{p, k} usando~Level Ancestor como caixa preta.} \label{lst:pilha-kth}
+\caption{Implementação de~\funcAPI{k-th}{p, k} usando~Ancestral de Nível como caixa preta.} \label{lst:pilha-kth}
 \end{algorithm}
 
 A Tabela~\ref{tab:pilha_persist} mostra o consumo de tempo e espaço de uma pilha persistente, usando o Ancestral de Nível do Capítulo~\ref{cap:ancestrais} e~\ref{cap:skew}.

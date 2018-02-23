@@ -76,7 +76,7 @@ Considerando apenas os nós negros, a árvore é totalmente balanceada (propried
 \newcommand{\cur}{\V{current}}
 
 
-Em uma árvore rubro-negra efêmera (não-persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~um, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó, dado que usaremos a técnica de node copying.
+Em uma árvore rubro-negra efêmera (não persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~um, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó, dado que usaremos a técnica de node copying.
 
 O ponteiro extra simula o vetor~$\V{changes}$ usado durante a Seção~\ref{sec:nodecopying}, que no caso sempre teria zero ou um elemento.
 
@@ -282,9 +282,9 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 
 	O nó~$x$ não viola mais nenhuma propriedade, mas o nó~$z$ se tornou vermelho e pode ter o pai vermelho ou ser a raiz, logo a próxima iteração deve ter~$x' = z$.
 
-	\item[Caso 2.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquedo de~$z$ e~$x$ é filho esquerdo de~$y$). Então realizamos uma rotação de~$z$ em direção a~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
+	\item[Caso 2.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquerdo de~$z$ e~$x$ é filho esquerdo de~$y$). Então realizamos uma rotação de~$z$ em direção a~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
 
-	Antes da tranformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, e os caminhos que passam por~$w$ passam pelos nós pretos~$z$ e~$w$ (se existir). Após a transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ passam pelos nós pretos~$y$ e $w$ (se existir). Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
+	Antes da transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, e os caminhos que passam por~$w$ passam pelos nós pretos~$z$ e~$w$ (se existir). Após a transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ passam pelos nós pretos~$y$ e $w$ (se existir). Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
 
 	\item[Caso 3.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de lados diferentes. A rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim transformamos este caso no~caso~2~(se trocamos~$x$ por~$y$).
 
