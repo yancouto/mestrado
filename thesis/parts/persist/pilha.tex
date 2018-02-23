@@ -158,7 +158,7 @@ Apresentaremos a implementação da função~\funcAPI{k-th}{p, k}. Esta operaç�
 
 Lembre-se que~$p$ é um nó de uma arborescência, e representa o último elemento da pilha, então~\funcAPI{k-th}{p, k} precisa determinar o~$(p.\V{size}-k)$-ésimo ancestral de~$p$, ou seja, o nó alcançado a partir de~$p$ ao caminhar por~$p.\V{size} - k$ links~$\V{next}$. Nesse caso, o~0-ésimo ancestral de um nó é o próprio nó.
 
-Note que esse é o problema do Ancestral de Nível, discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}. Nesses capítulos foi discutido como encontrar ancestrais de níveis usando as operações~\funcAPI{AddLeaf}{u} e~\funcAPI{LevelAncestor}{u, k}. Note que apresentamos essas operações de forma que folhas novas possam ser adicionadas de forma online, que é necessário neste problema, já que adicionamos uma folha quando aplicamos uma operação de modificação à pilha.
+Note que esse é o problema do Ancestral de Nível, discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}. Nesses capítulos foi discutido como encontrar ancestrais de níveis usando as operações~\funcAPI{AddLeaf}{u} e~\funcAPI{LevelAncestor}{k, u}. Note que apresentamos essas operações de forma que folhas novas possam ser adicionadas de forma online, que é necessário neste problema, já que adicionamos uma folha quando aplicamos uma operação de modificação à pilha.
 
 \providecommand{\Par}{\operatorname{Parent}}
 
@@ -167,7 +167,7 @@ Se assumimos que a função~${\New \func{Node}{x, \V{nx}, \V{sz}}}$ também cham
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Function{k-th}{$p, k$}
-	\State \Return $\Call{LevelAncestor}{p, p.\V{size} - k}.\V{val}$
+	\State \Return $\Call{LevelAncestor}{p.\V{size} - k, p}.\V{val}$
 \EndFunction
 \end{algorithmic}
 \caption{Implementação de~\funcAPI{k-th}{p, k} usando~Ancestral de Nível como caixa preta.} \label{lst:pilha-kth}

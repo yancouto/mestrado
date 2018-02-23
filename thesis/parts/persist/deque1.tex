@@ -191,7 +191,7 @@ O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \
 	\If{$d.\V{first} = d.\V{last}$}
 		\State \Return \funcAPI{Deque}{\null}
 	\ElsIf{$\funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}$}
-		\State \Return $(\funcAPI{LevelAncestor}{d.\V{last}, d.\V{last}.\V{depth} - d.\V{first}.\V{depth} - 1}, d.\V{last})$
+		\State \Return $(\funcAPI{LevelAncestor}{d.\V{last}.\V{depth} - d.\V{first}.\V{depth} - 1, d.\V{last}}, d.\V{last})$
 	\Else
 		\State \Return $(d.\V{first}.\V{parent}, d.\V{last})$
 	\EndIf
@@ -204,7 +204,7 @@ O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:deque1_ops2} mostra a implementação das operações~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}. Usamos o predicado~${\funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}}$ para determinar se~$d.\V{first}$ é o ancestral comum mais profundo de~$d.\V{first}$ e~$d.\V{last}$, mas esta condição pode ser verificada usando apenas chamadas para~\mbox{\API{\textsc{LevelAncestor}}}. Como discutido anteriormente, se isto ocorre, então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$, mas neste caso~$d.\V{first}$ é o~${(\V{last}.\V{depth} - \V{first}.\V{depth})}$-ésimo ancestral de~$\V{last}$. Então $$ \funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first} $$ é equivalente a $$ d.\V{first}.\V{depth} < d.\V{last}.\V{depth} \AND \funcAPI{LevelAncestor}{d.\V{last}, d.\V{last}.\V{depth} - d.\V{first}.\V{depth}} = d.\V{first}. $$
+O Código~\ref{lst:deque1_ops2} mostra a implementação das operações~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}. Usamos o predicado~${\funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}}$ para determinar se~$d.\V{first}$ é o ancestral comum mais profundo de~$d.\V{first}$ e~$d.\V{last}$, mas esta condição pode ser verificada usando apenas chamadas para~\mbox{\API{\textsc{LevelAncestor}}}. Como discutido anteriormente, se isto ocorre, então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$, mas neste caso~$d.\V{first}$ é o~${(\V{last}.\V{depth} - \V{first}.\V{depth})}$-ésimo ancestral de~$\V{last}$. Então $$ \funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first} $$ é equivalente a $$ d.\V{first}.\V{depth} < d.\V{last}.\V{depth} \AND \funcAPI{LevelAncestor}{d.\V{last}.\V{depth} - d.\V{first}.\V{depth}, d.\V{last}} = d.\V{first}. $$
 
 \section{Acesso a outros elementos}
 
@@ -219,9 +219,9 @@ Para implementar a operação~\funcAPI{k-th}{d, k}, é necessário comparar~$k-1
 	\State $\ell_1 = d.\V{first}.\V{depth} - d.\V{mid}.\V{depth}$
 	\State $\ell_2 = d.\V{last}.\V{depth} - d.\V{mid}.\V{depth}$
 	\If{$k - 1 \leq \ell_1$}
-		\State \Return $\funcAPI{LevelAncestor}{d.\V{first}, k - 1}$
+		\State \Return $\funcAPI{LevelAncestor}{k - 1, d.\V{first}}$
 	\Else
-		\State \Return $\funcAPI{LevelAncestor}{d.\V{last}, \ell_1 + \ell_2 + 1 - k}$
+		\State \Return $\funcAPI{LevelAncestor}{\ell_1 + \ell_2 + 1 - k, d.\V{last}}$
 	\EndIf
 \EndFunction
 

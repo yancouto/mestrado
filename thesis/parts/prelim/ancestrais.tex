@@ -25,7 +25,7 @@ $$\LCA(u, v) \coloneqq \argmax\{\Dep(w) : w \in V,\ w \text{ é ancestral de $u$
 
 \section{Potências de funções} \label{sec:potfunc}
 
-Vamos considerar o problema, um pouco mais genérico, de, dada uma função~$f : [n] \rightarrow [n]$ (que pode ser dada por um vetor de tamanho~$n$, por exemplo), construir um algoritmo que, após possivelmente algum pré-processamento sobre o vetor~$f$, responda consultas do tipo: dados~$i \in [n]$ e~$k \in [m] \cup \{0\}$, determinar~$f^k(i)$ de forma eficiente. Se o tempo de processamento é~$\Oh(p(n, m))$ e o tempo para responder cada consulta é~$\Oh(q(n, m))$, dizemos que a complexidade da solução é~$\angles{\Oh(p(n, m), \Oh(q(n, m))}$.
+Vamos considerar o problema, um pouco mais genérico, de, dada uma função~$f : [n] \rightarrow [n]$ (que pode ser dada por um vetor de tamanho~$n$, por exemplo), construir um algoritmo que, após possivelmente algum pré-processamento sobre o vetor~$f$, responda consultas do tipo: dados~$i \in [n]$ e~$k \in [m] \cup \{0\}$, determinar~$f^k(i)$ de forma eficiente. Se o tempo de processamento é~$\Oh(p(n, m))$ e o tempo para responder cada consulta é~$\Oh(q(n, m))$, dizemos que a complexidade da solução é~$\angles{\Oh(p(n, m)), \Oh(q(n, m))}$.
 
 \subsection{Soluções simples}
 
@@ -109,15 +109,15 @@ Por esse motivo, o algoritmo pode ser implementado de forma online, na qual nova
 \caption{Solução para o problema do Ancestral de Nível.} \label{lst:lapot2}
 \begin{algorithmic}[1]
 	\LineComment{Adiciona a folha~$u$ à árvore.}
-	\Function{AddLeaf}{$u$}
+	\Function{\API{AddLeaf}}{$u$}
 		\State $u.\jmp[0] = \Par(u)$
 		\For{$k = 1 \To \floor{\lg \Dep(u)}$}
 			\State $u.\jmp[k] = u.\jmp[k - 1].\jmp[k - 1]$
 		\EndFor
 	\EndFunction
 
-	\LineComment{Devolve~$\LA(k, u)$, deve ser chamada após~\Call{AddLeaf}{$u$}.}
-	\Function{LevelAncestor}{$k, u$}
+	\LineComment{Devolve~$\LA(k, u)$, deve ser chamada após~\funcAPI{AddLeaf}{u}.}
+	\Function{\API{LevelAncestor}}{$k, u$}
 		\For{$x = \floor{\lg{k}} \DownTo 0$}
 			\If{$2^x \leq k$}
 				\State $k = k - 2^x$
@@ -129,7 +129,7 @@ Por esse motivo, o algoritmo pode ser implementado de forma online, na qual nova
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, quando se pode adicionar folhas à árvore. A função~$\Call{AddLeaf}{u}$ consome tempo~$\Oh(\lg \Dep(u))$ e a função~$\Call{LevelAncestor}{k, u}$ consome tempo~$\Oh(\lg k) = \Oh(\lg \Dep(u))$. Note que cada nó~$u$ deve armazenar um vetor de tamanho~$\floor{\lg \Dep(u)}$. Na literatura, essa técnica é chamada de Sparse Table, já que ``armazenamos'' uma tabela de tamanho~$|V| \times |V|$ usando apenas espaço~$|V| \lg |V|$, ou~Jump Pointers, neste caso mais específico do Ancestral de Nível em árvores~\cite{BenderM-F2004}. A Figura~\ref{fig:treejmppot2} ilustra os jump pointers de uma árvore.
+O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, quando se pode adicionar folhas à árvore. A operação~$\funcAPI{AddLeaf}{u}$ consome tempo~$\Oh(\lg \Dep(u))$ e a operação~$\funcAPI{LevelAncestor}{k, u}$ consome tempo~$\Oh(\lg k) = \Oh(\lg \Dep(u))$. Note que cada nó~$u$ deve armazenar um vetor de tamanho~$\floor{\lg \Dep(u)}$. Na literatura, essa técnica é chamada de Sparse Table, já que ``armazenamos'' uma tabela de tamanho~$|V| \times |V|$ usando apenas espaço~$|V| \lg |V|$, ou~Jump Pointers, neste caso mais específico do Ancestral de Nível em árvores~\cite{BenderM-F2004}. A Figura~\ref{fig:treejmppot2} ilustra os jump pointers de uma árvore.
 
 \begin{figure}
 \centering
@@ -153,8 +153,6 @@ O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, qua
 	\caption{Exemplo de árvore com jump pointers. As arestas cheias são as arestas de pai~($\jmp[0]$), as arestas tracejadas pulam dois níveis~($\jmp[1]$), e as arestas pontilhadas pulam quatro níveis~($\jmp[2]$).} \label{fig:treejmppot2}
 \end{figure}
 
-\section{Skew binary}
-
 \section{Calculando Ancestral Comum Mais Profundo}
 
 Seja~$u, v \in V$ e~$c$ o ancestral comum mais profundo de~$u$ e~$v$, assuma, sem perda de generalidade que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' estes vértices, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
@@ -165,7 +163,7 @@ Assim, temos que~$\Dep(u) = \Dep(v)$, e, para encontrar o ancestral comum mais p
 $${\LA(k + 1, u) = \Par(\LA(k, u)) = \Par(c) = \Par(\LA(k, v)) = \LA(k + 1, v).}$$
 Isso permitirá a utilização dos Jump Pointers para determinar tal~$\kb$ mínimo.
 
-Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de checar se~$x < \kb$ sem conhecer~$\kb$. Como, pela prova do Teorema~\ref{thm:pot2}, para decompor um número em soma de potências de dois distintas basta determinar a maior potência de dois menor ou igual a esse número, adicioná-la à decomposição e repetir o algoritmo, e temos jump pointers para as potências de dois para todos os nós, conseguimos determinar a decomposição em potências de dois distintas de~${\kb - 1}$ (já que conseguimos testar~${x \leq \kb - 1}$ e não~${x \leq \kb}$), e de forma similar à função~\textsc{LevelAncestor} do Código~\ref{lst:lapot2}, podemos determinar o~\mbox{$(\kb-1)$-ésimo} ancestral de~$u$ e~$v$ em tempo~$\Oh(\Dep(u))$.
+Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de checar se~$x < \kb$ sem conhecer~$\kb$. Como, pela prova do Teorema~\ref{thm:pot2}, para decompor um número em soma de potências de dois distintas basta determinar a maior potência de dois menor ou igual a esse número, adicioná-la à decomposição e repetir o algoritmo, e temos jump pointers para as potências de dois para todos os nós, conseguimos determinar a decomposição em potências de dois distintas de~${\kb - 1}$ (já que conseguimos testar~${x \leq \kb - 1}$ e não~${x \leq \kb}$), e de forma similar à função~\API{LevelAncestor} do Código~\ref{lst:lapot2}, podemos determinar o~\mbox{$(\kb-1)$-ésimo} ancestral de~$u$ e~$v$ em tempo~$\Oh(\lg \Dep(u))$.
 
 \begin{algorithm}
 \caption{Ancestral Comum Mais Profundo usando Jump Pointers \label{lst:lcapot2}}
@@ -191,7 +189,7 @@ Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de 
 \end{algorithm}
 
 \begin{invar}
-Ao início da iteração com valor~$i$ do~\keyword{for} da linha~\ref{lst:lcapot2:for} do Código~\ref{lst:lcapot2}, vale que~${0 < \Dep(u) - \Dep(c) \leq 2^{i+1}}$, onde~${c = \LCA(u, v)}$, e o valor de~$\LCA(u, v)$ não ao final da iteração.
+Ao início da iteração com valor~$i$ do~\keyword{for} da linha~\ref{lst:lcapot2:for} do Código~\ref{lst:lcapot2}, vale que~${0 < \Dep(u) - \Dep(c) \leq 2^{i+1}}$, onde~${c = \LCA(u, v)}$, e o valor de~$\LCA(u, v)$ não se altera ao final da iteração.
 \end{invar}
 \begin{proof}
 	Para a base,~$i = \floor{\lg\Dep(u)}$ e
