@@ -153,7 +153,7 @@ O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, qua
 	\caption{Exemplo de árvore com jump pointers. As arestas cheias são as arestas de pai~($\jmp[0]$), as arestas tracejadas pulam dois níveis~($\jmp[1]$), e as arestas pontilhadas pulam quatro níveis~($\jmp[2]$).} \label{fig:treejmppot2}
 \end{figure}
 
-\section{Calculando Ancestral Comum Mais Profundo}
+\section{Calculando Ancestral Comum Mais Profundo} \label{sec:lca_pot2}
 
 Seja~$u, v \in V$ e~$c$ o ancestral comum mais profundo de~$u$ e~$v$, assuma, sem perda de generalidade que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' estes vértices, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
 
@@ -166,13 +166,13 @@ Isso permitirá a utilização dos Jump Pointers para determinar tal~$\kb$ míni
 Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de checar se~$x < \kb$ sem conhecer~$\kb$. Como, pela prova do Teorema~\ref{thm:pot2}, para decompor um número em soma de potências de dois distintas basta determinar a maior potência de dois menor ou igual a esse número, adicioná-la à decomposição e repetir o algoritmo, e temos jump pointers para as potências de dois para todos os nós, conseguimos determinar a decomposição em potências de dois distintas de~${\kb - 1}$ (já que conseguimos testar~${x \leq \kb - 1}$ e não~${x \leq \kb}$), e de forma similar à função~\API{LevelAncestor} do Código~\ref{lst:lapot2}, podemos determinar o~\mbox{$(\kb-1)$-ésimo} ancestral de~$u$ e~$v$ em tempo~$\Oh(\lg \Dep(u))$.
 
 \begin{algorithm}
-\caption{Ancestral Comum Mais Profundo usando Jump Pointers \label{lst:lcapot2}}
+\caption{Ancestral Comum Mais Profundo usando Jump Pointers. \label{lst:lcapot2}}
 \begin{algorithmic}[1]
-	\Function{LowestCommonAncestor}{$u, v$}
+	\Function{\API{LowestCommonAncestor}}{$u, v$}
 		\If{$\Dep(u) > \Dep(v)$}
 			\State $u, v = v, u$ \Comment{Garantindo que~$\Dep(u) \leq \Dep(v)$.}
 		\EndIf
-		\State $v = \Call{LevelAncestor}{\Dep(v) - \Dep(u), v}$ \Comment{Nivelando~$v$.}
+		\State $v = \funcAPI{LevelAncestor}{\Dep(v) - \Dep(u), v}$ \Comment{Nivelando~$v$.}
 		\If{$u = v$} \label{lst:lcapot2:if2}
 			\State \Return $u$
 		\EndIf
@@ -205,5 +205,18 @@ Ao início da iteração com valor~$i$ do~\keyword{for} da linha~\ref{lst:lcapot
 \end{proof}
 
 Portanto, ao final da última iteração, a invariante vale para~$i = -1$, ou seja, vale que~${0 < \Dep(u) - \Dep(c) \leq 2^0 = 1}$, logo~$c$ é o pai de~$u$ e a função retorna o valor correto.
+
+A Tabela~\ref{tab:la_pot2} mostra o consumo de tempo e espaço das implementações discutidas nesse capítulo.
+
+\begin{table} \centering
+\begin{tabular}{|l|c|}
+	\hline
+	& Consumo de tempo/espaço \\ \hline
+	\funcAPI{AddLeaf}{u} & $\Oh(\lg n) / \Oh(\lg n)$ \\ \hline
+	\funcAPI{LevelAncestor}{k, u} & $\Oh(\lg n) $ \\ \hline
+	\funcAPI{LowestCommonAncestor}{u, v} & $\Oh(\lg n)$ \\ \hline
+\end{tabular}
+	\caption{Consumo de tempo e espaço da solução discutida.} \label{tab:la_pot2}
+\end{table}
 
 \end{document}
