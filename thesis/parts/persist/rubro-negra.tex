@@ -4,13 +4,24 @@
 
 \chapter{Árvore rubro-negra} \label{cap:rubronegra_persist}
 
-Iremos implementar uma árvore rubro-negra parcialmente persistente utilizando a técnica de node copying, discutida na Seção~\ref{sec:nodecopying}. Uma árvore rubro-negra é uma árvore de busca binária balanceada, na qual cada nó é vermelho ou preto, e as cores são usadas para auxiliar no rebalanceamento.
+Apresentaremos neste capítulo a implementação de uma árvore rubro-negra parcialmente persistente utilizando a técnica de node copying, discutida na Seção~\ref{sec:nodecopying}. Uma árvore rubro-negra é uma árvore de busca binária balanceada, na qual cada nó é vermelho ou preto, e as cores são usadas para auxiliar no rebalanceamento.
 
-Com uma implementação baseada na de Cormen et al.~\cite[Cap. 13]{CLRS}, a cada inserção ou remoção em uma árvore de~$n$ nós, são necessárias apenas~$\Oh(1)$ rotações para rebalancear a árvore, e~$\Oh(\lg n)$ mudanças de cores. Como as cores servem apenas para auxiliar no rebalanceamento, não é necessário que estes dados sejam mantidos em versões que não a corrente para persistência parcial. Ou seja, só precisamos saber a cor dos nós ativos, logo são feitos apenas~$\Oh(1)$ passos de modificação~(considerando apenas os ponteiros de filho esquerdo e direito de um nó) por inserção, logo esta implementação parcialmente persistente consome tempo~$\Oh((m + a) \lg(m))$ e espaço~$\Oh(m)$, onde~$m$ é o número de operações de modificação~(inserções e remoções), e~$a$ é o número de operações de acesso~(acessar um elemento, mínimo, máximo, etc.).
+Com uma implementação baseada na de Cormen et al.~\cite[Cap. 13]{CLRS}, a cada inserção ou remoção em uma árvore de~$n$ nós, são necessárias apenas~$\Oh(1)$ rotações para rebalancear a árvore, e~$\Oh(\lg n)$ mudanças de cores. Como as cores servem apenas para auxiliar no rebalanceamento, não é necessário que estes dados sejam mantidos em versões que não a atual para persistência parcial. Ou seja, só precisamos saber a cor dos nós ativos, logo são feitos apenas~$\Oh(1)$ passos de modificação~(considerando apenas os ponteiros de filho esquerdo e direito de um nó) por inserção, logo esta implementação parcialmente persistente consome tempo~$\Oh((m + a) \lg(m))$ e espaço~$\Oh(m)$, onde~$m$ é o número de operações de modificação~(inserções e remoções), e~$a$ é o número de operações de acesso~(acessar um elemento, mínimo, máximo, etc.).
 
 A implementação de Sedgewick e Wayne~\cite{SedgewickRedBlack}, apesar de ser considerada mais simples, não serve para os nossos propósitos, pois, ao considerar apenas árvores rubro-negras esquerdistas, os algoritmos de inserção e remoção podem realizar~$\Theta(\lg n)$ rotações, logo não é possível manter o consumo de espaço~$\Oh(m)$, usando node copying.
 
-Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garante esse espaço, e é totalmente persistente. Esse método é discutido na Seção~\ref{sec:implfuncional}, e também usado nos Capítulos~\ref{cap:pilha_persist},~\ref{cap:deque1_persist},~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}. Basta, em operações de modificação, copiar todo o caminho percorrido na árvore, a partir da raiz.
+Se~$\Oh(m \lg m)$ de espaço é aceitável, uma implementação funcional garante esse espaço, e é totalmente persistente. Esse método é discutido na Seção~\ref{sec:implfuncional}, e utilizado nos Capítulos~\ref{cap:pilha_persist},~\ref{cap:deque1_persist},~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}. Basta, em operações de modificação, copiar todo o caminho percorrido na árvore, a partir da raiz.
+
+Estamos interessados na implementação das seguintes operações:
+
+\begin{itemize}
+	\item \funcAPI{Insert}{\V{value}}
+		\\ Insere um nó com valor~$\V{value}$ na ABB.
+	\item \funcAPI{Remove}{\V{value}}
+		\\ Remove um nó com valor~$\V{value}$ da ABB.
+	\item \funcAPI{Find}{\V{value}}
+		\\ Devolve algum nó da ABB com valor~$\V{value}$. Caso não exista, devolve~\keyword{null}.
+\end{itemize}
 
 \section{Definições}
 
@@ -65,7 +76,7 @@ Considerando apenas os nós negros, a árvore é totalmente balanceada (propried
 \newcommand{\cur}{\V{current}}
 
 
-Em uma árvore rubro-negra efêmera (não-persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~um, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó.
+Em uma árvore rubro-negra efêmera (não-persistente), todo nó precisa de dois campos para seus filhos, e um valor booleano que indica se o nó é vermelho ou não. Como já discutido, o campo booleano não precisa ser guardado de forma persistente. Como cada nó tem grau de entrada no máximo~um, na versão persistente é necessário armazenar apenas um ponteiro de volta e um ponteiro extra por nó, dado que usaremos a técnica de node copying.
 
 O ponteiro extra simula o vetor~$\V{changes}$ usado durante a Seção~\ref{sec:nodecopying}, que no caso sempre teria zero ou um elemento.
 
@@ -86,10 +97,10 @@ Para evitar a necessidade de replicar código muito parecido, vamos armazenar os
 
 \section{Operações de acesso} \label{sec:rbacesso}
 
-Para acessar o campo de um nó na versão~$\version$, ou na versão corrente, usamos versões modificadas das funções~\textsc{Access}. O campo~$\cur$, como na Seção~\ref{sec:nodecopying}, indica o tempo atual da estrutura, ou seja, o número de operações de modificação realizadas, e os campos~$\ts$ e~$\eTs$ armazenam o valor de~$\cur$ durante a criação do nó e do ponteiro extra, respectivamente.
+Para acessar o campo de um nó na versão~$\version$, ou na versão atual, usamos versões modificadas das funções~\textsc{Access}, dadas no Código~\ref{lst:arb_access} (neste capítulo, os nomes das funções de interface não estarão sublinhados para não serem confundidos com os nomes das operações da ABB). O campo~$\cur$, como na Seção~\ref{sec:nodecopying}, indica o tempo atual da estrutura, ou seja, o número de operações de modificação realizadas, e os campos~$\ts$ e~$\eTs$ armazenam o valor de~$\cur$ durante a criação do nó e do ponteiro extra, respectivamente.
 
 \begin{algorithm}
-\caption{Acesso aos campos de um nó.}
+	\caption{Acesso aos campos de um nó.} \label{lst:arb_access}
 \begin{algorithmic}[1]
 
 \Require $u$ deve ser um nó associado à versão~$\version$.
@@ -108,31 +119,28 @@ Para acessar o campo de um nó na versão~$\version$, ou na versão corrente, us
 \end{algorithmic}
 \end{algorithm}
 
-Vamos apresentar a operação~\textsc{Find}, que retorna o valor buscado, ou~\keyword{null} se ele não foi encontrado. Assumimos que é guardado um vetor~$\roots$, com o nó de entrada (a raiz) para cada versão.
+O Código~\ref{lst:arb_find} apresenta a operação~\API{Find}, que devolve um nó com o valor buscado, ou~\keyword{null} se tal nó não existe. Assumimos que é guardado um vetor~$\roots$, com o nó de entrada (a raiz) para cada versão.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
 
-\Function{Find}{$x, \version$}
+	\Function{\API{Find}}{$x, \version$}
 	\State $u = \roots[\version]$
 	\While{$u \neq \Null \AND x \neq u.\val$}
 	\State $u = \Call{Child}{u, [x > u.\val], \version}$ \label{line:findrb:iver}
 	\EndWhile
-	\If{$u = \Null$}
-		\State \Return \Null
-	\Else
-		\State \Return $u.\val$ % TODO mudar para u e adaptar o resto
-	\EndIf
+	\State \Return $u$
 \EndFunction
 
 \end{algorithmic}
+	\caption{Operação~\API{Find} em uma ABB rubro-negra parcialmente persistente.} \label{lst:arb_find}
 \end{algorithm}
 
 O algoritmo funciona como em uma árvore efêmera, mas usando a função~\textsc{Child} para acessar o filho direito ou esquerdo, em vez de utilizar o campo~$\child$, que pode não ter a versão desejada do ponteiro. Note que, na linha~\nref{line:findrb:iver}, já utilizamos a notação de~Iverson para diminuir o código. Outras operações de acesso (encontrar o maior elemento menor ou igual a algum valor, por exemplo) podem ser implementadas da mesma forma.
 
 \section{Modificação de um campo}
 
-Vamos apresentar no Código~\ref{lst:rbmodify_copy} as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação, que serão apresentadas nas próximas seções. No código, usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra, nunca o valor dos nós.
+O Código~\ref{lst:rbmodify_copy} apresenta as funções~\textsc{Modify} e~\textsc{Copy}, adaptadas da Seção~\ref{sec:nodecopying}, para utilizar durante as operações de modificação, que serão apresentadas nas próximas seções. No código, usamos que apenas ponteiros são modificados em nós de uma árvore rubro-negra, nunca o valor dos nós.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -193,15 +201,14 @@ Vamos apresentar no Código~\ref{lst:rbmodify_copy} as funções~\textsc{Modify}
 
 Utilizamos que cada nó tem apenas um campo extra e ponteiro de volta para diminuir o código, e o vetor de filhos para evitar duplicação de código. Com estas funções prontas, é possível manter a persistência da estrutura, e nas próximas seções vamos discutir como implementar as operações de inserir e remover um valor de uma árvore rubro-negra.
 
-Note que, na linha~\nref{line:copyrb:side} do código da próxima página, devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois o segundo predicado não funciona quando a ABB pode armazenar valores repetidos, já que~$v$ pode ter~dois filhos com o mesmo valor.
+Note que, na linha~\nref{line:copyrb:side} do Código~\ref{lst:rbmodify_copy}, devemos usar~$[\Call{Child}{v, 1} = u]$ e não~$[u'.\val > v.\val]$ pois o segundo predicado não funciona quando a ABB pode armazenar valores repetidos, já que~$v$ pode ter~dois filhos com o mesmo valor.
 
 \section{Inserção em ABB}
 
-Descreveremos a operação~\Call{Insert}{$\val$}, que insere o valor~$\val$ numa ABB efêmera e não rubro-negra. Para fazer isso, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente a árvore continua sendo uma ABB válida.
+Para inserir o valor~$\val$ em uma ABB efêmera e não rubro-negra, criamos um novo nó~$x$, com valor~$\val$. Se a árvore está vazia, fazemos~$x$ ser a raiz, e claramente a árvore continua sendo uma ABB válida.
+Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\API{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituímos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda, pela forma como percorremos a árvore.
 
-Se a árvore não está vazia, seguimos o caminho, a partir da raiz, dado pelo valor~$\val$ (similar a uma operação~\textsc{Find}). Ao analisar um nó, seguimos para seu filho direito se~$\val$ for maior que seu valor, e para seu filho esquerdo caso contrário. Quando encontrarmos um link nulo, substituímos este por~$x$. A árvore continua válida pois era válida inicialmente e, para todo ancestral de~$x$, este está no ``lado correto'', ou seja, se este ancestral tem valor menor que~$\val$ então~$x$ está em sua subárvore direita, e caso contrário em sua subárvore esquerda, pela forma como percorremos a árvore.
-
-Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda têm valores menores ou iguais e os nós da subárvore direita têm valores maiores ou iguais ao valor do nó.
+Note que é possível existirem valores repetidos na árvore, por isso na definição de ABB usamos que os nós na subárvore esquerda têm valores menores ou iguais e os nós da subárvore direita têm valores maiores ou iguais ao valor do nó. O Código~\ref{lst:abb_insert} mostra a implementação da operação~\API{Insert}.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -221,6 +228,7 @@ Note que é possível existirem valores repetidos na árvore, por isso na defini
 \EndFunction
 
 \end{algorithmic}
+\caption{Inserção em uma ABB efêmera e não rubro-negra.} \label{lst:abb_insert}
 \end{algorithm}
 
 \section{Inserção em rubro-negra}
@@ -424,7 +432,7 @@ Se~$u$ não tem filho direito, então podemos apenas substituí-lo por seu filho
 
 Se~$u$ tem filho direito,~seja~$x$ o nó de menor valor na subárvore direita de~$u$ (ou seja, o nó com menor valor maior que o valor de~$u$). O nó~$x$ não tem filho esquerdo (ou existiria um nó com valor menor que o dele na mesma subárvore), logo podemos substituir~$x$ por seu filho direito, e substituir~$u$ por~$x$.
 
-As propriedades de ABB continuam a ser seguidas pois todos os elementos da subárvore direita de~$u$ têm valores maiores ou iguais aos de~$x$ (pois este era o mínimo desta subárvore), e os elementos da subárvore esquerda de~$u$ tem valores menores ou iguais aos de~$x$ pois este era da subárvore direita de~$u$. Assumimos no código a seguir que os nós têm ponteiro de pai em seu campo~$\parent$.
+As propriedades de ABB continuam a ser seguidas pois todos os elementos da subárvore direita de~$u$ têm valores maiores ou iguais aos de~$x$ (pois este era o mínimo desta subárvore), e os elementos da subárvore esquerda de~$u$ tem valores menores ou iguais aos de~$x$ pois este era da subárvore direita de~$u$. No Código~\ref{lst:abb_remove}, assumimos que os nós têm ponteiro de pai em seu campo~$\parent$.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -449,7 +457,7 @@ As propriedades de ABB continuam a ser seguidas pois todos os elementos da subá
 \EndFunction
 
 \Require{A árvore tem um nó com valor~$\val$.}
-\Function{Remove}{$\val$}
+\Function{\API{Remove}}{$\val$}
 	\State $u = \Call{Find}{\val}$ \label{line:rmabb:findb}
 	\If{$u.\child[1] = \Null$} \label{line:rmabb:if1}
 		\State \Call{Transplant}{$u, u.\child[0]$}
@@ -462,9 +470,10 @@ As propriedades de ABB continuam a ser seguidas pois todos os elementos da subá
 \EndFunction
 
 \end{algorithmic}
+\caption{Remoção em uma ABB efêmera e não rubro-negra.} \label{lst:abb_remove}
 \end{algorithm}
 
-A função~\Call{MinElement}{$u$} retorna um nó com menor valor da subárvore de~$u$. Pelas propriedades de uma ABB, este está na subárvore esquerda de~$u$ se esta existe, então o~\keyword{while} segue links de esquerda até encontrar o menor elemento.
+A função~\Call{MinElement}{$u$} devolve um nó com menor valor da subárvore de~$u$. Pelas propriedades de uma ABB, este está na subárvore esquerda de~$u$ se esta existe, então o~\keyword{while} segue links de esquerda até encontrar o menor elemento.
 
 A função~\Call{Transplant}{$u, x$} substitui o nó~$u$ pelo nó~$x$. Para fazer isso, ela faz o pai de~$u$ apontar para~$x$ em vez de~$u$ (tratando o caso quando~$u$ é raiz). A função não modifica os filhos de~$u$ ou~$x$.
 
@@ -499,8 +508,7 @@ Para remover um nó de uma árvore rubro-negra, fazemos como em uma ABB normal, 
 
 Pelas propriedades~2 e~3, quando um nó~$u$ não tem o filho direito, a estrutura de sua subárvore pode ser apenas uma das três ilustradas na Figura~\ref{fig:rbnorchild}.
 Se a versão~\Call{Transplant}{$u, x$} de árvores rubro-negras também copiar a cor de~$u$ para~$x$, caso este não seja nulo, todas as propriedades rubro-negras continuam a ser respeitadas nas árvores~(b) e~(c), quando~$u$ é substituído por seu filho esquerdo. Na árvore~(a),~$u$ é removido e substituído por~\keyword{null}, logo os caminhos até links nulos que passavam por~$u$ agora têm um nó negro a menos, exceto se~$u$ for a raiz. Nesse caso, a árvore final é vazia e segue todas as propriedades.
-
-Usamos então a função~\textsc{AddBlack}, que arruma a violação da propriedade 3.
+Usamos então a função auxiliar~\textsc{AddBlack}, que arruma a violação da propriedade 3, e será discutida na próxima seção.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -530,10 +538,10 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da proprieda
 \EndFunction
 
 \Require{A árvore tem um nó com valor~$\val$.}
-\Function{Remove}{$\val$}
+\Function{\API{Remove}}{$\val$}
 	\State $\cur = \cur + 1$
 	\State $\roots[\cur] = \roots[\cur - 1]$
-	\State $u = \Call{Find}{\val}$ \label{line:rmrb:find}
+	\State $u = \funcAPI{Find}{\val, \cur}$ \label{line:rmrb:find}
 	\State $v = u.\parent$
 	\If{$\Call{Child}{u, 1} = \Null$} \label{line:rmrb:if1}
 		\State $\V{needFix} = (v \neq \Null \AND \Not\ u.\red \AND \Call{Child}{u, 0} = \Null)$
@@ -566,7 +574,7 @@ Usamos então a função~\textsc{AddBlack}, que arruma a violação da proprieda
 \caption{\textsc{Remove} em árvore rubro-negra parcialmente persistente.} \label{lst:remove_rb}
 \end{algorithm}
 
-O código funciona de forma parecida com o para ABBs quaisquer. A função~\textsc{Find}, chamada na linha~\nref{line:rmrb:if1}, funciona como a implementada na Seção~\ref{sec:rbacesso}, mas navega na versão mais atual da estrutura, e retorna o nó em vez do seu valor. A função~\textsc{MinElement} funciona como anteriormente, mas usando~\textsc{Child} para acessar os filhos. Já~\Call{Transplant}{$u, x$} foi modificada para remover o ponteiro que aponta para~$x$, caso esse exista. Isto faz diferença no caso da ABB (parcialmente) persistente pois queremos manter a propriedade de que no máximo um nó aponta para~$x$ a cada passo. A função~\textsc{Transplant} também copia a cor de~$u$ para~$x$, caso este não seja nulo.
+O Código~\ref{lst:remove_rb} mostra a implementação da remoção, e funciona de forma similar a de uma ABB qualquer. A operação~\API{Find} é usada para encontrar um nó com valor~$\val$. A função~\textsc{MinElement} funciona como anteriormente, mas usando~\textsc{Child} para acessar os filhos. Já~\Call{Transplant}{$u, x$} foi modificada para remover o ponteiro que aponta para~$x$, caso esse exista. Isto faz diferença no caso da ABB (parcialmente) persistente pois queremos manter a propriedade de que no máximo um nó aponta para~$x$ a cada passo. A função~\textsc{Transplant} também copia a cor de~$u$ para~$x$, caso este não seja nulo.
 
 Se~$u$ não tem filho direito, no~\keyword{if} da linha~\nref{line:rmrb:if1} este é trocado pelo seu filho esquerdo e, como discutido, se~$u$ é preto e não tem filho esquerdo, ocorre uma violação da propriedade~3 (a menos que~$u$ seja a raiz), que é então consertada por~\textsc{AddBlack}. Esta função recebe um nó e qual a direção do filho que deveria ser preto; isso é feito pois esse filho pode na verdade ser um link nulo. A função então modifica a árvore, rotacionando e mudando cores, de forma a remover a violação   da propriedade~3. Discutiremos a implementação desta função nas próximas subseções.
 
