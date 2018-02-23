@@ -61,7 +61,11 @@ template<class T> Stack<T>::~Stack() {
 template<class T> const T& Stack<T>::Top() const { return node->val; }
 
 template<class T> const T& Stack<T>::K_th(int k) const {
-	return node->K_Ancestor(k)->val;
+	return node->K_Ancestor(node->depth - k)->val;
+}
+
+template<class T> int Stack<T>::Size() const {
+	return node? node->depth : 0;
 }
 
 template<class T> Stack<T> Stack<T>::Push(const T& x) const {

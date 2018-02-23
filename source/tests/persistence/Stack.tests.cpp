@@ -7,9 +7,11 @@ using namespace persistence::stack;
 
 TEST(STSimple, Example) {
 	Stack<int> p0;
+	EXPECT_EQ(p0.Size(), 0);
 	Stack<int> p1 = p0.Push(5);
 	Stack<int> p2 = p1.Push(7);
 	Stack<int> p3 = p2.Push(6);
+	EXPECT_EQ(p3.Size(), 3);
 	Stack<int> tmp = p3;
 	for(int x : {6, 7, 5}) {
 		EXPECT_EQ(tmp.Top(), x);
@@ -31,12 +33,14 @@ TEST(STSimple, Reverse) {
 		for(int i = 0; i < 100000; i++) {
 			v.push_back(rand() * RAND_MAX + rand());
 			p = p.Push(v[i]);
+			EXPECT_EQ(p.Size(), v.size());
 		}
 		std::reverse(v.begin(), v.end());
 		for(int i = 0; i < 100000; i++) {
 			EXPECT_EQ(p.Top(), v[i]);
 			p = p.Pop();
 		}
+		EXPECT_EQ(p.Size(), 0);
 	}
 }
 
@@ -49,6 +53,7 @@ TEST(STSimple, NonInt) {
 	EXPECT_EQ(st1.Top(), "omar");
 	EXPECT_EQ(st1.Pop().Top(), "oioioi");
 	EXPECT_EQ(st1.K_th(1), "oioioi");
+	EXPECT_EQ(st1.K_th(2), "omar");
 	Stack<double> st2 = Stack<double>();
 	st2 = st2.Push(0.1234);
 	EXPECT_LT(st2.Top(), 0.15);
@@ -75,7 +80,7 @@ TEST(STPersistence, Vector) {
 		std::random_shuffle(perm.begin(), perm.end());
 		for(int i = 0; i < 100000; i++) {
 			EXPECT_EQ(st[perm[i]].Top(), v[perm[i]]);
-			EXPECT_EQ(st.back().K_th(v.size() - 1 - perm[i]), v[perm[i]]);
+			EXPECT_EQ(st.back().K_th(perm[i] + 1), v[perm[i]]);
 		}
 	}
 }
@@ -100,6 +105,7 @@ TEST(STPersistence, Bitmasks) {
 	int p[D];
 	for(int i = 0; i < D; i++) p[i] = i;
 	for(int i = 0; i < (1 << D); i++) {
+		EXPECT_EQ(vbm[i].Size(), D);
 		Stack<bool> st = vbm[i];
 		for(int d = 0; d < D; d++) {
 			EXPECT_EQ((i >> d) & 1, st.Top());
@@ -107,6 +113,6 @@ TEST(STPersistence, Bitmasks) {
 		}
 		std::random_shuffle(p, p + D);
 		for(int d = 0; d < D; d++)
-			EXPECT_EQ((i >> p[d]) & 1, vbm[i].K_th(p[d]));
+			EXPECT_EQ((i >> (D - 1 - p[d])) & 1, vbm[i].K_th(p[d] + 1));
 	}
 }

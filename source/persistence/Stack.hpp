@@ -19,7 +19,8 @@ public:
 	 */
 	T val;
 	/** Próximo nó.
-	 * Este campo armazena um ponteiro para o próximo nó da lista ligada.
+	 * Este campo armazena um ponteiro para o próximo nó da lista ligada, que no caso é o nó
+	 * do elemento anterior da pilha.
 	 */
 	Node *next;
 
@@ -37,7 +38,7 @@ public:
 
 	/** k-ésimo ancestral.
 	 * @param k Indice do ancestral.
-	 * @returns O k-ésimo ancestral do nó. Se `k = 0`, retorna o próprio nó.
+	 * @returns O k-ésimo ancestral do nó. Se `k = 0`, devolve o próprio nó.
 	 */
 	Node* K_Ancestor(int k);
 
@@ -73,17 +74,17 @@ public:
  * Uma diferença do código discutido no Capítulo 2 da tese é que aqui as funções não recebem a
  * pilha, mas são métodos desta.
  *
- * Um objeto Stack é apenas um ponteiro para um nó (Node) que é o topo da pilha. O objeto é
- * imutável, e continua válido mesmo após chamadas de #Push e #Pop, já que estas retornam uma
- * **cópia** modificada da estrutura. Dessa forma, é possível acessar (e modificar) versões
- * antigas da estrutura, como no exemplo abaixo:
+ * Um objeto Stack é apenas um ponteiro para um nó (Node) que é o último elemento da pilha. O
+ * objeto é imutável, e continua válido mesmo após chamadas de #Push e #Pop, já que estas
+ * devolvem uma **cópia** modificada da estrutura. Dessa forma, é possível acessar (e modificar)
+ * versões antigas da estrutura, como no exemplo abaixo:
  *
  * @code
  * using namespace persistence::stack;
  * Stack<int> p1; // ()
  * Stack<int> p2 = p1.Push(1); // (1)
- * Stack<int> p3 = p2.Push(2); // (2, 1)
- * Stack<int> p4 = p3.Push(0); // (0, 2, 1)
+ * Stack<int> p3 = p2.Push(2); // (1, 2)
+ * Stack<int> p4 = p3.Push(0); // (1, 2, 0)
  * Stack<int> p5 = p2.Pop(); // (1)
  * @endcode
  *
@@ -94,8 +95,7 @@ public:
 template<class T> class Stack {
 public:
 	/** Topo da pilha.
-	 * O nó #node é o primeiro elemento da pilha. O ponteiro é constante pois não podemos
-	 * modificar este nó.
+	 * O nó #node é o último elemento da pilha.
 	 * @see Node
 	 */
 	Node<T> *node;
@@ -110,7 +110,7 @@ public:
 	///@{
 
 	/** Topo da pilha.
-	 * @returns O valor no topo da pilha.
+	 * @returns O valor do último elemento da pilha.
 	 * @pre A pilha não deve estar vazia.
 	 * @see K_th
 	 *
@@ -119,45 +119,51 @@ public:
 	 * stack::Stack<int> st;
 	 * st = st.Push(2);
 	 * st = st.Push(3);
-	 * st.Top(); // retorna 3
-	 * st.Pop().Top(); // retorna 2
+	 * st.Top(); // devolve 3
+	 * st.Pop().Top(); // devolve 2
 	 * @endcode
 	 */
 	const T& Top() const;
 
 	/** k-ésimo elemento.
-	 * @param k O elemento desejado. 0 é o topo da pilha.
+	 * @param k O elemento desejado. 1 é o primeiro elemento da pilha.
 	 * @returns O valor do k-ésimo elemento da pilha.
-	 * @pre `0 &le; k < n`, onde \c n é o tamanho da pilha.
-	 * @remark `Top()` é equivalente a `K_th(0)`
+	 * @pre `1 &le; k &le; n`, onde \c n é o tamanho da pilha.
+	 * @remark `Top()` é equivalente a `K_th(n)`
 	 *
 	 * @ex
 	 * @code
 	 * stack::Stack<int> st;
 	 * st = st.Push(2);
 	 * st = st.Push(3);
-	 * st.K_th(0); // retorna 3
-	 * st.K_th(1); // retorna 2
+	 * st.K_th(0); // devolve 2
+	 * st.K_th(1); // devolve 3
 	 * @endcode
 	 */
 	const T& K_th(int k) const;
 
+	/** Tamanho da pilha.
+	 * @returns O tamanho da pilha
+	 */
+	int Size() const;
+
+
 	///@}
 
 	/** @name Operações de Modificação
-	 * Estas funções retornam uma **cópia** modificada da pilha, e não alteram o objeto na qual
+	 * Estas funções devolvem uma **cópia** modificada da pilha, e não alteram o objeto na qual
 	 * são chamadas.
 	 */
 	///@{
 
 	/** Inserção da valor.
 	 * @param x Valor a ser adicionado.
-	 * @returns Uma nova pilha como esta mas com o valor \p x em seu topo.
+	 * @returns Uma cópia desta pilha com o valor \p x em seu fim.
 	 */
 	Stack<T> Push(const T& x) const;
 
 	/** Remoção do topo.
-	 * @returns Uma nova pilha como esta mas sem seu topo.
+	 * @returns Uma cópia desta pilha sem seu último elemento.
 	 * @pre A pilha não deve estar vazia.
 	 */
 	Stack<T> Pop() const;
