@@ -5,3 +5,4 @@ persistence/Stack.tests
 persistence/Deque2.tests
 persistence/Queue.tests
 retroactivity/Queue.tests
+point-location/PointLocation.tests
