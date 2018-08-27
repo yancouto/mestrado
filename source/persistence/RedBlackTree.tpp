@@ -113,7 +113,7 @@ template<class T> RedBlackTree<T>::~RedBlackTree() {
 	for(Node<T> *x : all) delete x;
 }
 
-template<class T> Node<T>* RedBlackTree<T>::Child(Node<T> *u, bool side, int version) {
+template<class T> Node<T>* RedBlackTree<T>::Child(Node<T> *u, bool side, int version) const {
 	if(u->extraTimestamp != -1 && u->extraSide == side && version >= u->extraTimestamp)
 		return u->extra;
 	return u->child[side];

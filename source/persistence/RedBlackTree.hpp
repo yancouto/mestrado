@@ -186,7 +186,7 @@ template<class T> class RedBlackTree {
 	 * @returns O filho \p side de \p u na versão \p version.
 	 * @remarks Essa função é utilizada em operações de acesso.
 	 */
-	Node<T>* Child(Node<T> *u, bool side, int version);
+	Node<T>* Child(Node<T> *u, bool side, int version) const;
 	///@}
 
 	/** @name Funções Auxiliares de Modificação
