@@ -56,12 +56,13 @@ class PointLocationSolver {
 	/** Construtor.
 	 * Recebe uma lista de polígonos e faz um preprocessamente nestes para conseguir responder
 	 * chamadas à #WhichPolygon.
-	 * @param polygons Lista de polígonos. Os polígonos devem ser válidos e não se intersectar.
+	 * @param polygons Lista de polígonos. Os polígonos devem ser dados em
+	 * sentido horário e não se intersectar.
 	 */
 	PointLocationSolver(std::vector<Polygon> polygons);
 
 	/** Consulta de ponto.
-	 * @param p O ponto a ser consultado. Não deve estar na borda de nenhum poligono
+	 * @param p O ponto a ser consultado. Não deve estar na borda de nenhum dos polígono
 	 * @returns O indice do polígono que contém o ponto \p p, ou -1 se \p p não está contido em
 	 * nenhum dos polígonos.
 	 */

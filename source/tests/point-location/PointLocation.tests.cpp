@@ -42,3 +42,35 @@ TEST(PointLocation, Tricky) {
 	for(Point p : {Point{-9.81, 28.37}, Point{-14.91, 8.6}, Point{13.04, 12.33}, Point{25.67, 3.04}, Point{11.4, -13.98}, Point{51.07, 15.41}})
 		EXPECT_EQ(pls.WhichPolygon(p), -1);
 }
+
+// https://www.geogebra.org/graphing/smm9wx3t
+TEST(PointLocation, T1) {
+	Polygon p1 = {{-6.69, 2.52}, {-3.85, -1.62}, {1.16, -1.98}, {4.56, 1.71}, {3.8, 6.67}, {-0.56, 9.17}, {-5.22, 7.32}};
+	Polygon p2 = {{7.04, 7.02}, {8.25, 4.7}, {9.66, 6.92}};
+	Polygon p3 = {{-10.29, 12.01}, {-6.96, 10.39}, {-5.34, 13.71}, {-8.66, 15.33}};
+	Polygon p4 = {{-10, 4}, {-2.93, 10.25}, {4.12, 9.52}, {6, 4}, {5.79, 11.21}, {-3.69, 11.94}};
+	std::vector<Polygon> pols = {p1, p2, p3, p4};
+	for(Polygon &p : pols)
+		std::reverse(p.begin(), p.end());
+	PointLocationSolver pls(pols);
+	std::vector<Point> queries = {{-2.43, 5.01}, {-0.86, 11.14}, {8.27, 6.3}, {-6.8, 13.16}, {0.68, 12.93}, {2.15, 8.66}, {3.24, 4.71}};
+	std::vector<int> answers =   {0            , 3             , 1          , 2            , -1           , -1          , 0};
+	for(unsigned i = 0; i < queries.size(); i++)
+		EXPECT_EQ(pls.WhichPolygon(queries[i]), answers[i]);
+}
+
+TEST(PointLocation, Large) {
+	std::vector<Polygon> pols;
+	const int N = 100000, Q = 1000000;
+	for(int i = 0; i < N; i++)
+		pols.push_back({{3. * i, 3. * i}, {3. * i, 3. * i + 2}, {3. * i + 2, 3. * i + 2}, {3. * i + 2, 3. * i}});
+	PointLocationSolver pls(pols);
+	for(int i = 0; i < Q; i++) {
+		int j = (rand() % (N + 1)) - 1;
+		double x, y;
+		if(j == -1) x = -double(rand()) - 0.5, y = -double(rand()) - 0.5;
+		else x = 3. * j + 1 + (double(rand()) * .5 / RAND_MAX),
+		     y = 3. * j + 1 + (double(rand()) * .5 / RAND_MAX);
+		EXPECT_EQ(pls.WhichPolygon(Point{x, y}), j);
+	}
+}

@@ -51,7 +51,25 @@ bool Segment::operator < (const Segment &o) const {
 	       std::make_tuple(o.from.x, o.from.y, o.to.x, o.to.y, o.polygon);
 }
 
+namespace {
+
+double cross(Point a, Point b) {
+	return a.x * b.y - a.y * b.x;
+}
+
+void checkPolygon(const Polygon &p) {
+	double area = 0;
+	for(unsigned i = 0; i < p.size(); i++)
+		area += cross(p[i], p[(i + 1) % p.size()]);
+	assert(area < 0); // Poligono deve ser dado em sentido horario
+}
+
+}
+
+
 PointLocationSolver::PointLocationSolver(std::vector<Polygon> polygons) {
+	for(const Polygon &p : polygons)
+		checkPolygon(p);
 	angle = (double(rand()) / RAND_MAX) * M_PI * 2.;
 	for(Polygon &pol : polygons)
 		for(Point &pt : pol)
