@@ -98,16 +98,58 @@ A observação essencial para reduzir a complexidade da solução é que a difer
 
 Queremos manter os segmentos ordenados, e adicionar e remover segmentos ao longo do tempo; para isso é possível utilizar uma ABB que armazena os segmentos, e é possível nesta ABB realizar uma busca para determinar o segmento diretamente abaixo de algum ponto, quando estamos na faixa correspondente a esse ponto. Note que não são quaisquer dois segmentos que são comparáveis (apenas se eles são intersectados por uma mesma reta vertical), porém, a todo momento, todos os segmentos presentes na ABB são comparáveis entre si, e essa condição é suficiente para a utilização de uma ABB.
 
-\section{Transformando online em offline}
+\section{Conversão de online em offline}
 
 Se tivéssemos os pontos das consultas de antemão, poderíamos separá-los por faixas e, ao percorrer os segmentos da esquerda para a direita, usar a ABB para determinar a resposta para cada uma das consultas.
 
 Podemos, entretanto, usar uma ABB parcialmente persistente, percorrer os segmentos da esquerda para a direita de forma que, quando dada uma consulta para um ponto~$p$, podemos acessar a versão da ABB que correspondente à faixa que contém~$p$. Dessa forma, transformamos uma solução offline, que necessitava ter os pontos de antemão, em uma solução online, que pode responder consultas imediatamente.
 
-Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solução para o problema tem complexidade~$\angles{\Oh(n \lg n), \Oh(\lg n)}$, e usa espaço~$\Oh(n)$. Os detalhes da implementação serão discutidos na próxima seção.
+Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solução para o problema tem complexidade~$\angles{\Oh(n \lg n), \Oh(\lg n)}$, e usa espaço~$\Oh(n)$. Os detalhes da implementação serão discutidos nas próximas seções.
 
 \section{Implementação}
 
-TODO
+\providecommand{\seg}{\V{seg}}
+\providecommand{\from}{\V{from}}
+\providecommand{\tto}{\V{to}}
+\providecommand{\events}{\V{events}}
+\providecommand{\rbt}{\V{rbt}}
+\providecommand{\slabs}{\V{slabs}}
+\providecommand{\current}{\V{current}}
+
+\begin{algorithm}
+\caption{Preprocessamento para localização de ponto} \label{lst:geraloffline}
+\begin{algorithmic}[1]
+
+\Function{Preprocess}{$\{P_1, \ldots, P_k\}$}
+	\State $\events = \{\}$ \Comment{Vetor vazio}
+	\For{$i \in [k]$}
+		\For{$j \in [|P_i|]$}
+			\State $(a, b) = (P^j_i, P^{j+1}_i)$
+			\State $\seg.i = i$
+			\If{$a.x > b.x$}
+				\State $\Call{Swap}{a, b}$
+				\State $\seg.i = -1$
+			\EndIf
+			\State $\seg.\from = a$
+			\State $\seg.\tto = b$
+			\State $\events.\Call{Add}{\Call{Event}{a.x, \V{seg}}}$
+			\State $\events.\Call{Add}{\Call{Event}{b.x, \seg}}$
+		\EndFor
+	\EndFor
+	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$.
+	\State $\rbt =\ $Árvore rubro-negra parcialmente persistente do Capítulo~\ref{cap:rubronegra_persist}.
+	\State $\slabs = \{\}$
+	\For{$e \in \events$}
+		\If{$e.x = e.\seg.\from.x$} \Comment{Adicionar segmento}
+			\State $\rbt.\Call{Insert}{e.\seg}$
+		\Else \Comment{Remover segmento}
+			\State $\rbt.\Call{Remove}{e.\seg}$
+		\EndIf
+		\State $\slabs.\Call{Add}{(x, \rbt.\current)}$
+	\EndFor
+\EndFunction
+
+\end{algorithmic}
+\end{algorithm}
 
 \end{document}

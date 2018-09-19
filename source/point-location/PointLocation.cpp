@@ -12,7 +12,9 @@ struct event {
 	Segment s;
 	inline bool add() const { return x == s.from.x; }
 	bool operator < (const event &o) const {
-		return x < o.x;
+		if(x != o.x)
+			return x < o.x;
+		return false;
 	}
 };
 
@@ -47,8 +49,8 @@ bool Segment::operator < (const Segment &o) const {
 	double y = HeightAtX(x), oy = o.HeightAtX(x);
 	if(y != oy)
 		return y < oy;
-	return std::make_tuple(from.x, from.y, to.x, to.y, polygon) <
-	       std::make_tuple(o.from.x, o.from.y, o.to.x, o.to.y, o.polygon);
+	// Ainda precisamos diferenciar os dois polígonos
+	return from.x < o.from.x;
 }
 
 namespace {
