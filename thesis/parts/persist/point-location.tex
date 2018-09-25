@@ -91,7 +91,7 @@ Para determinar em qual polígono está um ponto, determinamos qual segmento est
 
 \section{Partição do plano em faixas}
 
-A solução de Cole~\cite{Cole86} envolve particionar o plano por retas verticais passando pelos vértices dos polígonos, como na Figura~\ref{fig:slabs}. Em cada uma das faixas da partição, os segmentos presentes naquela faixa são ordenados verticalmente, ou seja, se sabemos em qual faixa está o ponto da consulta (o que pode ser determinado por uma busca binária), então é possível determinar o segmento diretamente abaixo deste ponto usando busca binária nos segmentos presentes nesta faixa.
+A solução de Cole~\cite{Cole86} envolve particionar o plano por retas verticais passando pelos vértices dos polígonos, como na Figura~\ref{fig:slabs}. Em cada uma das faixas da partição, os segmentos presentes naquela faixa são ordenados verticalmente, ou seja, se sabemos em qual faixa está o ponto da consulta (o que pode ser determinado por uma busca binária), é possível determinar o segmento diretamente abaixo deste ponto usando busca binária nos segmentos presentes nesta faixa.
 Se armazenarmos os segmentos de cada faixa de forma ingênua, isto se torna uma solução com complexidade~$\angles{\Oh(n^2 \lg n), \Oh(\lg n)}$, como na solução de Dobkin e Lipton~\cite{DobkinL76}.
 
 A observação essencial para reduzir a complexidade da solução é que a diferença entre duas faixas adjacentes consiste apenas dos segmentos que terminam ou começam entre estas duas faixas. Além disso, se considerarmos as faixas da esquerda para a direita, cada segmento é adicionado e removido apenas uma vez. Dessa forma, conseguimos ``visitar'' todas as listas de cada faixa usando apenas~$n$ adições e remoções.
@@ -106,15 +106,25 @@ Podemos, entretanto, usar uma ABB parcialmente persistente, percorrer os segment
 
 Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solução para o problema tem complexidade~$\angles{\Oh(n \lg n), \Oh(\lg n)}$, e usa espaço~$\Oh(n)$. Os detalhes da implementação serão discutidos nas próximas seções.
 
-\section{Implementação}
+\section{Preprocessamento}
 
-\providecommand{\seg}{\V{seg}}
+Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consulta está exatamente na borda de duas faixas. Para evitar este problema, e outros, podemos rotacionar todos os polígonos e pontos de consulta por um ângulo aleatório. É óbvio que neste caso as respostas para todas as consultas continua a mesma, e a chance de um ponto de consulta ter a mesma coordenada x que algum dos pontos dos polígonos é nula.
+
 \providecommand{\from}{\V{from}}
 \providecommand{\tto}{\V{to}}
+\providecommand{\seg}{\V{seg}}
 \providecommand{\events}{\V{events}}
 \providecommand{\rbt}{\V{rbt}}
 \providecommand{\slabs}{\V{slabs}}
 \providecommand{\current}{\V{current}}
+\providecommand{\polygon}{\V{polygon}}
+
+São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~$i$-ésimo polígono e~$P_i^j$ é o seu~$j$-ésimo ponto (para facilitar o código vale ${P_i^{|P|+1} = P_i^1}$). Assumimos que os pontos dos polígonos são dados em sentido horário.
+
+Um segmento é um objeto com três campos:~$\from$ e~$\tto$, seus pontos de início e fim, e~$\polygon$, um campo que indica a qual polígono pertence um ponto localizado diretamente acima deste segmento. Assumimos que~$\from.x < \tto.x$, ou seja,~$\from$ é sempre o ``ponto esquerdo'' do segmento (note que podemos assumir desigualdade estrita já que a chance de existir um segmento vertical depois da rotação é nula).
+
+Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para isso utilizamos o tipo de objeto evento, que indica o momento em que um segmento deve ser adicionado ou removido da ABB. Um evento é um objeto com dois campos:~$x$, a coordenada~$x$ na qual dado evento deve ser realizado, e~$\seg$, o segmento que deve ser adicionado ou removido.
+
 
 \begin{algorithm}
 \caption{Preprocessamento para localização de ponto} \label{lst:preprocess_pl}
@@ -126,10 +136,10 @@ Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solu
 	\For{$i \in [k]$}
 		\For{$j \in [|P_i|]$}
 			\State $(a, b) = (P^j_i, P^{j+1}_i)$
-			\State $\seg.i = i$
+			\State $\seg.\polygon = i$
 			\If{$a.x > b.x$}
 				\State $\Call{Swap}{a, b}$
-				\State $\seg.i = -1$
+				\State $\seg.\polygon = -1$
 			\EndIf
 			\State $\seg.\from = a$
 			\State $\seg.\tto = b$
@@ -178,11 +188,9 @@ Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solu
 	\If{$\below = \Null$}
 		\State \Return $-1$
 	\Else
-		\State \Return $\below.i$
+		\State \Return $\below.\polygon$
 	\EndIf
 \EndFunction
-
-
 
 \end{algorithmic}
 \end{algorithm}
