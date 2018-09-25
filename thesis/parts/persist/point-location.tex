@@ -98,7 +98,7 @@ A observação essencial para reduzir a complexidade da solução é que a difer
 
 Queremos manter os segmentos ordenados, e adicionar e remover segmentos ao longo do tempo; para isso é possível utilizar uma ABB que armazena os segmentos, e é possível nesta ABB realizar uma busca para determinar o segmento diretamente abaixo de algum ponto, quando estamos na faixa correspondente a esse ponto. Note que não são quaisquer dois segmentos que são comparáveis (apenas se eles são intersectados por uma mesma reta vertical), porém, a todo momento, todos os segmentos presentes na ABB são comparáveis entre si, e essa condição é suficiente para a utilização de uma ABB.
 
-\section{Conversão de online em offline}
+\section{Conversão de offline em online}
 
 Se tivéssemos os pontos das consultas de antemão, poderíamos separá-los por faixas e, ao percorrer os segmentos da esquerda para a direita, usar a ABB para determinar a resposta para cada uma das consultas.
 
@@ -117,10 +117,11 @@ Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solu
 \providecommand{\current}{\V{current}}
 
 \begin{algorithm}
-\caption{Preprocessamento para localização de ponto} \label{lst:geraloffline}
+\caption{Preprocessamento para localização de ponto} \label{lst:preprocess_pl}
 \begin{algorithmic}[1]
 
 \Function{Preprocess}{$\{P_1, \ldots, P_k\}$}
+	\State Rotacione todos os polígonos por um ângulo~$\alpha$ aleatório.
 	\State $\events = \{\}$ \Comment{Vetor vazio}
 	\For{$i \in [k]$}
 		\For{$j \in [|P_i|]$}
@@ -139,6 +140,7 @@ Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solu
 	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$.
 	\State $\rbt =\ $Árvore rubro-negra parcialmente persistente do Capítulo~\ref{cap:rubronegra_persist}.
 	\State $\slabs = \{\}$
+	\State $\slabs.\Call{Add}{(-\infty, \rbt.\current)}$
 	\For{$e \in \events$}
 		\If{$e.x = e.\seg.\from.x$} \Comment{Adicionar segmento}
 			\State $\rbt.\Call{Insert}{e.\seg}$
@@ -151,5 +153,39 @@ Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solu
 
 \end{algorithmic}
 \end{algorithm}
+
+\providecommand{\roots}{\V{roots}}
+\providecommand{\below}{\V{below}}
+\providecommand{\val}{\V{value}}
+
+\begin{algorithm}
+\caption{Respondendo consulta} \label{lst:consulta_pl}
+\begin{algorithmic}[1]
+
+\Function{WhichPolygon}{p}
+	\State Rotacione~$p$ por~$\alpha$.
+	\State Determine o último par~$(x, \current)$ tal que~$x \leq p.x$. \Comment{Busca binária~$\Oh(\lg n)$}
+	\State $u = \rbt.\roots[\current]$
+	\State $\below = \Null$
+	\While{$u \neq \Null$}
+		\If{$u.\val.\Call{HeightAt}{p.x} \leq p.y$} \Comment{Se~$p$ está acima do segmento}
+			\State $\below = u.\val$
+			\State $u = \rbt.\Call{Child}{u, 1, \current}$
+		\Else
+			\State $u = \rbt.\Call{Child}{u, 0, \current}$
+		\EndIf
+	\EndWhile
+	\If{$\below = \Null$}
+		\State \Return $-1$
+	\Else
+		\State \Return $\below.i$
+	\EndIf
+\EndFunction
+
+
+
+\end{algorithmic}
+\end{algorithm}
+
 
 \end{document}
