@@ -108,7 +108,7 @@ Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solu
 
 \section{Preprocessamento}
 
-Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consulta está exatamente na borda de duas faixas. Para evitar este problema, e outros, podemos rotacionar todos os polígonos e pontos de consulta por um ângulo aleatório. É óbvio que neste caso as respostas para todas as consultas continua a mesma, e a chance de um ponto de consulta ter a mesma coordenada x que algum dos pontos dos polígonos é nula.
+Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consulta está exatamente na borda de duas faixas. Para evitar este problema, e outros, podemos rotacionar todos os polígonos e pontos de consulta por um ângulo aleatório. É óbvio que neste caso a resposta de todas as consultas continua a mesma, e além disso a chance de um ponto de consulta ter a mesma coordenada x que algum dos pontos dos polígonos é nula (assumimos aqui os pontos de consulta não podem ser iguais a pontos dos polígonos, e esse caso pode ser resolvido separadamente de forma simples).
 
 \providecommand{\from}{\V{from}}
 \providecommand{\tto}{\V{to}}
@@ -119,23 +119,19 @@ Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consult
 \providecommand{\current}{\V{current}}
 \providecommand{\polygon}{\V{polygon}}
 
-São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~$i$-ésimo polígono e~$P_i^j$ é o seu~$j$-ésimo ponto (para facilitar o código vale ${P_i^{|P|+1} = P_i^1}$). Assumimos que os pontos dos polígonos são dados em sentido horário.
-
-Um segmento é um objeto com três campos:~$\from$ e~$\tto$, seus pontos de início e fim, e~$\polygon$, um campo que indica a qual polígono pertence um ponto localizado diretamente acima deste segmento. Assumimos que~$\from.x < \tto.x$, ou seja,~$\from$ é sempre o ``ponto esquerdo'' do segmento (note que podemos assumir desigualdade estrita já que a chance de existir um segmento vertical depois da rotação é nula).
-
-Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para isso utilizamos o tipo de objeto evento, que indica o momento em que um segmento deve ser adicionado ou removido da ABB. Um evento é um objeto com dois campos:~$x$, a coordenada~$x$ na qual dado evento deve ser realizado, e~$\seg$, o segmento que deve ser adicionado ou removido.
+São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~$i$-ésimo polígono e~$P_i^j$ é o seu~$j$-ésimo ponto (para facilitar o código vale ${P_i^{|P_i|+1} = P_i^1}$). Assumimos que os pontos dos polígonos são dados em sentido horário.
 
 
 \begin{algorithm}
-\caption{Preprocessamento para localização de ponto} \label{lst:preprocess_pl}
+\caption{Preprocessamento para localização de ponto} \label{lst:prepl}
 \begin{algorithmic}[1]
 
 \Function{Preprocess}{$\{P_1, \ldots, P_k\}$}
-	\State Rotacione todos os polígonos por um ângulo~$\alpha$ aleatório.
+	\State Rotacione todos os polígonos por um ângulo~$\alpha$ aleatório. \label{line:prepl:rot} \Comment{$\Oh(n)$}
 	\State $\events = \{\}$ \Comment{Vetor vazio}
-	\For{$i \in [k]$}
-		\For{$j \in [|P_i|]$}
-			\State $(a, b) = (P^j_i, P^{j+1}_i)$
+	\For{$i \in [k]$} \label{line:prepl:for1}
+		\For{$j \in [|P_i|]$} \label{line:prepl:for2}
+			\State $(a, b) = (P^j_i, P^{j+1}_i)$ \label{line:prepl:forb}
 			\State $\seg.\polygon = i$
 			\If{$a.x > b.x$}
 				\State $\Call{Swap}{a, b}$
@@ -143,19 +139,19 @@ Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para 
 			\EndIf
 			\State $\seg.\from = a$
 			\State $\seg.\tto = b$
-			\State $\events.\Call{Add}{\Call{Event}{a.x, \V{seg}}}$
-			\State $\events.\Call{Add}{\Call{Event}{b.x, \seg}}$
+			\State $\events.\Call{Add}{\Call{Event}{a.x, \seg}}$ \Comment{Evento de adição}
+			\State $\events.\Call{Add}{\Call{Event}{b.x, \seg}}$ \label{line:prepl:fore} \Comment{Evento de remoção}
 		\EndFor
 	\EndFor
-	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$.
+	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$. \Comment{$\Oh(n \lg n)$}
 	\State $\rbt =\ $Árvore rubro-negra parcialmente persistente do Capítulo~\ref{cap:rubronegra_persist}.
 	\State $\slabs = \{\}$
 	\State $\slabs.\Call{Add}{(-\infty, \rbt.\current)}$
 	\For{$e \in \events$}
 		\If{$e.x = e.\seg.\from.x$} \Comment{Adicionar segmento}
-			\State $\rbt.\Call{Insert}{e.\seg}$
+			\State $\rbt.\Call{Insert}{e.\seg}$ \Comment{$\Oh(\lg n)$}
 		\Else \Comment{Remover segmento}
-			\State $\rbt.\Call{Remove}{e.\seg}$
+			\State $\rbt.\Call{Remove}{e.\seg}$ \Comment{$\Oh(\lg n)$}
 		\EndIf
 		\State $\slabs.\Call{Add}{(x, \rbt.\current)}$
 	\EndFor
@@ -163,6 +159,19 @@ Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para 
 
 \end{algorithmic}
 \end{algorithm}
+
+Um segmento é um objeto com três campos:~$\from$ e~$\tto$, seus pontos de início e fim, e~$\polygon$, um campo que indica a qual polígono pertence um ponto localizado diretamente acima deste segmento. Assumimos que~$\from.x < \tto.x$, ou seja,~$\from$ é sempre o ``ponto esquerdo'' do segmento (note que podemos assumir desigualdade estrita já que a chance de existir um segmento vertical depois da rotação é nula).
+
+Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para isso utilizamos o tipo de objeto evento, que indica o momento em que um segmento deve ser adicionado ou removido da ABB. Um evento é um objeto com dois campos:~$x$, a coordenada~$x$ na qual dado evento deve ser realizado, e~$\seg$, o segmento que deve ser adicionado ou removido.
+
+Observe o Código~\ref{lst:prepl}. A linha~\nref{line:prepl:rot} rotaciona todos polígonos por um mesmo ângulo aleatório. Os \keyword{for}s das linhas~\nref{line:prepl:for1} e~\nref{line:prepl:for2} iteram por todos os segmentos dos polígonos. Como os polígonos são dados em sentido horário, então se o segmento vai da esquerda para a direita, os pontos imediatamente acima dele não pertencem ao polígono, e se vai da direita para a esquerda, então pertencem. As linhas~\mbox{\nref{line:prepl:forb}-\nref{line:prepl:fore}} então criam um objeto de segmento corretamente e adiciona dois eventos à lista~$\events$, um para adicionar e outro para remover o segmento.
+
+A lista~$\events$ tem todos os eventos de adição e remoção de segmentos. A linha~\nref{line:prepl:ord} ordena esses eventos pela ordem que eles ocorrem. Dessa forma o~\keyword{for} da linha~\nref{line:prepl:for3} itera pelos segmentos da esquerda para a direita. Note que um evento~$e$ é de adição se~${e.x = e.\seg.\from.x}$ e de remoção caso contrário. Usamos uma árvore rubro-negra parcialmente persistente, com a mesma API que a do Capítulo~\ref{cap:rubronegra_persist}.
+
+Por fim, a lista~$\slabs$ é usada para armazenar a correspondência entre faixas e versões da ABB. Ela armazena, em ordem, as coordenadas~$x$ do começo das faixas e a versão da ABB que representa essa faixa.
+
+\section{Consulta}
+
 
 \providecommand{\roots}{\V{roots}}
 \providecommand{\below}{\V{below}}
@@ -178,7 +187,7 @@ Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para 
 	\State $u = \rbt.\roots[\current]$
 	\State $\below = \Null$
 	\While{$u \neq \Null$}
-		\If{$u.\val.\Call{HeightAt}{p.x} \leq p.y$} \Comment{Se~$p$ está acima do segmento}
+		\If{$u.\val.\Call{HeightAt}{p.x} < p.y$} \Comment{Se~$p$ está acima do segmento}
 			\State $\below = u.\val$
 			\State $u = \rbt.\Call{Child}{u, 1, \current}$
 		\Else
