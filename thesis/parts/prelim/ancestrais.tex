@@ -189,14 +189,14 @@ Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de 
 \end{algorithm}
 
 \begin{invar}
-Ao início da iteração com valor~$i$ do~\keyword{for} da linha~\ref{lst:lcapot2:for} do Código~\ref{lst:lcapot2}, vale que~${0 < \Dep(u) - \Dep(c) \leq 2^{i+1}}$, onde~${c = \LCA(u, v)}$, e o valor de~$\LCA(u, v)$ não se altera ao final da iteração.
+Ao início da iteração com valor~$i$ do~\keyword{for} da linha~\nref{lst:lcapot2:for} do Código~\ref{lst:lcapot2}, vale que~${0 < \Dep(u) - \Dep(c) \leq 2^{i+1}}$, onde~${c = \LCA(u, v)}$, e o valor de~$\LCA(u, v)$ não se altera ao final da iteração.
 \end{invar}
 \begin{proof}
 	Para a base,~$i = \floor{\lg\Dep(u)}$ e
 	$$\Dep(u) - \Dep(c) \leq \Dep(u) = 2^{\lg\Dep(u)} \leq 2^{\floor{\lg\Dep(u)}+1},$$
-	além disso, se~$u = c$, então o~\keyword{if} da linha~\ref{lst:lcapot2:if2} é executado, logo~${\Dep(u) - \Dep(c) > 0}$.
+	além disso, se~$u = c$, então o~\keyword{if} da linha~\nref{lst:lcapot2:if2} é executado, logo~${\Dep(u) - \Dep(c) > 0}$.
 
-	Suponha que o invariante vale ao início da iteração com valor~$i$, e provaremos que continua valendo ao começo da iteração com valor~$i - 1$. Seja~${d \coloneqq \Dep(u) - \Dep(c)}$, sabemos então que~${0 < d \leq 2^{i+1}}$. Note que~${d \leq 2^i \iff \LA(2^i, u) = \LA(2^i, v)}$, ou seja, o~\keyword{if} da linha~\ref{lst:lcapot2:iffor} é executado se e somente se~$d > 2^i$. Então
+	Suponha que o invariante vale ao início da iteração com valor~$i$, e provaremos que continua valendo ao começo da iteração com valor~$i - 1$. Seja~${d \coloneqq \Dep(u) - \Dep(c)}$, sabemos então que~${0 < d \leq 2^{i+1}}$. Note que~${d \leq 2^i \iff \LA(2^i, u) = \LA(2^i, v)}$, ou seja, o~\keyword{if} da linha~\nref{lst:lcapot2:iffor} é executado se e somente se~$d > 2^i$. Então
 	\begin{itemize}
 		\item se~$d \leq 2^i$, o invariante já vale para~$i-1$ e o~\keyword{if} não é executado;
 		\item se~$d > 2^i$, o~\keyword{if} é executado, portanto trocamos~$u$ por~$\LA(2^i, u)$ e~$v$ por~$\LA(2^i, v)$. Seja~$d'$ o novo valor de~$\Dep(u) - \Dep(c)$. A profundidade de~$u$ e~$v$ diminui de~$2^i$, logo o valor de~$$d' = d - 2^i \leq 2^{i+1} - 2^i = 2^i.$$

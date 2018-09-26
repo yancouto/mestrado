@@ -233,7 +233,7 @@ Dessa forma, conseguimos encontrar o ancestral de~$u$ com profundidade~$D(c) + 1
 			\State $u, v = v, u$ \Comment{Garantindo que~$\Dep(u) \leq \Dep(v)$.}
 		\EndIf
 		\State $v = \funcAPI{LevelAncestor}{\Dep(v) - \Dep(u), v}$ \Comment{Nivelando~$v$.}
-		\If{$u = v$} \label{lst:lcapot2:if2}
+		\If{$u = v$}
 			\State \Return $u$
 		\EndIf
 		\While{$\Par(u) \neq \Par(v)$}
