@@ -143,11 +143,11 @@ São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i
 			\State $\events.\Call{Add}{\Call{Event}{b.x, \seg}}$ \label{line:prepl:fore} \Comment{Evento de remoção}
 		\EndFor
 	\EndFor
-	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$. \Comment{$\Oh(n \lg n)$}
+	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$. \Comment{$\Oh(n \lg n)$} \label{line:prepl:ord}
 	\State $\rbt =\ $Árvore rubro-negra parcialmente persistente do Capítulo~\ref{cap:rubronegra_persist}.
 	\State $\slabs = \{\}$
 	\State $\slabs.\Call{Add}{(-\infty, \rbt.\current)}$
-	\For{$e \in \events$}
+	\For{$e \in \events$} \label{line:prepl:for3}
 		\If{$e.x = e.\seg.\from.x$} \Comment{Adicionar segmento}
 			\State $\rbt.\Call{Insert}{e.\seg}$ \Comment{$\Oh(\lg n)$}
 		\Else \Comment{Remover segmento}
@@ -170,21 +170,24 @@ A lista~$\events$ tem todos os eventos de adição e remoção de segmentos. A l
 
 Por fim, a lista~$\slabs$ é usada para armazenar a correspondência entre faixas e versões da ABB. Ela armazena, em ordem, as coordenadas~$x$ do começo das faixas e a versão da ABB que representa essa faixa.
 
+A complexidade desse código é~$\Oh(n \lg n)$, já que realizamos~$\Oh(n)$ adições e remoções à ABB, e a ordenação também consome tempo~$\Oh(n \lg n)$. Todos os passos que tem complexidade diferente de constante estão explicitados no Código~\ref{lst:prepl}.
+
 \section{Consulta}
 
+Para determinar a qual polígono pertence um dado ponto, precisamos determinar a qual faixa este pertence, e o segmento diretamente abaixo do ponto nesta faixa. Observe o Código~\ref{lst:conpl}.
 
 \providecommand{\roots}{\V{roots}}
 \providecommand{\below}{\V{below}}
 \providecommand{\val}{\V{value}}
 
 \begin{algorithm}
-\caption{Respondendo consulta} \label{lst:consulta_pl}
+\caption{Respondendo consulta} \label{lst:conpl}
 \begin{algorithmic}[1]
 
 \Function{WhichPolygon}{p}
-	\State Rotacione~$p$ por~$\alpha$.
-	\State Determine o último par~$(x, \current)$ tal que~$x \leq p.x$. \Comment{Busca binária~$\Oh(\lg n)$}
-	\State $u = \rbt.\roots[\current]$
+	\State Rotacione~$p$ por~$\alpha$. \label{line:conpl:rot}
+	\State Determine o último par~$(x, \current)$ tal que~$x \leq p.x$. \Comment{Busca binária~$\Oh(\lg n)$} \label{line:conpl:bb}
+	\State $u = \rbt.\roots[\current]$ \label{line:conpl:ceilb}
 	\State $\below = \Null$
 	\While{$u \neq \Null$}
 		\If{$u.\val.\Call{HeightAt}{p.x} < p.y$} \Comment{Se~$p$ está acima do segmento}
@@ -193,16 +196,22 @@ Por fim, a lista~$\slabs$ é usada para armazenar a correspondência entre faixa
 		\Else
 			\State $u = \rbt.\Call{Child}{u, 0, \current}$
 		\EndIf
-	\EndWhile
-	\If{$\below = \Null$}
+	\EndWhile \label{line:conpl:ceile}
+	\If{$\below = \Null$} \label{line:conpl:retb}
 		\State \Return $-1$
 	\Else
 		\State \Return $\below.\polygon$
-	\EndIf
+	\EndIf \label{line:conpl:rete}
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
+
+A linha~\nref{line:conpl:rot} rotaciona~$p$ pelo mesmo ângulo que os polígonos foram rotacionados. A linha~\nref{line:conpl:bb} determina a faixa a qual pertence~$p$, usando busca binária na lista~$\slabs$.
+
+Nas linhas~\mbox{\nref{line:conpl:ceilb}-\nref{line:conpl:ceile}}, buscamos o segmento imediatamente abaixo do ponto~$p$. Para isso usamos as funções apresentadas no Capítulo~\ref{cap:rubronegra_persist} e a função~\textsc{HeightAt} da classe segmento, que determina qual a coordenada~$y$ de um segmento em um dado~$x$. O procedimento é análogo ao procedimento de~\textsc{Floor}, descrito por Sedgewick~\cite{Sedgewick}. Com este segmento, podemos determinar o polígono a qual~$p$ pertence (linhas~\mbox{\nref{line:conpl:retb}-\nref{line:conpl:rete}}).
+
+A complexidade da consulta é~$\Oh(\lg n)$, já que tanto a busca binária quanto a busca na ABB têm essa complexidade.
 
 
 \end{document}
