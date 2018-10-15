@@ -1,56 +1,41 @@
 #include "PointLocation.hpp"
 
 #include <cassert>
-#include <cmath>
 #include <utility>
 #include <algorithm>
 #include <tuple>
 
 namespace point_location {
 struct event {
-	double x;
+	bool add;
 	Segment s;
-	inline bool add() const { return x == s.from.x; }
+	const Point& point() const { return add? s.from : s.to; }
 	bool operator < (const event &o) const {
-		if(x != o.x)
-			return x < o.x;
-		return false;
+		return point() < o.point();
 	}
 };
 
-void Point::Rotate(double angle) {
-	double nx = cos(angle) * x - sin(angle) * y,
-	       ny = sin(angle) * x + cos(angle) * y;
-	x = nx;
-	y = ny;
+Point Point::operator - (const Point &o) const {
+	return {x - o.x, y - o.y};
+}
+
+bool Point::operator == (const Point &o) const {
+	return x == o.x && y == o.y;
+}
+
+bool Point::operator < (const Point &o) const {
+	if(x != o.x)
+		return x < o.x;
+	return y < o.y;
 }
 
 Segment::Segment() {}
 
-Segment::Segment(Point a, Point b, int pol) : from(a), to(b), polygon(pol) {
-	assert(a.x != b.x);
-	if(a.x > b.x)
+Segment::Segment(Point a, Point b, int pol) : from(a), to(b), polygon(pol), top(false) {
+	if(!(a < b)) {
 		std::swap(from, to);
-}
-
-double Segment::HeightAtX(double x) const {
-	assert(from.x <= x && x <= to.x);
-	if(from.x == to.x)
-		return from.y;
-	double ratio = (to.x - x) / (to.x - from.x);
-	return to.y + ratio * (from.y - to.y);
-}
-
-bool Segment::operator < (const Segment &o) const {
-	double xl = std::max(from.x, o.from.x);
-	double xr = std::min(to.x, o.to.x);
-	double x = (xl + xr) / 2;
-	assert(xl <= xr);
-	double y = HeightAtX(x), oy = o.HeightAtX(x);
-	if(y != oy)
-		return y < oy;
-	// Ainda precisamos diferenciar os dois polígonos
-	return from.x < o.from.x;
+		top = true;
+	}
 }
 
 namespace {
@@ -63,55 +48,66 @@ void checkPolygon(const Polygon &p) {
 	double area = 0;
 	for(unsigned i = 0; i < p.size(); i++)
 		area += cross(p[i], p[(i + 1) % p.size()]);
-	assert(area < 0); // Poligono deve ser dado em sentido horario
+	assert(area > 0); // Poligono deve ser dado em sentido anti-horario
 }
 
 }
 
+bool Segment::operator < (const Segment &o) const {
+	if(from == o.from && to == o.to) return false;
+	if(o.from < from) return !(o < *this);
+	if(from == o.from) {
+		if(to < o.to) return !(o < *this);
+		return cross(to - from, o.to - from) > 0;
+	} else {
+		return cross(to - from, o.from - from) > 0;
+	}
+}
 
 PointLocationSolver::PointLocationSolver(std::vector<Polygon> polygons) {
 	for(const Polygon &p : polygons)
 		checkPolygon(p);
-	angle = (double(rand()) / RAND_MAX) * M_PI * 2.;
-	for(Polygon &pol : polygons)
-		for(Point &pt : pol)
-			pt.Rotate(angle);
 	std::vector<event> events;
 
 	unsigned p_i = 0;
 	for(const Polygon &p : polygons) {
 		for(unsigned i = 0; i < p.size(); i++) {
 			Point a = p[i], b = p[(i + 1) % p.size()];
-			Segment s(a, b, a.x < b.x? -1 : p_i);
-			events.push_back(event{s.from.x, s});
-			events.push_back(event{s.to.x, s});
+			Segment s(a, b, p_i);
+			events.push_back(event{true, s});
+			events.push_back(event{false, s});
 		}
 		p_i++;
 	}
 	std::sort(events.begin(), events.end());
 
-	slabs.push_back(-1.0 / 0.0);
+	slabs.push_back({-1.0 / 0.0, 0});
 	for(const event &ev : events) {
-		if(ev.add()) rbt.Insert(ev.s);
+		if(ev.add) rbt.Insert(ev.s);
 		else assert(rbt.Remove(ev.s) != nullptr);
-		slabs.push_back(ev.x);
+		slabs.push_back(ev.point());
 	}
 }
 
-int PointLocationSolver::WhichPolygon(Point p) const {
-	p.Rotate(angle);
-	int i = int(std::upper_bound(slabs.begin(), slabs.end(), p.x) - slabs.begin()) - 1;
+int PointLocationSolver::WhichPolygon(const Point p) const {
+	int i = int(std::upper_bound(slabs.begin(), slabs.end(), p) - slabs.begin()) - 1;
 	assert(i >= 0);
 	using namespace persistence::red_black_tree;
 	Node<Segment> *u = rbt.roots[i];
 	const Segment *below = nullptr;
 	while(u != nullptr) {
-		if(u->value.HeightAtX(p.x) <= p.y)
+		bool u_is_below = (cross(u->value.to - u->value.from, p - u->value.from) >= 0);
+		if(u_is_below)
 			below = &u->value;
-		u = rbt.Child(u, u->value.HeightAtX(p.x) <= p.y, i);
+		u = rbt.Child(u, u_is_below, i);
 	}
 
-	return below == nullptr? -1 : below->polygon;
+	if(below == nullptr)
+		return -1;
+	// if below is on the "bottom" of the polygon, or if p is on top of the segment
+	if(!below->top || cross(below->to - below->from, p - below->from) == 0)
+		return below->polygon;
+	return -1;
 }
 
 } // namespace point_location

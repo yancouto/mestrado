@@ -15,7 +15,9 @@ struct Point {
 	/** Coordenada Y */
 	double y;
 
-	void Rotate(double angle);
+	bool operator < (const Point &o) const;
+	bool operator == (const Point &o) const;
+	Point operator - (const Point &o) const;
 };
 
 typedef std::vector<Point> Polygon;
@@ -32,14 +34,11 @@ struct Segment {
 	/** Ponto de fim */
 	Point to;
 
+	/* A qual polígono pertence este segmento */
 	int polygon;
 
-	/** Altura no ponto x
-	 * @returns A coordenada y quando a coordenada x é dada
-	 * @pre `from.x ≤ x ≤ to.x`
-	 * @note Se `from.x = to.x` então `from.y` é devolvido
-	 */
-	double HeightAtX(double x) const;
+	/* Se o segmento é da parte "de cima" do polígono */
+	bool top;
 
 	/** Comparação de segmentos
 	 * @returns Se este segmento está "em baixo" de \p o
@@ -70,8 +69,7 @@ class PointLocationSolver {
 
 	private:
 	persistence::red_black_tree::RedBlackTree<Segment> rbt;
-	double angle;
-	std::vector<double> slabs;
+	std::vector<Point> slabs;
 };
 
 } // namespace point_location
