@@ -52,9 +52,9 @@ A Figura~\ref{fig:exemplo_pl} mostra um exemplo do problema com três polígonos
 
 \section{Solução ingênua}
 
-Note que, neste problema, temos os polígonos de antemão, e queremos preprocessá-los de forma a poder responder as consultas de maneira rápida. Considere~${n \coloneqq \sum\limits_{i = 1}^k{|P_i|}}$, ou seja,~$n$ é o número total de vértices em todos os polígonos. A solução mais simples para o problema é, para cada consulta, verificar para cada polígono se o ponto está no polígono. Esta solução tem complexidade~$\angles{\Oh(1), \Oh(n)}$, usando a mesma notação de tempo de preprocessamento e consulta da Seção~\ref{sec:potfunc}.
+Note que, neste problema, temos os polígonos de antemão, e queremos pré-processá-los de forma a poder responder as consultas de maneira rápida. Considere~${n \coloneqq \sum\limits_{i = 1}^k{|P_i|}}$, ou seja,~$n$ é o número total de vértices em todos os polígonos. A solução mais simples para o problema é, para cada consulta, verificar para cada polígono se o ponto está no polígono. Esta solução tem complexidade~$\angles{\Oh(1), \Oh(n)}$, usando a mesma notação de tempo de preprocessamento e consulta da Seção~\ref{sec:potfunc}.
 
-Para determinar em qual polígono está um ponto, determinamos qual segmento está diretamente abaixo do ponto, e analisando esse segmento determinamos se o ponto está dentro do polígono que contém aquele segmento ou fora de todos os polígonos. Na Figura~\ref{fig:exemplo_pl}, a projeção de cada ponto no segmento diretamente abaixo está indicada pelas linhas tracejadas. Um ponto que não tem nenhum segmento abaixo dele, como o ponto mais abaixo no exemplo, não pertence a nenhum polígono.
+Nessa solução, para determinar em qual polígono está um ponto, determinamos qual segmento está diretamente abaixo do ponto, e analisando esse segmento determinamos se o ponto está dentro do polígono que contém aquele segmento ou fora de todos os polígonos. Na Figura~\ref{fig:exemplo_pl}, a projeção de cada ponto no segmento diretamente abaixo está indicada pelas linhas tracejadas. Um ponto que não tem nenhum segmento abaixo dele, como o ponto mais abaixo no exemplo, não pertence a nenhum polígono.
 
 \begin{figure}
 \centering
@@ -94,7 +94,7 @@ Para determinar em qual polígono está um ponto, determinamos qual segmento est
 A solução de Cole~\cite{Cole86} envolve particionar o plano por retas verticais passando pelos vértices dos polígonos, como na Figura~\ref{fig:slabs}. Em cada uma das faixas da partição, os segmentos presentes naquela faixa são ordenados verticalmente, ou seja, se sabemos em qual faixa está o ponto da consulta (o que pode ser determinado por uma busca binária), é possível determinar o segmento diretamente abaixo deste ponto usando busca binária nos segmentos presentes nesta faixa.
 Se armazenarmos os segmentos de cada faixa de forma ingênua, isto se torna uma solução com complexidade~$\angles{\Oh(n^2 \lg n), \Oh(\lg n)}$, como na solução de Dobkin e Lipton~\cite{DobkinL76}.
 
-A observação essencial para reduzir a complexidade da solução é que a diferença entre duas faixas adjacentes consiste apenas dos segmentos que terminam ou começam entre estas duas faixas. Além disso, se considerarmos as faixas da esquerda para a direita, cada segmento é adicionado e removido apenas uma vez. Dessa forma, conseguimos ``visitar'' todas as listas de cada faixa usando apenas~$n$ adições e remoções.
+A observação essencial para reduzir a complexidade da solução é que a diferença entre duas faixas adjacentes consiste apenas dos segmentos que terminam ou começam entre estas duas faixas. Além disso, se considerarmos as faixas da esquerda para a direita, cada segmento é adicionado e removido apenas uma vez. Podemos então usar uma linha de varredura para ``visitar'' todas as listas de cada faixa usando apenas~$n$ adições e remoções.
 
 Queremos manter os segmentos ordenados, e adicionar e remover segmentos ao longo do tempo; para isso é possível utilizar uma ABB que armazena os segmentos, e é possível nesta ABB realizar uma busca para determinar o segmento diretamente abaixo de algum ponto, quando estamos na faixa correspondente a esse ponto. Note que não são quaisquer dois segmentos que são comparáveis (apenas se eles são intersectados por uma mesma reta vertical), porém, a todo momento, todos os segmentos presentes na ABB são comparáveis entre si, e essa condição é suficiente para a utilização de uma ABB.
 
@@ -102,24 +102,27 @@ Queremos manter os segmentos ordenados, e adicionar e remover segmentos ao longo
 
 Se tivéssemos os pontos das consultas de antemão, poderíamos separá-los por faixas e, ao percorrer os segmentos da esquerda para a direita, usar a ABB para determinar a resposta para cada uma das consultas.
 
-Podemos, entretanto, usar uma ABB parcialmente persistente, percorrer os segmentos da esquerda para a direita de forma que, quando dada uma consulta para um ponto~$p$, podemos acessar a versão da ABB que correspondente à faixa que contém~$p$. Dessa forma, transformamos uma solução offline, que necessitava ter os pontos de antemão, em uma solução online, que pode responder consultas imediatamente.
+Podemos, entretanto, usar uma ABB parcialmente persistente, percorrer os segmentos da esquerda para a direita de forma que, quando dada uma consulta para um ponto~$p$, podemos acessar a versão da ABB que corresponde à faixa que contém~$p$. Dessa forma, transformamos uma solução offline, que necessitava ter os pontos de antemão, em uma solução online, que pode responder consultas imediatamente.
 
 Usando a estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist}, a solução para o problema tem complexidade~$\angles{\Oh(n \lg n), \Oh(\lg n)}$, e usa espaço~$\Oh(n)$. Os detalhes da implementação serão discutidos nas próximas seções.
 
-\section{Preprocessamento}
 
-Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consulta está exatamente na borda de duas faixas. Para evitar este problema, e outros, podemos rotacionar todos os polígonos e pontos de consulta por um ângulo aleatório. É óbvio que neste caso a resposta de todas as consultas continua a mesma, e além disso a chance de um ponto de consulta ter a mesma coordenada x que algum dos pontos dos polígonos é nula (assumimos aqui os pontos de consulta não podem ser iguais a pontos dos polígonos, e esse caso pode ser resolvido separadamente de forma simples).
+\section{Pré-processamento}
+
+Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consulta está exatamente na borda de duas faixas, ou quando existem segmentos verticais. Para evitar estes problemas, consideramos que um ponto~$p$ está à esquerda de~$q$ se tem coordenada~$x$ menor, ou se a coordenada~$x$ é igual e a coordenada~$y$ é menor. Assumimos aqui que os pontos de consulta não podem ser iguais a pontos dos polígonos, e esse caso pode ser resolvido separadamente de forma simples.
 
 \providecommand{\from}{\V{from}}
 \providecommand{\tto}{\V{to}}
+\providecommand{\topp}{\V{top}}
 \providecommand{\seg}{\V{seg}}
+\providecommand{\add}{\V{add}}
 \providecommand{\events}{\V{events}}
 \providecommand{\rbt}{\V{rbt}}
 \providecommand{\slabs}{\V{slabs}}
 \providecommand{\current}{\V{current}}
 \providecommand{\polygon}{\V{polygon}}
 
-São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~$i$-ésimo polígono e~$P_i^j$ é o seu~$j$-ésimo ponto (para facilitar o código vale ${P_i^{|P_i|+1} = P_i^1}$). Assumimos que os pontos dos polígonos são dados em sentido horário.
+São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~\mbox{$i$-ésimo} polígono e~$P_i^j$ é o seu~$j$-ésimo ponto. Para facilitar o código vale ${P_i^{|P_i|+1} = P_i^1}$. Assumimos que os pontos dos polígonos são dados em sentido anti-horário.
 
 
 \begin{algorithm}
@@ -127,50 +130,70 @@ São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i
 \begin{algorithmic}[1]
 
 \Function{Preprocess}{$\{P_1, \ldots, P_k\}$}
-	\State Rotacione todos os polígonos por um ângulo~$\alpha$ aleatório. \label{line:prepl:rot} \Comment{$\Oh(n)$}
 	\State $\events = \{\}$ \Comment{Vetor vazio}
 	\For{$i \in [k]$} \label{line:prepl:for1}
 		\For{$j \in [|P_i|]$} \label{line:prepl:for2}
 			\State $(a, b) = (P^j_i, P^{j+1}_i)$ \label{line:prepl:forb}
 			\State $\seg.\polygon = i$
-			\If{$a.x > b.x$}
+			\State $\seg.\topp = \False$
+			\If{$a > b$}
 				\State $\Call{Swap}{a, b}$
-				\State $\seg.\polygon = -1$
+				\State $\seg.\topp = \True$
 			\EndIf
 			\State $\seg.\from = a$
 			\State $\seg.\tto = b$
-			\State $\events.\Call{Add}{\Call{Event}{a.x, \seg}}$ \Comment{Evento de adição}
-			\State $\events.\Call{Add}{\Call{Event}{b.x, \seg}}$ \label{line:prepl:fore} \Comment{Evento de remoção}
+			\State $\events.\Call{Add}{\Call{Event}{\True, \seg}}$ \Comment{Evento de adição}
+			\State $\events.\Call{Add}{\Call{Event}{\False, \seg}}$ \label{line:prepl:fore} \Comment{Evento de remoção}
 		\EndFor
 	\EndFor
-	\State Ordene~$\events$ de forma que~${\events[i].x \leq \events[j].x}$ se~${i < j}$. \Comment{$\Oh(n \lg n)$} \label{line:prepl:ord}
+	\State Ordene~$\events$ de forma que~${\Call{Point}{\events[i]} \leq \Call{Point}{\events[j]}}$ se~${i < j}$. \Comment{$\Oh(n \lg n)$} \label{line:prepl:ord}
 	\State $\rbt =\ $Árvore rubro-negra parcialmente persistente do Capítulo~\ref{cap:rubronegra_persist}.
 	\State $\slabs = \{\}$
-	\State $\slabs.\Call{Add}{(-\infty, \rbt.\current)}$
+	\State $\slabs.\Call{Add}{((-\infty, 0), \rbt.\current)}$
 	\For{$e \in \events$} \label{line:prepl:for3}
-		\If{$e.x = e.\seg.\from.x$} \Comment{Adicionar segmento}
+		\If{$e.\add$} \Comment{Adicionar segmento}
 			\State $\rbt.\Call{Insert}{e.\seg}$ \Comment{$\Oh(\lg n)$}
 		\Else \Comment{Remover segmento}
 			\State $\rbt.\Call{Remove}{e.\seg}$ \Comment{$\Oh(\lg n)$}
 		\EndIf
-		\State $\slabs.\Call{Add}{(x, \rbt.\current)}$
+		\State $\slabs.\Call{Add}{(\Call{Point}{e}, \rbt.\current)}$
 	\EndFor
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
 
-Um segmento é um objeto com três campos:~$\from$ e~$\tto$, seus pontos de início e fim, e~$\polygon$, um campo que indica a qual polígono pertence um ponto localizado diretamente acima deste segmento. Assumimos que~$\from.x < \tto.x$, ou seja,~$\from$ é sempre o ``ponto esquerdo'' do segmento (note que podemos assumir desigualdade estrita já que a chance de existir um segmento vertical depois da rotação é nula).
+Um segmento é um objeto com quatro campos:~$\from$ e~$\tto$, seus pontos de início e fim,~$\polygon$, a qual polígono pertence este segmento, e~$\topp$, um booleano que indica se o segmento é da parte ``de cima'' do polígono, ou seja, se os pontos imediatamente acima desse segmento não pertencem a nenhum polígono. Assumimos que~$\from$ é sempre o ``ponto esquerdo'' do segmento.
 
-Precisamos percorrer as arestas dos polígonos da esquerda para a direita, para isso utilizamos o tipo de objeto evento, que indica o momento em que um segmento deve ser adicionado ou removido da ABB. Um evento é um objeto com dois campos:~$x$, a coordenada~$x$ na qual dado evento deve ser realizado, e~$\seg$, o segmento que deve ser adicionado ou removido.
+Precisamos percorrer as arestas dos polígonos da esquerda para a direita. Para isso utilizamos o tipo de objeto evento, que indica o momento em que um segmento deve ser adicionado ou removido da ABB. Um evento é um objeto com dois campos:~$\seg$, o segmento que deve ser adicionado ou removido, e~$\add$, um booleano que indica se estamos adicionando ou removendo este segmento. Os segmento são adicionados quando a linha de varredura atinge seu ponto esquerdo, e removido quando a linha atinge seu ponto direito. Se~$e$ é um evento,~$\Call{Point}{e}$ devolve~$e.\from$ se~$e.\add$ é verdadeiro e~$e.\tto$ caso contrário.
 
-Observe o Código~\ref{lst:prepl}. A linha~\nref{line:prepl:rot} rotaciona todos polígonos por um mesmo ângulo aleatório. Os \keyword{for}s das linhas~\nref{line:prepl:for1} e~\nref{line:prepl:for2} iteram por todos os segmentos dos polígonos. Como os polígonos são dados em sentido horário, então se o segmento vai da esquerda para a direita, os pontos imediatamente acima dele não pertencem ao polígono, e se vai da direita para a esquerda, então pertencem. As linhas~\mbox{\nref{line:prepl:forb}-\nref{line:prepl:fore}} então criam um objeto de segmento corretamente e adiciona dois eventos à lista~$\events$, um para adicionar e outro para remover o segmento.
+\begin{figure}
+\centering
+\begin{tikzpicture}[]
 
-A lista~$\events$ tem todos os eventos de adição e remoção de segmentos. A linha~\nref{line:prepl:ord} ordena esses eventos pela ordem que eles ocorrem. Dessa forma o~\keyword{for} da linha~\nref{line:prepl:for3} itera pelos segmentos da esquerda para a direita. Note que um evento~$e$ é de adição se~${e.x = e.\seg.\from.x}$ e de remoção caso contrário. Usamos uma árvore rubro-negra parcialmente persistente, com a mesma API que a do Capítulo~\ref{cap:rubronegra_persist}.
+	\fill[blue, opacity=0.3] (-7, 4) -- (-5, 5) -- (-3, 4) -- (-5, 1) -- (-7, 1);
 
-Por fim, a lista~$\slabs$ é usada para armazenar a correspondência entre faixas e versões da ABB. Ela armazena, em ordem, as coordenadas~$x$ do começo das faixas e a versão da ABB que representa essa faixa.
+	\path[blue, ->] (-7, 4) edge (-7, 1) (-7, 1) edge (-5, 1) (-5, 1) edge (-3, 4) (-3, 4) edge (-5, 5) (-5, 5) edge (-7, 4);
 
-A complexidade desse código é~$\Oh(n \lg n)$, já que realizamos~$\Oh(n)$ adições e remoções à ABB, e a ordenação também consome tempo~$\Oh(n \lg n)$. Todos os passos que tem complexidade diferente de constante estão explicitados no Código~\ref{lst:prepl}.
+	\node[black, below] at (-7, 1) {1};
+	\node[black, below] at (-5, 1) {2};
+	\node[black, above] at (-3, 4) {3};
+	\node[black, above] at (-5, 5) {4};
+	\node[black, above] at (-7, 4) {5};
+
+\end{tikzpicture}
+\caption{Exemplo do polígono dado em sentido anti-horário.} \label{fig:exemplo_anti}
+\end{figure}
+
+Observe o Código~\ref{lst:prepl}. Os \keyword{for}s das linhas~\nref{line:prepl:for1} e~\nref{line:prepl:for2} iteram por todos os segmentos dos polígonos. Os polígonos são dados em sentido anti-horário, como na Figura~\ref{fig:exemplo_anti}, então se o segmento vai da esquerda para a direita, os pontos imediatamente acima dele pertencem ao polígono (como o segmento de 1 para 2), e se vai da direita para a esquerda, então não pertencem pertencem (como o segmento de 3 para 4). As linhas~\mbox{\nref{line:prepl:forb}-\nref{line:prepl:fore}} então criam um objeto de segmento corretamente e adicionam dois eventos à lista~$\events$, um para adicionar e outro para remover o segmento.
+
+A lista~$\events$ tem todos os eventos de adição e remoção de segmentos. A linha~\nref{line:prepl:ord} ordena esses eventos pela ordem que eles ocorrem. Dessa forma o~\keyword{for} da linha~\nref{line:prepl:for3} itera pelos segmentos da esquerda para a direita. Usamos uma árvore rubro-negra parcialmente persistente, com a mesma API que a do Capítulo~\ref{cap:rubronegra_persist}.
+
+A ordenação dos segmentos, que está implicitamente sendo usada pela ABB, pode ser feita usando produto cruzado de vetores.
+
+Por fim, a lista~$\slabs$ é usada para armazenar a correspondência entre faixas e versões da ABB. Ela armazena, em ordem, o ponto correspondente a cada faixa e a versão da ABB que a representa.
+
+A complexidade desse código é~$\Oh(n \lg n)$, já que realizamos~$\Oh(n)$ adições e remoções à ABB, e a ordenação também consome tempo~$\Oh(n \lg n)$. Todos os passos que têm complexidade diferente de constante estão explicitados no Código~\ref{lst:prepl}.
 
 \section{Consulta}
 
@@ -185,12 +208,12 @@ Para determinar a qual polígono pertence um dado ponto, precisamos determinar a
 \begin{algorithmic}[1]
 
 \Function{WhichPolygon}{p}
-	\State Rotacione~$p$ por~$\alpha$. \label{line:conpl:rot}
-	\State Determine o último par~$(x, \current)$ tal que~$x \leq p.x$. \Comment{Busca binária~$\Oh(\lg n)$} \label{line:conpl:bb}
+	\State Determine o último par~$(q, \current)$ tal que~$q \leq p$. \Comment{Busca binária~$\Oh(\lg n)$} \label{line:conpl:bb}
 	\State $u = \rbt.\roots[\current]$ \label{line:conpl:ceilb}
 	\State $\below = \Null$
 	\While{$u \neq \Null$}
-		\If{$u.\val.\Call{HeightAt}{p.x} < p.y$} \Comment{Se~$p$ está acima do segmento}
+		\LineComment{Se~$p$ está acima do segmento}
+		\If{$\Call{Cross}{u.\val.\tto - u.\val.\from, p - u.\val.\from} \geq 0$}
 			\State $\below = u.\val$
 			\State $u = \rbt.\Call{Child}{u, 1, \current}$
 		\Else
@@ -199,17 +222,20 @@ Para determinar a qual polígono pertence um dado ponto, precisamos determinar a
 	\EndWhile \label{line:conpl:ceile}
 	\If{$\below = \Null$} \label{line:conpl:retb}
 		\State \Return $-1$
-	\Else
+	\ElsIf{$\Not\ \below.\topp \Or \Call{Cross}{\below.\tto - \below.\from, p - \below.\from} = 0$}
 		\State \Return $\below.\polygon$
+	\Else
+		\State \Return $-1$
 	\EndIf \label{line:conpl:rete}
 \EndFunction
 
 \end{algorithmic}
 \end{algorithm}
 
-A linha~\nref{line:conpl:rot} rotaciona~$p$ pelo mesmo ângulo que os polígonos foram rotacionados. A linha~\nref{line:conpl:bb} determina a faixa a qual pertence~$p$, usando busca binária na lista~$\slabs$.
+A linha~\nref{line:conpl:bb} determina a faixa a qual pertence~$p$, usando busca binária na lista~$\slabs$.
+Nas linhas~\mbox{\nref{line:conpl:ceilb}-\nref{line:conpl:ceile}}, buscamos o segmento imediatamente abaixo do ponto~$p$. Para isso usamos as funções apresentadas no Capítulo~\ref{cap:rubronegra_persist} e a função~\textsc{Cross}, que calcula o produto cruzado de dois vetores, cujo sinal é usado para determinar se o ponto está acima do segmento. O procedimento é análogo ao procedimento de~\textsc{Floor}, descrito por Sedgewick~\cite{Sedgewick}.
 
-Nas linhas~\mbox{\nref{line:conpl:ceilb}-\nref{line:conpl:ceile}}, buscamos o segmento imediatamente abaixo do ponto~$p$. Para isso usamos as funções apresentadas no Capítulo~\ref{cap:rubronegra_persist} e a função~\textsc{HeightAt} da classe segmento, que determina qual a coordenada~$y$ de um segmento em um dado~$x$. O procedimento é análogo ao procedimento de~\textsc{Floor}, descrito por Sedgewick~\cite{Sedgewick}. Com este segmento, podemos determinar o polígono a qual~$p$ pertence (linhas~\mbox{\nref{line:conpl:retb}-\nref{line:conpl:rete}}).
+Com o segmento determinado, podemos determinar o polígono a qual~$p$ pertence, nas linhas~\mbox{\nref{line:conpl:retb}-\nref{line:conpl:rete}}. Se existe não existe segmento abaixo de~$p$ ou ele está acima de um segmento que era da parte ``de cima'' do polígono, então~$p$ não está em nenhum polígono, caso contrário o polígono é dado pelo segmento.
 
 A complexidade da consulta é~$\Oh(\lg n)$, já que tanto a busca binária quanto a busca na ABB têm essa complexidade.
 
