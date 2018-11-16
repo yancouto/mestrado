@@ -17,20 +17,101 @@
 
 \frontmatter
 
+% ---------------------------------------------------------------------------- %
+% CAPA
+% Nota: O título para as dissertações/teses do IME-USP devem caber em um 
+% orifício de 10,7cm de largura x 6,0cm de altura que há na capa fornecida pela SPG.
 \thispagestyle{empty}
 \begin{center}
-	\vspace*{2.3cm}
-	\textbf{\huge{Estruturas de dados persistentes}}\\
+    \vspace*{2.3cm}
+    \textbf{\Large{Estruturas de dados persistentes}}\\
 
-	\vspace*{1cm}
-	\Large{Yan Soares Couto}
+    \vspace*{1.2cm}
+    \Large{Yan Soares Couto}
 
-	\vskip 1.8cm
-	Orientadora: Cristina G. Fernandes\\
+    \vskip 2cm
+    \textsc{
+    Dissertação apresentada\\[-0.25cm] 
+    ao\\[-0.25cm]
+    Instituto de Matemática e Estatística\\[-0.25cm]
+    da\\[-0.25cm]
+    Universidade de São Paulo\\[-0.25cm]
+    para\\[-0.25cm]
+    obtenção do título\\[-0.25cm]
+    de\\[-0.25cm]
+    Mestre em Ciências}
 
-	\vspace{\fill}
-	\normalsize{São Paulo, 2018}
+    \vskip 1.5cm
+    Programa: Ciência da Computação\\
+    Orientadora: Profa. Dra. Cristina Gomes Fernandes
+
+    \vskip 1cm
+    \normalsize{Durante o desenvolvimento deste trabalho o autor recebeu auxílio
+    financeiro da FAPESP e CNPq}
+
+    \vskip 0.5cm
+    \normalsize{São Paulo, novembro de 2018}
 \end{center}
+
+% ---------------------------------------------------------------------------- %
+% Página de rosto (SÓ PARA A VERSÃO DEPOSITADA - ANTES DA DEFESA)
+% Resolução CoPGr 5890 (20/12/2010)
+%
+% IMPORTANTE:
+%   Coloque um '%' em todas as linhas
+%   desta página antes de compilar a versão
+%   final, corrigida, do trabalho
+%
+%
+\newpage
+\thispagestyle{empty}
+    \begin{center}
+        \vspace*{2.3 cm}
+        \textbf{\Large{Estruturas de dados persistentes}}\\
+        \vspace*{2 cm}
+    \end{center}
+
+    \vskip 2cm
+
+    \begin{flushright}
+    Esta é a versão original da dissertação elaborada pelo\\
+    candidato (Yan Soares Couto), tal como \\
+    submetida à Comissão Julgadora.
+    \end{flushright}
+
+\pagebreak
+
+
+% ---------------------------------------------------------------------------- %
+% Resumo
+\chapter*{Resumo}
+
+\noindent COUTO, Y. S. \textbf{Estruturas de dados persistentes}.
+2018. 80 f.
+Dissertação (Mestrado) - Instituto de Matemática e Estatística,
+Universidade de São Paulo, São Paulo, 2018.
+\\
+
+Os problemas de ancestral comum mais profundo e ancestral de nível em árvores podem ser resolvidos com complexidade sub-quadrática. Estruturas de dados persistentes permitem acesso ou modificação à suas versões anteriores. Pilhas, filas e deques podem ser implementadas de forma persistente. Existem tecnicas gerais para tornar alguns tipos de estruturas de dados persistentes. Árvores rubro-negras podem ser implementadas de forma persistente com espaço adicional constante por operação. O problema da localização de ponto pode ser resolvido utilizando uma árvore de busca binária balanceada persistente.
+\\
+
+\noindent \textbf{Palavras-chave:} estruturas de dados, persistência, árvores rubro-negra, localização de ponto
+
+% ---------------------------------------------------------------------------- %
+% Abstract
+\chapter*{Abstract}
+\noindent Couto, Y. S. \textbf{Persistent data structures}. 
+2018. 80 f.
+Dissertação (Mestrado) - Instituto de Matemática e Estatística,
+Universidade de São Paulo, São Paulo, 2018.
+\\
+
+
+The lowest common ancestor and level ancestor problems can be solved in sub-quadratic complexity. Persistent data structures allow the access or modification of their previous verions. Stacks, queues and deques can be made persistent. There are general techniques to make certain types of data structures persistent. Red-black tress can be made persistent with const additional space per operation. The point location problem can be solved using a persistent balanced binary search tree.
+\\
+
+\noindent \textbf{Keywords:} data structures, persistence, red-black trees, point location
+
 
 \setcounter{tocdepth}{1}
 
