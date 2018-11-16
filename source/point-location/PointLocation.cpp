@@ -7,12 +7,7 @@
 
 namespace point_location {
 struct event {
-	bool add;
-	Segment s;
-	const Point& point() const { return add? s.from : s.to; }
-	bool operator < (const event &o) const {
-		return point() < o.point();
-	}
+	unsigned i, j;
 };
 
 Point Point::operator - (const Point &o) const {
@@ -69,28 +64,32 @@ PointLocationSolver::PointLocationSolver(std::vector<Polygon> polygons) {
 		checkPolygon(p);
 	std::vector<event> events;
 
-	unsigned p_i = 0;
-	for(const Polygon &p : polygons) {
-		for(unsigned i = 0; i < p.size(); i++) {
-			Point a = p[i], b = p[(i + 1) % p.size()];
-			Segment s(a, b, p_i);
-			events.push_back(event{true, s});
-			events.push_back(event{false, s});
-		}
-		p_i++;
-	}
-	std::sort(events.begin(), events.end());
+	for(unsigned i = 0; i < polygons.size(); i++)
+		for(unsigned j = 0; j < polygons[i].size(); j++)
+			events.push_back(event{i, j});
+	std::sort(events.begin(), events.end(), [&polygons](const event &a, const event &b) {
+		return polygons[a.i][a.j] < polygons[b.i][b.j];
+	});
 
-	slabs.push_back({-1.0 / 0.0, 0});
-	for(const event &ev : events) {
-		if(ev.add) rbt.Insert(ev.s);
-		else assert(rbt.Remove(ev.s) != nullptr);
-		slabs.push_back(ev.point());
+	slabs.push_back(std::make_pair(Point{-1.0 / 0.0, 0}, rbt.current()));
+	for(const event &e : events) {
+		unsigned i = e.i, j = e.j;
+		unsigned jm1 = j? j - 1 : polygons[i].size() - 1;
+		if(polygons[i][jm1] < polygons[i][j])
+			assert(rbt.Remove(Segment(polygons[i][jm1], polygons[i][j], i)) != nullptr);
+		else
+			rbt.Insert(Segment(polygons[i][jm1], polygons[i][j], i));
+		unsigned jp1 = j == polygons[i].size() - 1? 0 : j + 1;
+		if(polygons[i][j] < polygons[i][jp1])
+			rbt.Insert(Segment(polygons[i][j], polygons[i][jp1], i));
+		else
+			assert(rbt.Remove(Segment(polygons[i][j], polygons[i][jp1], i)) != nullptr);
+		slabs.push_back(std::make_pair(polygons[i][j], rbt.current()));
 	}
 }
 
 int PointLocationSolver::WhichPolygon(const Point p) const {
-	int i = int(std::upper_bound(slabs.begin(), slabs.end(), p) - slabs.begin()) - 1;
+	int i = prev(std::upper_bound(slabs.begin(), slabs.end(), std::make_pair(p, -1)))->second;
 	assert(i >= 0);
 	using namespace persistence::red_black_tree;
 	Node<Segment> *u = rbt.roots[i];

@@ -69,7 +69,7 @@ class PointLocationSolver {
 
 	private:
 	persistence::red_black_tree::RedBlackTree<Segment> rbt;
-	std::vector<Point> slabs;
+	std::vector<std::pair<Point, int>> slabs;
 };
 
 } // namespace point_location
