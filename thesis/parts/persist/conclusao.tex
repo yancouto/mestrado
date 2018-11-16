@@ -1,0 +1,21 @@
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+
+\setcounter{secnumdepth}{0}
+
+\chapter*{Conclusão}
+\chaptermark{Conclusão}
+\addcontentsline{toc}{chapter}{Conclusão}
+
+A dissertação apresenta persistência em estruturas de dados, mostrando vários resultados dessa área, com atenção especial para a implementação destas estruturas de forma prática. Todas as estruturas apresentadas foram implementadas em C\texttt{++}, e as implementações podem ser acessadas pelo repositório~\mbox{\href{https://github.com/yancouto/mestrado/}{\texttt{yancouto/mestrado}}} no GitHub. A documentação dessas implementações está disponível em~\mbox{\href{https://yancouto.github.io/mestrado/}{\texttt{yancouto.github.io/mestrado}}}.
+
+As implementações de deque apresentadas mostram como reduzir a complexidade pode complicar bastante a teoria e implementação de uma estrutura. Como indicado na Tabela~\ref{tab:deque_persist_comp}, para reduzir a complexidade de tempo de duas operações da deque, de logaritmico pra constante, foi necessário apresentar toda a teoria e código complicados do Capítulo~\ref{cap:deque3_persist}; e, na prática, com limites razoáveis para os computadores dos dias de hoje, esta solução fica mais lenta.
+
+Apresentamos algumas técnicas gerais para tornar algumas classes de estruturas de dados em persistentes, e aplicamos algumas destas a estruturas conhecidas: apresentamos uma deque persistente que usar implementação funcional e uma árvore rubro-negra parcialmente persistente que usa node copying.
+
+Por último, apresentamos uma aplicação de estruturas persistentes, a solução do problema de localização de ponto. É possível generalizar este tipo de solução, na qual fazemos uma linha de varredura com alguma estrutura de dados de forma offline, já que é possível utilizar uma versão persistente da estrutura para respondermos as consultas de forma online.
+
+\setcounter{secnumdepth}{1}
+
+\end{document}
