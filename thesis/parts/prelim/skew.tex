@@ -219,7 +219,7 @@ A Proposição~\ref{prop:csbjj} nos dá uma maneira de verificar se a representa
 
 O Código~\ref{lst:addleafskew} mostra como adicionar uma folha de forma online à árvore, da mesma forma como no Código~\ref{lst:lapot2}. Nesse caso, porém, o consumo de tempo e espaço é constante. A correção segue diretamente do Teorema~\ref{thm:csbj+1} e da Proposição~\ref{prop:csbjj}, já que a comparação da linha~\nref{lst:addleafskew:if} verifica as condição dadas pela proposição e o~\keyword{if} computa o campo~$\jmp$ (equivalente à função~$\J$) como no teorema. Note que a raiz~$r$ tem profundidade~0 e seu campo~$\jmp$ não é usado.
 
-\section{Ancestral Comum Mais Profundo}
+\section{Ancestral comum mais profundo}
 
 Para encontra o ancestral comum mais profundo de dois vértices~$u$ e~$v$, usamos a mesma lógica descrita na Seção~\ref{sec:lca_pot2}. Inicialmente nivelamos~$u$ e~$v$ para terem a mesma profundidade. Seja~$c$ o ancestral comum mais profundo de~$u$ e~$v$, note que no Código~\ref{lst:xysub} não é realmente necessário conhecermos~$y$, apenas precisamos determinar, a cada iteração, se~$\J(x) \geq y$. Sabemos que~${u.\jmp = v.\jmp \iff D(u.\jmp) > D(c)}$, ou seja, podemos determinar se~${J(D(u)) \geq D(c) + 1}$.
 

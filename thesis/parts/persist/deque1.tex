@@ -133,7 +133,7 @@ Devemos ter uma representação especial para deques vazias, por exemplo o valor
 
 \section{Acesso e inserção}
 
-Em cada nó dá arborescência guardaremos: o pai deste nó (o nó para o qual ele aponta), no campo~$\V{parent}$; sua profundidade, no campo~$\V{depth}$; e seu valor associado, que é o valor armazenado na deque, no campo~$\V{val}$. Usamos que~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente. Esta função também realiza o preprocessamento necessário para o algoritmo de Ancestral de Nível funcionar, ou seja, chama a função~\funcAPI{AddLeaf}{u} para o novo vértice, como discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
+Em cada nó dá arborescência guardaremos: o pai deste nó (o nó para o qual ele aponta), no campo~$\V{parent}$; sua profundidade, no campo~$\V{depth}$; e seu valor associado, que é o valor armazenado na deque, no campo~$\V{val}$. Usamos que~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente. Esta função também realiza o pré-processamento necessário para o algoritmo de Ancestral de Nível funcionar, ou seja, chama a função~\funcAPI{AddLeaf}{u} para o novo vértice, como discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
 
 Uma deque é representada por um par ordenado de nós. Usaremos~$(a, b)$ para criar uma deque associada aos nós~$a$ e~$b$, e estes nós podem ser acessados pelos campos~$\V{first}$ e~$\V{last}$.
 

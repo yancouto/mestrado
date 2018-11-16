@@ -41,11 +41,11 @@ ou seja, podemos preencher~$M$ iterando pelos seus índices em ordem não decres
 
 \subsection{Potências de dois} \label{subsec:pot2}
 
-As soluções apresentadas funcionam da seguinte maneira: escolhe-se uma base~$(a_1, \ldots, a_x)$ tal que todo número entre~0 e~$m$ pode ser escrito como soma de zero ou mais destes números, e calcula-se (durante o preprocessamento)~$f^{a_j}(i)$ para todo~$i \in [n]$ e~$j \in [x]$. Dado um número~$k$, escreve-se este como~$k = a_{b_1} + a_{b_2} + \ldots + a_{b_y}$, e após isso calcula-se
+As soluções apresentadas funcionam da seguinte maneira: escolhe-se uma base~$(a_1, \ldots, a_x)$ tal que todo número entre~0 e~$m$ pode ser escrito como soma de zero ou mais destes números, e calcula-se (durante o pré-processamento)~$f^{a_j}(i)$ para todo~$i \in [n]$ e~$j \in [x]$. Dado um número~$k$, escreve-se este como~$k = a_{b_1} + a_{b_2} + \ldots + a_{b_y}$, e após isso calcula-se
 $$f^k(i) = f^{a_{b_1}}(f^{a_{b_2}}(\ldots(f^{a_{b_y}}(i))\ldots)).$$
 Os exemplos eram simples, e no primeiro exemplos escolhemos como base apenas~$(1)$, e o tempo de consulta foi grande, enquanto no segundo exemplo escolhemos~$(1, \ldots, m)$, e o tempo de pré-processamento foi grande.
 
-Escolhendo a base de forma mais inteligente, é possível melhorar a complexidade. Cada número tem uma decomposição (única) em somas de potências de dois distintas (correspondente a sua representação binária), e existem apenas~$\floor{\lg m}$ potências de~2 entre~1 e~$m$. Portanto, podemos escolher a base~${(1, 2, 4, \ldots, 2^{\floor{\lg m}})}$. Para fazer o preprocessamento, utilizaremos programação dinâmica preenchendo uma matriz~$M$ tal que~${M[k][i] \coloneqq f^{2^k}(i)}$ para todo~$i \in [n]$ e~$0 \leq k \leq \floor{\lg m}$. Sabemos que~$f^x(f^x(i)) = f^{2x}(i)$, logo temos
+Escolhendo a base de forma mais inteligente, é possível melhorar a complexidade. Cada número tem uma decomposição (única) em somas de potências de dois distintas (correspondente a sua representação binária), e existem apenas~$\floor{\lg m}$ potências de~2 entre~1 e~$m$. Portanto, podemos escolher a base~${(1, 2, 4, \ldots, 2^{\floor{\lg m}})}$. Para fazer o pré-processamento, utilizaremos programação dinâmica preenchendo uma matriz~$M$ tal que~${M[k][i] \coloneqq f^{2^k}(i)}$ para todo~$i \in [n]$ e~$0 \leq k \leq \floor{\lg m}$. Sabemos que~$f^x(f^x(i)) = f^{2x}(i)$, logo temos
 $$M[k][i] = \left\{
 	\begin{array}{ll}
 		M[k-1][M[k - 1][i]] & \text{ se $k > 0$} \\
@@ -153,7 +153,7 @@ O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, qua
 	\caption{Exemplo de árvore com jump pointers. As arestas cheias são as arestas de pai~($\jmp[0]$), as arestas tracejadas pulam dois níveis~($\jmp[1]$), e as arestas pontilhadas pulam quatro níveis~($\jmp[2]$).} \label{fig:treejmppot2}
 \end{figure}
 
-\section{Calculando Ancestral Comum Mais Profundo} \label{sec:lca_pot2}
+\section{Cálculo do ancestral comum mais profundo} \label{sec:lca_pot2}
 
 Seja~$u, v \in V$ e~$c$ o ancestral comum mais profundo de~$u$ e~$v$, assuma, sem perda de generalidade que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' estes vértices, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
 
