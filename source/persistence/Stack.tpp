@@ -45,9 +45,10 @@ template<class T> void ptr_clean(Node<T> *u) {
 	}
 }
 
-}
+} // namespace
 
 template<class T> Stack<T>& Stack<T>::operator=(const Stack<T> &o) {
+	if(&o == this) return *this;
 	ptr_clean(node);
 	node = o.node;
 	if(node) node->ptr_ct++;

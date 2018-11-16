@@ -59,6 +59,9 @@ public:
 	 * Constrói uma deque sem nenhum elemento.
 	 */
 	Deque();
+	~Deque();
+	Deque& operator=(const Deque &o);
+	Deque(const Deque &o);
 
 	/** @name Operações de Acesso
 	 */

@@ -11,6 +11,7 @@ TEST(STSimple, Example) {
 	Stack<int> p1 = p0.Push(5);
 	Stack<int> p2 = p1.Push(7);
 	Stack<int> p3 = p2.Push(6);
+	p3 = p3; // This may break stuff
 	EXPECT_EQ(p3.Size(), 3);
 	Stack<int> tmp = p3;
 	for(int x : {6, 7, 5}) {

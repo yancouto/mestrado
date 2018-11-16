@@ -8,7 +8,41 @@ namespace deque1 {
 
 template<class T> Deque<T>::Deque() : first(nullptr), last(nullptr) {}
 
-template<class T> Deque<T>::Deque(Node<T> *f, Node<T> *l) : first(f), last(l) {}
+template<class T> Deque<T>::Deque(Node<T> *f, Node<T> *l) : first(f), last(l) {
+	if(first != nullptr) first->ptr_ct++;
+	if(last != nullptr) last->ptr_ct++;
+}
+template<class T> Deque<T>::Deque(const Deque<T> &o) : first(nullptr), last(nullptr) { *this = o; }
+
+namespace {
+
+template<class T> void ptr_clean(Node<T> *u) {
+	while(u != nullptr && --u->ptr_ct == 0) {
+		Node<T> *nx = u->next;
+		delete u;
+		u = nx;
+	}
+}
+
+} // namespace
+
+template <class T> Deque<T>& Deque<T>::operator=(const Deque<T> &o) {
+	if(&o == this) return *this;
+	ptr_clean(first);
+	ptr_clean(last);
+	first = o.first;
+	last = o.last;
+	if(first != nullptr) first->ptr_ct++;
+	if(last != nullptr) last->ptr_ct++;
+	return *this;
+}
+
+template <class T> Deque<T>::~Deque() {
+	ptr_clean(first);
+	ptr_clean(last);
+}
+
+
 
 template<class T> const T& Deque<T>::Front() const { return first->val; }
 
