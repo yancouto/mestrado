@@ -165,7 +165,7 @@ Portanto, é possível usar a mesma ideia para resolver o problema do Ancestral 
 \end{algorithmic}
 \end{algorithm}
 
-\section{Computando Jump pointers}
+\section{Computando jump pointers}
 
 A seção anterior apresentou uma solução para o problema do Ancestral de Nível que consome tempo logarítmico, porém, assumimos que cada nó~$u$ tinha um campo~$u.\jmp$ com seu~$\J(\Dep(u))$-ésimo ancestral. Nesta seção, detalharemos como encontrar tal ancestral para cada nó.
 
@@ -264,7 +264,7 @@ A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementaç�
 	\caption{Consumo de tempo e espaço da solução com skew-binary, onde~$n$ é o tamanho da árvore.} \label{tab:la_skew}
 \end{table}
 
-\begin{table} \centering
+\begin{table}[H] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
 	& Representação binária & Skew-binary \\ \hline

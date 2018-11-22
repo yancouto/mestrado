@@ -1,0 +1,37 @@
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+
+\setcounter{secnumdepth}{0}
+
+\chapter*{Introdução}
+\chaptermark{Introdução}
+\addcontentsline{toc}{chapter}{Introdução}
+
+Uma estrutura de dados (ED) é uma forma de organizar dados em programas de computador. Estruturas de dados permitem operações de acesso e de modificação; operações de acesso apenas consultam um ou mais campos de uma ED, enquanto operações de modificação podem alterar os campos da estrutura.
+
+Em geral, operações só podem ser feitas na configuração atual da ED, ou seja, ao realizar uma operação de modificação, perde-se informação sobre o ``passado'' da estrutura. Dizemos que, ao realizar uma operação de modificação, criamos uma nova versão da ED. Estruturas de dados \deff{persistentes}~\cite{DriscollSST1989} permitem realizar operações em versões criadas anteriormente. Dizemos que uma ED é \deff{parcialmente persistente} se permite apenas operações de acesso a versões anteriores e modificação apenas na versão mais nova, e \deff{totalmente persistente}, ou apenas~\deff{persistente}, se também permite operações de modificação em todas as versões.
+
+Considerando um digrafo das versões onde se a versão $j$ foi criada a partir da versão $i$ então existe um arco de $i$ para $j$, temos que para estruturas parcialmente persistentes esse digrafo é um caminho, e para estruturas totalmente persistentes é uma árvore enraizada, em que as arestas vão para longe da raiz. Este digrafo é chamado de árvore de versões.
+
+O estudo de estruturas persistentes segue dois caminhos: técnicas gerais, para tornar \emph{qualquer} estrutura de dados persistente, ou técnicas para tornar alguma ED específica (como uma pilha ou fila) persistente, deixando-a tão eficiente e simples quanto possível.
+
+Persistência foi formalmente introduzida por Driscoll, Sleator e Tarjan~\cite{DriscollSST1989}, porém já era estudada anteriormente, principalmente para a implementação de estruturas de dados em linguagens funcionais, como pilhas~\cite{Myers83}, filas~\cite{HoodMelville} e árvores de busca binária (ABBs~\cite{Myers82}).
+
+A Parte~\ref{part:prelim} desta dissertação detalha a solução para os problemas de ancestral comum mais profundo e ancestral de nível, usadas como caixa preta nos Capítulos~\ref{cap:pilha_persist} e~\ref{cap:deque1_persist}. Pode ser pulada se já houver o conhecimento destes problemas.
+
+A Parte~\ref{part:persist} detalha a teoria de estruturas persistentes, e se divide da seguinte forma:
+\begin{itemize}
+\item Os Capítulos~\ref{cap:pilha_persist} a~\ref{cap:deque3_persist} apresentam técnicas para tornar persistentes estruturas específicas, como pilhas, filas e deques.
+\item O Capítulo~\ref{cap:geral_persist} apresenta técnicas gerais para tornar persistentes certas classes de estruturas de dados. O Capítulo~\ref{cap:rubronegra_persist} aplica uma destas técnicas na árvore rubro-negra.
+\item O Capítulo~\ref{cap:pl_persist} apresenta uma aplicação da estrutura apresentada no Capítulo~\ref{cap:rubronegra_persist} para resolver o problema de localização de ponto.
+\end{itemize}
+
+
+
+\setcounter{secnumdepth}{1}
+
+\end{document}
+
+
+

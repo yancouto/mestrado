@@ -47,7 +47,7 @@
 
     \vskip 1cm
     \normalsize{Durante o desenvolvimento deste trabalho o autor recebeu auxílio
-    financeiro da FAPESP e CNPq}
+    financeiro da FAPESP e CNPq.}
 
     \vskip 0.5cm
     \normalsize{São Paulo, novembro de 2018}
@@ -75,7 +75,7 @@
 
     \begin{flushright}
     Esta é a versão original da dissertação elaborada pelo\\
-    candidato (Yan Soares Couto), tal como \\
+    candidato Yan Soares Couto, tal como \\
     submetida à Comissão Julgadora.
     \end{flushright}
 
@@ -92,7 +92,7 @@ Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2018.
 \\
 
-Os problemas de ancestral comum mais profundo e ancestral de nível em árvores podem ser resolvidos com complexidade sub-quadrática. Estruturas de dados persistentes permitem acesso ou modificação à suas versões anteriores. Pilhas, filas e deques podem ser implementadas de forma persistente. Existem técnicas gerais para tornar alguns tipos de estruturas de dados persistentes. Árvores rubro-negras podem ser implementadas de forma persistente com espaço adicional constante por operação. O problema da localização de ponto pode ser resolvido utilizando uma árvore de busca binária balanceada persistente.
+Os problemas de ancestral comum mais profundo e ancestral de nível em árvores podem ser resolvidos com complexidade sub-quadrática. Estruturas de dados persistentes permitem acesso ou modificação a suas versões anteriores. Pilhas, filas e deques podem ser implementadas de forma persistente. Existem técnicas gerais para tornar alguns tipos de estruturas de dados persistentes. Árvores rubro-negras podem ser implementadas de forma persistente com espaço adicional constante por operação. O problema da localização de ponto pode ser resolvido utilizando uma árvore de busca binária balanceada persistente.
 \\
 
 \noindent \textbf{Palavras-chave:} estruturas de dados, persistência, árvores rubro-negra, localização de ponto
@@ -107,7 +107,7 @@ Universidade de São Paulo, São Paulo, 2018.
 \\
 
 
-The lowest common ancestor and level ancestor problems can be solved in sub-quadratic complexity. Persistent data structures allow the access or modification of their previous verions. Stacks, queues and deques can be made persistent. There are general techniques to make certain types of data structures persistent. Red-black tress can be made persistent with const additional space per operation. The point location problem can be solved using a persistent balanced binary search tree.
+The lowest common ancestor and level ancestor problems can be solved in sub-quadratic complexity. Persistent data structures allow the access or modification of their previous versions. Stacks, queues and deques can be made persistent. There are general techniques to make certain types of data structures persistent. Red-black trees can be made persistent with constant additional space per operation. The point location problem can be solved using a persistent balanced binary search tree.
 \\
 
 \noindent \textbf{Keywords:} data structures, persistence, red-black trees, point location
@@ -124,15 +124,17 @@ The lowest common ancestor and level ancestor problems can be solved in sub-quad
 \mainmatter
 \pagenumbering{arabic}
 
-\part{Preliminares}
-\subfile{parts/prelim/intro}
+\subfile{intro}
+
+\part{Preliminares} \label{part:prelim}
+%\subfile{parts/prelim/intro}
 
 \subfile{parts/prelim/ancestrais}
 
 \subfile{parts/prelim/skew}
 
-\part{Persistência}
-\subfile{parts/persist/intro}
+\part{Persistência} \label{part:persist}
+%\subfile{parts/persist/intro}
 
 \subfile{parts/persist/pilha}
 \subfile{parts/persist/deque1}
