@@ -92,10 +92,14 @@ Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2018.
 \\
 
-Os problemas de ancestral comum mais profundo e ancestral de nível em árvores podem ser resolvidos com complexidade sub-quadrática. Estruturas de dados persistentes permitem acesso ou modificação a suas versões anteriores. Pilhas, filas e deques podem ser implementadas de forma persistente. Existem técnicas gerais para tornar alguns tipos de estruturas de dados persistentes. Árvores rubro-negras podem ser implementadas de forma persistente com espaço adicional constante por operação. O problema da localização de ponto pode ser resolvido utilizando uma árvore de busca binária balanceada persistente.
+Estruturas de dados (EDs) permitem operações de acesso e de modificação; operações de acesso apenas consultam um ou mais campos de uma ED, enquanto operações de modificação podem alterar os campos da estrutura. Dizemos que, ao realizar uma operação de modificação, criamos uma nova versão da ED.
+
+Uma ED é \deff{parcialmente persistente} se permite apenas operações de acesso a versões anteriores e modificação apenas na versão mais nova, e \deff{totalmente persistente} se também permite operações de modificação em todas as versões.
+
+Esta dissertação apresenta a descrição e implementação de várias estruturas: pilhas, filas, deques e árvores rubro-negras. Também são discutidas técnicas gerais para tornar persistentes certas classes de estruturas de dados. Por fim, é apresentada uma solução ao problema de localização de ponto que usa uma árvore de busca binária persistente.
 \\
 
-\noindent \textbf{Palavras-chave:} estruturas de dados, persistência, árvores rubro-negra, localização de ponto
+\noindent \textbf{Palavras-chave:} estruturas de dados, persistência, árvores rubro-negras, localização de ponto
 
 % ---------------------------------------------------------------------------- %
 % Abstract
