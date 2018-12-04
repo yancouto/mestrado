@@ -110,8 +110,11 @@ Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2018.
 \\
 
+Data structures (DSs) allow access and update operations; access operations only allow accessing the value one or more fields of the DS, while update operations allow modifying the fields of the structure. We say that, whenever an update operation is done, a new version of the DS is created.
 
-The lowest common ancestor and level ancestor problems can be solved in sub-quadratic complexity. Persistent data structures allow the access or modification of their previous versions. Stacks, queues and deques can be made persistent. There are general techniques to make certain types of data structures persistent. Red-black trees can be made persistent with constant additional space per operation. The point location problem can be solved using a persistent balanced binary search tree.
+A DS is~\deff{partially persistent} if it allows access operatiors to previous versions of the structure and update operations only in the newest version, and~\deff{totally persistent} if it also allows update operations on all versions.
+
+This dissertation presents the description and implementation of totally or partially persistent versions of several data structures: stacks, queues, deques and red-black trees. General techniques to make certain classes of DSs persistent are also discussed. At last, a solution to the point location problem, using a persistent binary search tree, is presented.
 \\
 
 \noindent \textbf{Keywords:} data structures, persistence, red-black trees, point location
