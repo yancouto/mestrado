@@ -123,7 +123,7 @@ Vamos considerar a sequência de operações no Exemplo~\ref{ex:pilha}. Na esque
 \caption{Exemplo de uso de uma pilha persistente.} \label{ex:pilha}
 \end{example}
 
-Em uma pilha efêmera, adicionamos apenas elementos no começo da lista ligada, mas no caso da pilha persistente podemos adicionar nós em outros pontos, e na verdade a estrutura resultante é uma arborescência, ou seja, uma árvore enraizada onde as arestas apontam em direção à raiz, considerando que a raiz é o valor~\keyword{null} (pilha vazia). Note que, como discutido anteriormente, a partir de cada nó podemos apenas acessar os nós do caminho deste nó até a raiz, utilizando seus campos~\code{next}.
+Em uma pilha efêmera, adicionamos apenas elementos no início da lista ligada, mas no caso da pilha persistente podemos adicionar nós em outros pontos, e na verdade a estrutura resultante é uma arborescência, ou seja, uma árvore enraizada onde as arestas apontam em direção à raiz, considerando que a raiz é o valor~\keyword{null} (pilha vazia). Note que, como discutido anteriormente, a partir de cada nó podemos apenas acessar os nós do caminho deste nó até a raiz, utilizando seus campos~\code{next}.
 
 A Figura~\ref{fig:pilha_ex1} mostra a arborescência criada para a sequência de operações do Exemplo~\ref{ex:pilha}. Em cada nó é indicado o valor armazenado naquele nó, e a flecha saindo de cada nó indica seu campo~$\V{next}$. Os valores~$p_0, \ldots, p_6$ apontam para os seus nós correspondentes. Note que é possível que~${p_i = p_j}$ para~${i \neq j}$. Isso ocorre no exemplo, onde~$p_4 = p_1$. Isso não ocorre sempre que as pilhas têm os mesmos valores; perceba que~$p_1 \neq p_6$, apesar destas duas pilhas terem os mesmos elementos na mesma ordem.
 
@@ -147,7 +147,7 @@ Perceba também que a árvore de versões não é igual à árvore da estrutura.
 \draw[->, shorten >= 10pt] node[draw=none, right = 1cm of p6]{$p_6$} edge (p6);
 
 	\end{tikzpicture}
-	\caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:pilha}. O nó com um risco simboliza o valor~\keyword{null}.} \label{fig:pilha_ex1}
+	\caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:pilha}. A raiz na figura (o nó cortado) é a representação do valor~\keyword{null}.} \label{fig:pilha_ex1}
 \end{figure}
 
 \begin{figure}
@@ -201,7 +201,9 @@ A Tabela~\ref{tab:pilha_persist} mostra o consumo de tempo e espaço de uma pilh
 
 \section{Filas persistentes}
 
-Filas são estruturas quase tão simples quanto pilhas. Elas são listas, e permitem inserções no final e remoções no começo. Mais precisamente, filas de acesso aleatório permitem as seguintes operações:
+Nesta seção apresentaremos uma implementação persistente bastante natural que desenvolvemos para filas, usando uma pilha persistente. A ideia dessa implementação surgiu quando elaboramos um problema para a Seletiva USP de 2016, uma prova que seleciona alunos da USP para participar da Maratona de Programação. O problema em inglês pode ser acessado em~\href{http://codeforces.com/gym/101064/problem/G}{\texttt{codeforces.com/gym/101064/problem/G}}.
+
+Filas são estruturas quase tão simples quanto pilhas. Elas são listas, e permitem inserções no final e remoções no início. Mais precisamente, filas de acesso aleatório permitem as seguintes operações:
 
 \begin{itemize}
 	\item \funcAPI{Queue}{}
@@ -255,9 +257,9 @@ Assumimos que criar pares consome tempo constante.
 \caption{Fila de acesso aleatório persistente.} \label{lst:fila}
 \end{algorithm}
 
-O Código~\ref{lst:fila} mostra a implementação das operações da fila. A correção segue diretamente da correção das funções para pilha. De fato, podendo acessar qualquer elemento de uma pilha, implementar uma fila é simples, já que usamos apenas as operações~\textsc{Push} e~\textsc{k-th}, e simplesmente ignoramos os elementos que existem antes do começo da fila.
+O Código~\ref{lst:fila} mostra a implementação das operações da fila. A correção segue diretamente da correção das funções para pilha. De fato, podendo acessar qualquer elemento de uma pilha, implementar uma fila é simples, já que usamos apenas as operações~\textsc{Push} e~\textsc{k-th}, e simplesmente ignoramos os elementos que existem antes do início da fila.
 
-%Sempre assumimos que todas as chamadas de operações são válidas, ou seja, nunca haverá uma chamada para~\funcAPI{k-th}{q, k} com~$k$ maior que o tamanho de~$q$, de modo que os elementos antes do começo da fila nunca serão acessados indevidamente.
+%Sempre assumimos que todas as chamadas de operações são válidas, ou seja, nunca haverá uma chamada para~\funcAPI{k-th}{q, k} com~$k$ maior que o tamanho de~$q$, de modo que os elementos antes do início da fila nunca serão acessados indevidamente.
 
 Desde que a implementação da pilha seja persistente, a implementação da fila é persistente pois nunca modifica nenhum par, apenas cria novos objetos. A Tabela~\ref{tab:fila_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
 

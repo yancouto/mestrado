@@ -4,21 +4,22 @@
 
 \chapter{Deque com LA e LCA} \label{cap:deque1_persist}
 
-Uma~\deff{fila duplamente terminada} ou fila de duas pontas é uma estrutura de dados que generaliza pilhas e filas. Essa estrutura é uma lista em que é possível adicionar e remover elementos de qualquer uma das suas extremidades. Ela é usualmente chamada de deque, uma abreviatura de dequeue.
+Uma~\deff{fila com duas pontas} é uma estrutura de dados que generaliza pilhas e filas. Essa estrutura é uma lista em que é possível adicionar e remover elementos de qualquer uma das suas extremidades. Ela é usualmente chamada de~\deff{deque}, uma abreviatura de~\deff{dequeue}.
+Chama-se uma das extremidades da deque de início e outra de fim, embora ambas tenham o mesmo papel.
 
-Uma deque de acesso aleatório é uma lista que permite as seguintes operações:
+Uma deque de acesso aleatório admite as seguintes operações:
 
 \begin{itemize}
 	\item \funcAPI{Deque}{}
 	      \\ Devolve uma deque vazia.
-	\item \funcAPI{PushFront}{d, x}
-	      \\ Devolve uma cópia da deque~$d$ com o valor~$x$ inserido no seu início.
-	\item \funcAPI{PushBack}{d, x}
-	      \\ Devolve uma cópia da deque~$d$ com o valor~$x$ inserido no seu fim.
 	\item \funcAPI{Front}{d}
 	      \\ Devolve o primeiro elemento de~$d$.
 	\item \funcAPI{Back}{d}
 	      \\ Devolve o último elemento de~$d$.
+	\item \funcAPI{PushFront}{d, x}
+	      \\ Devolve uma cópia da deque~$d$ com o valor~$x$ inserido no seu início.
+	\item \funcAPI{PushBack}{d, x}
+	      \\ Devolve uma cópia da deque~$d$ com o valor~$x$ inserido no seu fim.
 	\item \funcAPI{PopFront}{d}
 	      \\ Devolve uma cópia da deque~$d$ sem o primeiro elemento.
 	\item \funcAPI{PopBack}{d}
@@ -27,19 +28,17 @@ Uma deque de acesso aleatório é uma lista que permite as seguintes operações
 	      \\ Devolve o $k$-ésimo elemento da deque~$d$.
 \end{itemize}
 
-Note que, usando apenas \funcAPI{PushBack}{d, x}, \funcAPI{Back}{d} e \funcAPI{PopBack}{d}, simulamos uma pilha. Analogamente, usando apenas \funcAPI{PushBack}{d, x}, \funcAPI{Front}{d} e \funcAPI{PopFront}{d}, simulamos uma fila simples.
+Note que, usando apenas \funcAPI{PushBack}{d, x}, \funcAPI{Back}{d} e \funcAPI{PopBack}{d}, podemos simular uma pilha. Analogamente, usando apenas \funcAPI{PushBack}{d, x}, \funcAPI{Front}{d} e \funcAPI{PopFront}{d}, podemos simular uma fila simples.
 
-Apresentaremos uma implementação persistente de deques, que se baseia nas implementações de pilhas e filas persistentes discutidas no Capítulo~\ref{cap:pilha_persist}. Esta implementação utiliza Ancestral de Nível e Ancestral Comum Mais Profundo, discutidos nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
+Na literatura existem outras implementações persistentes de deques, que serão apresentadas nos dois próximos capítulos. Neste capítulo, apresentaremos uma implementação persistente que desenvolvemos de deques. Ela se baseia nas implementações de pilhas e filas persistentes discutidas no Capítulo~\ref{cap:pilha_persist}, e utiliza Ancestral de Nível e Ancestral Comum Mais Profundo, discutidos nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
 
-Esta implementação, e a da fila no Capítulo~\ref{cap:pilha_persist}, são de minha autoria. Ambas são baseadas na implementação da pilha de acesso aleatório persistente. Desenvolvi inicialmente a ideia para uma fila persistente ao escrever um problema para a Seletiva USP de 2016, uma prova que seleciona alunos da USP para participar da Maratona de Programação. O problema em inglês pode ser acessado em~\href{http://codeforces.com/gym/101064/problem/G}{\texttt{codeforces.com/gym/101064/problem/G}}.
-
-Acreditamos que, mesmo sendo necessário resolver o problema do Ancestral de Nível e Ancestral Comum Mais Profundo, esta implementação é mais simples que as outras, apresentadas nos capítulos seguintes.
+Embora utilize os algoritmos para Ancestral de Nível e Ancestral Comum Mais Profundo, acreditamos que esta implementação seja mais simples que as apresentadas nos capítulos seguintes.
 
 \section{Representação e visão geral}
 
-Na implementação de pilhas no Capítulo~\ref{cap:pilha_persist}, a lista ligada, quando em um contexto persistente, se torna uma arborescência. É possível adicionar novas folhas, pois estas não mudam os ponteiros dos outros elementos; e então é possível adicionar elementos ao final da pilha.
+Na implementação de pilhas no Capítulo~\ref{cap:pilha_persist}, a lista ligada, quando em um contexto persistente, se torna uma arborescência. É possível adicionar novas folhas, pois estas não mudam os ponteiros dos outros nós; e então é possível adicionar elementos ao final da pilha.
 
-Na implementação de filas, no mesmo capítulo, também foi discutido como simular a remoção de elementos do início da estrutura, guardando, junto com o nó, o número de elementos já removidos. Dessa forma, os elementos da fila são um sufixo do caminho da raiz até o vértice. Isso, porém, não permite adicionar elementos no início.
+Na implementação de filas persistentes, descrita no mesmo capítulo, também foi discutido como simular a remoção de elementos do início da estrutura, guardando, junto ao nó indicado pela versão da fila, o número de elementos já removidos naquela versão. Dessa forma, os elementos de uma determinada versão da fila são um sufixo do caminho da raiz até o nó indicado pela versão. Essa organização, porém, não permite adicionar elementos no início da fila.
 
 \begin{figure}
 \centering
@@ -82,7 +81,7 @@ Na implementação de filas, no mesmo capítulo, também foi discutido como simu
 \draw[->, shorten >= 10pt] node[draw=none, right = 1cm of v6]{$\V{last}_9$} edge (v6);
 
 \end{tikzpicture}
-\caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:deque}.} \label{fig:deque_ex1}
+\caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:deque}. A raiz na figura (o nó cortado) é a representação do valor~\keyword{null}.} \label{fig:deque_ex1}
 \end{figure}
 
 \begin{example}[t]
@@ -123,26 +122,34 @@ Na implementação de filas, no mesmo capítulo, também foi discutido como simu
 \caption{Exemplo de uso de uma deque persistente.} \label{ex:deque}
 \end{example}
 
-Para a implementação de deques, ainda usaremos uma arborescência, ou seja, as arestas são em direção à raiz, mas cada versão de uma deque será associada a dois nós,~$\V{first}$ e~$\V{last}$. Os elementos da deque serão os elementos no caminho de~$\V{first}$ para~$\V{last}$, se considerarmos que as arestas não têm direção. Na Figura~\ref{fig:deque_ex1}, a deque apontada pelo par~$(\V{first}_3, \V{last}_3)$, por exemplo, contém os elementos~2,~3 e~4.
+Para a implementação de deques, ainda usaremos uma arborescência, mas cada versão da deque indicará dois nós:~$\V{first}$ e~$\V{last}$. Os elementos dessa versão da deque serão os elementos no caminho entre~$\V{first}$ para~$\V{last}$ na árvore subjacente à arborescência (ou seja, na versão não dirigida da arborescência). Na Figura~\ref{fig:deque_ex1}, a deque apontada pelo par~$(\V{first}_3, \V{last}_3)$, por exemplo, contém os elementos~2,~3 e~4.
 
-Para adicionar um elemento no início da deque, criamos uma nova folha conectada a~$\V{first}$ e substituímos~$\V{first}$ por esta folha; para adicionar um elemento no final da deque, criamos uma nova folha conectada a~$\V{last}$ e substituímos~$\V{last}$. Criar folhas em uma árvore não muda os caminhos entres vértices já existentes, então as versões de deques anteriores continuam válidas, e o novo par~$(\V{first}, \V{last})$ representa a deque desejada, com um elemento adicionado em seu início ou final. Na Figura~\ref{fig:deque_ex1} ao inserir~1 no começo da deque representada por~$(\V{first}_3, \V{last_3})$, obtemos a deque~$(\V{first}_4, \V{last}_4)$.
+Para adicionar um elemento no início de uma determinada versão da deque, criamos uma nova folha conectada ao~$\V{first}$ dessa versão e indicamos essa nova folha como o~$\V{first}$ da nova versão criada e o seu~$\V{last}$ é o mesmo da versão que foi modificada; para adicionar um elemento no final de uma determinada versão da deque, criamos uma nova folha conectada a~$\V{last}$ e definimos o~$\V{first}$ e~$\V{last}$ da nova versão analogamente. Criar folhas em uma árvore não muda os caminhos entres vértices já existentes, então as versões anteriores da deque continuam válidas, e o novo par~$(\V{first}, \V{last})$ representa a deque alterada com um elemento adicionado em seu início ou final. Isso funciona se a versão da deque em questão tem pelo menos um elemento antes da adição. Na Figura~\ref{fig:deque_ex1}, ao inserir~1 no início da deque representada por~$(\V{first}_3, \V{last_3})$, obtemos a deque~$(\V{first}_4, \V{last}_4)$.
 
-Para remover um elemento do começo, alteramos apenas~$\V{first}$ para apontar para o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$; para remover um elemento do final, alteramos~$\V{last}$ para apontara para o penúltimo elemento do caminho de~$\V{first}$ para~$\V{last}$. Como fazer essas operações será discutido nas próximas seções. Na Figura~\ref{fig:deque_ex1} ao remover o último elemento da deque~$(\V{first}_5, \V{last}_5)$ obtemos a deque~$(\V{first}_6, \V{last}_6)$.
+Para remover um elemento do início de uma versão da deque indicada pelo par~$(\V{first}, \V{last})$, tomamos como~$\V{first}$ da nova versão o segundo elemento no caminho entre~$\V{first}$ e~$\V{last}$; para remover um elemento do final dessa versão, tomamos como~$\V{last}$ o vizinho de~$\V{last}$ no caminho entre~$\V{first}$ e~$\V{last}$. Isso functiona se a versão da deque em questão tem pelo menos dois elementos antes da remoção. Como fazer essas operações será discutido nas próximas seções. Na Figura~\ref{fig:deque_ex1}, ao remover o último elemento da deque~$(\V{first}_5, \V{last}_5)$ obtemos a deque~$(\V{first}_6, \V{last}_6)$.
 
-Devemos ter uma representação especial para deques vazias, por exemplo o valor~\keyword{null} em~$\V{first}$ e~$\V{last}$. Ao remover um elemento de uma deque com um único elemento (quando~$\V{first}=\V{last}$), devolvemos este nó vazio; e para adicionar algum elemento à deque vazia basta criamos e devolvemos um novo nó que aponta para~\keyword{null}. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em que a raiz é~\keyword{null}, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha_persist}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
+É necessária uma representação especial para deques vazias, por exemplo, o par~$(\keyword{null}, \keyword{null})$. Assim, ao remover um elemento de uma deque com um único elemento (ou seja, quando~$\V{first}=\V{last}$), devolvemos o par~$(\keyword{null}, \keyword{null})$; e para adicionar algum elemento à deque vazia basta criarmos um nó~$u$ com o valor desejado e devolvermos o par~$(u, u)$. Dessa forma nossa estrutura é na verdade uma coleção de arborescências, ou podemos considerar que é uma arborescência em~\keyword{null} representa a raiz, assim como fizemos para pilhas no Capítulo~\ref{cap:pilha_persist}. Na Figura~\ref{fig:deque_ex1}, ao remover o único elemento da deque~$(\V{first}_6, \V{last}_6)$, obtemos a deque vazia~$(\V{first}_8, \V{last}_8)$, onde o nó cortado representa~\keyword{null}, e ao adicionar~6 a essa deque obtemos~$(\V{first}_9, \V{last}_9)$.
 
 \section{Acesso e inserção}
 
-Em cada nó dá arborescência guardaremos: o pai deste nó (o nó para o qual ele aponta), no campo~$\V{parent}$; sua profundidade, no campo~$\V{depth}$; e seu valor associado, que é o valor armazenado na deque, no campo~$\V{val}$. Usamos que~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente. Esta função também realiza o pré-processamento necessário para o algoritmo de Ancestral de Nível funcionar, ou seja, chama a função~\funcAPI{AddLeaf}{u} para o novo vértice, como discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
+Em cada nó da arborescência guardaremos: o pai do nó no campo~$\V{parent}$; sua profundidade no campo~$\V{depth}$; e seu valor associado, que é um dos valores armazenados na deque, no campo~$\V{val}$. O código~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente, e também realiza o pré-processamento necessário para o algoritmo de Ancestral de Nível funcionar, ou seja, chama a função~\API{AddLeaf} para o novo vértice, como discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
 
 Uma deque é representada por um par ordenado de nós. Usaremos~$(a, b)$ para criar uma deque associada aos nós~$a$ e~$b$, e estes nós podem ser acessados pelos campos~$\V{first}$ e~$\V{last}$.
 
 \begin{algorithm}
-\caption{Operações de acesso e inserção} \label{lst:deque1_ops1}
+\caption{Operações de acesso e inserção.} \label{lst:deque1_ops1}
 \begin{algorithmic}[1]
 
 \Function{\API{Deque}}{\null}
     \State \Return $(\Null, \Null)$
+\EndFunction
+
+\Function{\API{Front}}{$d$}
+    \State \Return $d.\V{first}.\V{val}$
+\EndFunction
+
+\Function{\API{Back}}{$d$}
+    \State \Return $d.\V{last}.\V{val}$
 \EndFunction
 
 \Function{Swap}{$d$}
@@ -162,29 +169,21 @@ Uma deque é representada por um par ordenado de nós. Usaremos~$(a, b)$ para cr
     \State \Return $\Call{Swap}{\Call{PushFront}{\Call{Swap}{d}, x}}$
 \EndFunction
 
-\Function{\API{Front}}{$d$}
-    \State \Return $d.\V{first}.\V{val}$
-\EndFunction
-
-\Function{\API{Back}}{$d$}
-    \State \Return $d.\V{last}.\V{val}$
-\EndFunction
-
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:deque1_ops1} mostra a implementação das operações mais simples. A função~$\Call{Swap}{d}$ devolve o inverso da deque~$d$ (basta trocar seus dois vértices), e é usada para diminuir a necessidade de duplicar código entre as operações~\API{\textsc{PushFront}} e~\API{\textsc{PushBack}}, assim como~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}.
+O Código~\ref{lst:deque1_ops1} mostra a implementação das operações mais simples. A função~$\Call{Swap}{d}$ devolve o inverso da deque~$d$ (basta inverter~$\V{first}$ e~$\V{last}$ no par associado a~$d$), e é usada para diminuir a necessidade de duplicar código entre as operações~\API{\textsc{PushFront}} e~\API{\textsc{PushBack}}, assim como~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}.
 
-As implementações dadas são funcionais e mantêm a propriedade que os elementos de uma deque são os valores dos nós no caminho de seu campo~$\V{first}$ para~$\V{last}$.
+As implementações dadas são funcionais e mantêm a propriedade de que os elementos de uma deque são os valores nos nós no caminho de seu campo~$\V{first}$ para~$\V{last}$.
 
 \section{Remoção}
 
-Discutiremos como determinar o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$, já que encontrar o penúltimo é encontrar o segundo no caminho de~$\V{last}$ para~$\V{first}$, e usaremos~\textsc{Swap} para não ter que tratar esse caso separadamente. Para uma árvore com raiz, dizemos que o~\deff{ancestral comum mais profundo} de~$\V{first}$ e~$\V{last}$ é o ancestral comum de ambos com maior profundidade. Seja~$\V{mid}$ este ancestral. Então o caminho de~$\V{first}$ para~$\V{last}$ é o caminho de~$\V{first}$ para~$\V{mid}$ concatenado com o caminho de~$\V{mid}$ para~$\V{last}$.
+Discutiremos como determinar o segundo elemento no caminho de~$\V{first}$ para~$\V{last}$. Encontrar o penúltimo é encontrar o segundo no caminho de~$\V{last}$ para~$\V{first}$, assim usaremos~\textsc{Swap} para não ter que tratar esse caso separadamente. Para uma árvore enraízada, dizemos que o~\deff{ancestral comum mais profundo} de~$\V{first}$ e~$\V{last}$ é o ancestral comum de ambos com maior profundidade. Seja~$\V{mid}$ este ancestral. Então o caminho de~$\V{first}$ para~$\V{last}$ é o caminho de~$\V{first}$ para~$\V{mid}$ concatenado com o caminho de~$\V{mid}$ para~$\V{last}$.
 
-O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \ldots, \V{mid})}$; então se~$\V{first} \neq \V{mid}$ temos que~$\V{first}.\V{parent}$ é o segundo elemento do caminho. Se~$\V{first} = \V{mid}$ então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$. Este caminho tem tamanho~${\V{last}.\V{depth} - \V{first}.\V{depth}}$, e então o segundo nó deste caminho é o~${(\V{last}.\V{depth} - \V{first}.\V{depth} - 1)}$-ésimo ancestral de~$\V{last}$, considerando que o~\mbox{0-ésimo} ancestral de um vértice é ele mesmo, primeiro é seu pai, e assim por diante.
+O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \ldots, \V{mid})}$; assim, se~$\V{first} \neq \V{mid}$, temos que~$\V{first}.\V{parent}$ é o segundo elemento do caminho. Se~$\V{first} = \V{mid}$ então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$. Este caminho tem comprimento~${\V{last}.\V{depth} - \V{first}.\V{depth}}$, e então o segundo nó deste caminho é o~${(\V{last}.\V{depth} - \V{first}.\V{depth} - 1)}$-ésimo ancestral de~$\V{last}$ na arborescência, considerando que o~\mbox{0-ésimo} ancestral de um nó é ele mesmo, o primeiro é seu pai, e assim por diante.
 
 \begin{algorithm}
-\caption{Operações de remoção} \label{lst:deque1_ops2}
+\caption{Operações de remoção.} \label{lst:deque1_ops2}
 \begin{algorithmic}[1]
 
 \Function{\API{PopFront}}{$d$}
@@ -204,14 +203,14 @@ O caminho de~$\V{first}$ para~$\V{mid}$ é~${(\V{first}, \V{first}.\V{parent}, \
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:deque1_ops2} mostra a implementação das operações~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}. Usamos o predicado~${\funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}}$ para determinar se~$d.\V{first}$ é o ancestral comum mais profundo de~$d.\V{first}$ e~$d.\V{last}$, mas esta condição pode ser verificada usando apenas chamadas para~\mbox{\API{\textsc{LevelAncestor}}}. Como discutido anteriormente, se isto ocorre, então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$, mas neste caso~$d.\V{first}$ é o~${(\V{last}.\V{depth} - \V{first}.\V{depth})}$-ésimo ancestral de~$\V{last}$. Então $$ \funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first} $$ é equivalente a $$ d.\V{first}.\V{depth} < d.\V{last}.\V{depth} \AND \funcAPI{LevelAncestor}{d.\V{last}.\V{depth} - d.\V{first}.\V{depth}, d.\V{last}} = d.\V{first}. $$
+O Código~\ref{lst:deque1_ops2} mostra a implementação das operações~\API{\textsc{PopFront}} e~\API{\textsc{PopBack}}. Usamos o predicado~${\funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first}}$ para determinar se~$d.\V{first}$ é o ancestral comum mais profundo de~$d.\V{first}$ e~$d.\V{last}$. Esta condição pode também ser verificada usando apenas chamadas para~\mbox{\API{\textsc{LevelAncestor}}}. Se~$\V{first}$ é o ancestral comum mais profundo de~$\V{first}$ e~$\V{last}$, então o caminho de~$\V{first}$ para~$\V{last}$ é~${(\V{first}, \ldots, \V{last}.\V{parent}, \V{last})}$, mas neste caso~$d.\V{first}$ é o~${(\V{last}.\V{depth} - \V{first}.\V{depth})}$-ésimo ancestral de~$\V{last}$. Portanto $$ \funcAPI{LCA}{d.\V{first}, d.\V{last}} = d.\V{first} $$ se e somente se $$ d.\V{first}.\V{depth} < d.\V{last}.\V{depth} \AND \funcAPI{LevelAncestor}{d.\V{last}.\V{depth} - d.\V{first}.\V{depth}, d.\V{last}} = d.\V{first}. $$
 
 \section{Acesso a outros elementos}
 
-Para implementar a operação~\funcAPI{k-th}{d, k}, é necessário comparar~$k-1$ com o tamanho do caminho de~$\V{first}$ até~$\V{mid}$, o ancestral comum mais profundo de~$\V{first}$ e~$\V{last}$. Esse caminho tem tamanho~${\ell_1 \coloneqq \V{first}.\V{depth} - \V{mid}.\V{depth}}$. Se~$k-1$ for menor ou igual a~$\ell_1$, o~$k$-ésimo elemento da deque é o~$(k-1)$-ésimo ancestral de~$\V{first}$; senão, devemos determinar o~$(k-\ell_1)$-ésimo elemento da segunda parte do caminho. Seja~${\ell_2 \coloneqq \V{last}.\V{depth} - \V{mid}.\V{depth}}$ o tamanho do caminho de~$\V{mid}$ até~$\V{last}$. Então o~$(k-\ell_1)$-ésimo elemento da segunda parte do caminho é o~$(\ell_2 - (k-1-\ell_1)) = (\ell_2 + \ell_1 + 1 - k)$-ésimo ancestral de~$\V{last}$.
+Para implementar a operação~\funcAPI{k-th}{d, k}, é necessário comparar~$k-1$ com o tamanho do caminho de~$\V{first}$ até~$\V{mid}$, o ancestral comum mais profundo de~$\V{first}$ e~$\V{last}$. Esse caminho tem tamanho~${\ell_1 \coloneqq \V{first}.\V{depth} - \V{mid}.\V{depth}}$. Se~$k-1$ for menor ou igual a~$\ell_1$, então o~$k$-ésimo elemento da deque é o~$(k-1)$-ésimo ancestral de~$\V{first}$; senão, devemos determinar o~$(k-\ell_1)$-ésimo elemento da segunda parte do caminho. Seja~${\ell_2 \coloneqq \V{last}.\V{depth} - \V{mid}.\V{depth}}$ o tamanho do caminho de~$\V{mid}$ até~$\V{last}$. Então o~$(k-\ell_1)$-ésimo elemento da segunda parte do caminho é o~$(\ell_2 - (k-1-\ell_1)) = (\ell_2 + \ell_1 + 1 - k)$-ésimo ancestral de~$\V{last}$.
 
 \begin{algorithm}
-\caption{Operação~\textsc{k-th}} \label{lst:deque1_ops3}
+\caption{Operação~\textsc{k-th}.} \label{lst:deque1_ops3}
 \begin{algorithmic}[1]
 
 \Function{\API{k-th}}{$d, k$}
@@ -228,7 +227,7 @@ Para implementar a operação~\funcAPI{k-th}{d, k}, é necessário comparar~$k-1
 \end{algorithmic}
 \end{algorithm}
 
-O Código~\ref{lst:deque1_ops3} faz exatamente o que discutido, e portanto corretamente devolve o $k$-ésimo elemento da deque, se~$k$ é válido, ou seja, está entre~1 e o tamanho da deque. A Tabela~\ref{tab:deque1_persist} mostra o consumo de tempo e espaço da implementação discutida nesse capítulo, usando o Ancestral de Nível do Capítulo~\ref{cap:ancestrais} e~\ref{cap:skew}.
+O Código~\ref{lst:deque1_ops3} faz exatamente o que foi discutido, e portanto devolve corretamente o $k$-ésimo elemento da versão~$d$ da deque, se~$k$ é válido, ou seja, está entre~1 e o número de elementos da deque~$d$. A Tabela~\ref{tab:deque1_persist} mostra o consumo de tempo e espaço da implementação discutida nesse capítulo, usando as soluções de Ancestral de Nível dos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
 
 \begin{table} \centering
 \begin{tabular}{|l|c|c|}
@@ -243,7 +242,7 @@ O Código~\ref{lst:deque1_ops3} faz exatamente o que discutido, e portanto corre
 	\funcAPI{PopBack}{q} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(1)$ \\
 	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Consumo de tempo e espaço da implementação de uma deque de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho da deque. \label{tab:deque1_persist}}
+	\caption{Consumo de tempo e espaço da implementação de uma deque de acesso aleatório persistente, usando cada uma das duas implementações de Ancestral de Nível vistas na Parte~\ref{part:prelim}, onde~$n$ é o tamanho da deque. \label{tab:deque1_persist}}
 \end{table}
 
 \end{document}
