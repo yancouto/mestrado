@@ -4,29 +4,40 @@
 
 \chapter{Deque de Kaplan e Tarjan} \label{cap:deque3_persist}
 
-Modificaremos a implementação do Capítulo~\ref{cap:deque2_persist} para que todas as operações, exceto~\textsc{k-th}, consumam tempo e espaço~$\Oh(1)$. Esta implementação foi inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}.
+Apresentaremos neste capítulo uma modificação da implementação do Capítulo~\ref{cap:deque2_persist} para que todas as operações, exceto~\textsc{k-th}, consumam tempo e espaço~$\Oh(1)$. Esta implementação foi inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}.
+
+Assim como na deque recursiva do Capítulo~\ref{cap:deque2_persist}, a estrutura da deque deste capítulo será composta por níveis, cada um armazenando um prefixo e um sufixo da deque, e um apontador para o próximo nível da deque, que armazena pares dos elementos desse nível. A diferença se dá pois, ao invés de o prefixo e sufixo armazenarem zero ou um elemento, como na deque recursiva, nesta estrutura o prefixo e sufixo armazenam de zero a cinco elementos. Uma estratégia é usada para tentar manter cada uma destas extremidades balanceadas, de forma que seja possível executar as operações de forma mais rápida, já que em geral será possível adicionar ou remover um elemento alterando apenas o primeiro nível.
+
+Para apresentar esta estratégia, na Seção~\ref{sec:contbin} observamos a similaridade das operações nessas estruturas com a operação de incremento em contadores binários e então, analisando um algoritmo mais eficiente de incremento em contadores binários, é possível utilizar a mesma ideia para tornar a implementação da deque mais eficiente.
 
 \section{Contadores binários} \label{sec:contbin}
 
-\subsection{Deque persistente como um contador binário}
+\subsection{Deque persistente como um contador binário} \label{subsec:contbin_simples}
 
 Note que, na estrutura do Capítulo~\ref{cap:deque2_persist}, se adicionarmos elementos apenas usando~\funcAPI{PushFront}{d, x}, o primeiro nível da estrutura é visitado em todas as adições, o segundo nível é visitado a cada duas adições, o terceiro a cada quatro, e assim por diante.
 
-Esse comportamento é similar ao de um contador binário. Podemos considerar que cada nível é um dígito:~0 se~$\V{prefix}$ é nulo ou~1 se~$\V{prefix}$ é não nulo. O primeiro nível é o dígito menos significativo. Assim, adicionar um elemento usando~\funcAPI{PushFront}{d, x} é equivalente a somar~1 no contador binário, pois se encontramos um~0 colocamos~$x$ ali, senão, formamos um par de~$x$ com o elemento que ali estava (transformando essa posição em~0), e adicionamos esse par na posição seguinte~(somamos~1 na posição seguinte).
+Esse comportamento é similar à operação de incrementar~1 em um contador binário. Podemos considerar que cada nível da estrutura do Capítulo~\ref{cap:deque2_persist} é um dígito:~0 se~$\V{prefix}$ do nível é nulo ou~1 se~$\V{prefix}$ do nível é não nulo. O primeiro nível é o dígito menos significativo. Assim, adicionar um elemento usando~\funcAPI{PushFront}{d, x} é equivalente a incrementar de~1 o contador binário:
+se o dígito menos significativo é~0, esse dígito se torna~1; se ele é~1, então ele vira~0 e propagamos o aumento de~1 para o próximo dígito. Em~\funcAPI{PushFront}{d, x}, se~$\V{prefix}$ é nulo, então~$\V{prefix}$ passa a apontar para~$x$; senão, ele passa a valer~\keyword{null} e formamos um par com~$x$ e o elemento que era apontado por~$\V{prefix}$, e incluímos esse par no próximo nível da estrutura.
 
-Apesar de sabermos que adições em um contador binário consomem tempo amortizado~$\Oh(1)$, sabemos que algumas adições específicas podem levar tempo~$\Theta(\lg n)$. Então, como estamos em uma estrutura persistente, podemos efetuar essa operação repetidas vezes na mesma versão, e não é possível manter o custo amortizado~$\Oh(1)$.
+Apesar de sabermos que incrementar~1 em um contador binário consome tempo amortizado~$\Oh(1)$, sabemos que algumas vezes incrementar~1 pode levar tempo~$\Theta(\lg n)$, onde~$n$ é o valor máximo que o contador atinge. Como estamos em uma estrutura persistente, podemos efetuar essa operação cara repetidas vezes na mesma versão, e não é possível manter o custo amortizado~$\Oh(1)$.
 
-\subsection{Contadores binários redundantes}
+\subsection{Contadores binários redundantes} \label{subsec:contbin_redun}
 
-Contadores binários redundantes são contadores binários nos quais cada dígito pode ser 0,~1 ou~2. Ainda como em um contador normal, se o contador redundante tem~$n$ dígitos~$x_0, x_1, \ldots, x_{n-1}$, então o seu valor é~$\sum\limits_{i=0}^{n-1}{x_i 2^i}$. Ao permitirmos dígitos~2, passam a existir diversas formas de representar o mesmo número. Por exemplo, o número 9 pode ser representado como 1001, 201 ou 121.
+Contadores binários redundantes são contadores binários nos quais cada dígito pode ser 0,~1 ou~2. Ainda como em um contador normal, se o contador redundante tem~$b$ dígitos~$x_0, x_1, \ldots, x_{b-1}$, então o seu valor é~$\sum\limits_{i=0}^{b-1}{x_i 2^i}$. Ao permitirmos dígitos~2, passam a existir diversas formas de representar o mesmo número. Por exemplo, o número 9 pode ser representado como 1001, 201 ou 121.
 
-Dizemos que um contador binário redundante~$x$ é~\deff{semirregular} se, entre quaisquer dígitos~2, existe um dígito~0, ou seja, se~${x_i = 2}$,~${x_j = 2}$ e~$i < j$, então existe~$k$ tal que~${x_k = 0}$ e~${i < k < j}$. Se também existe um~0 entre o primeiro~2 e o começo do contador (dígito menos significativo), dizemos que o contador é~\deff{regular}. Um contador com apenas 0s é claramente regular, e vamos mostrar como somar~1 em um contador binário regular mudando apenas~$\Oh(1)$ dígitos e mantendo sua regularidade.
+Dizemos que um contador binário redundante~$x$ é~\deff{semirregular} se, entre quaisquer dígitos~2, existe um dígito~0, ou seja, se~${x_i = 2}$,~${x_j = 2}$ e~$i < j$, então existe~$k$ tal que~${x_k = 0}$ e~${i < k < j}$. Se também existe um~0 entre o primeiro~2 e o começo do contador (dígito menos significativo), dizemos que o contador é~\deff{regular}. Um contador com apenas 0s é claramente regular, e vamos mostrar como incrementar de~1 um contador binário regular mudando apenas~$\Oh(1)$ dígitos e mantendo sua regularidade.
 
-Suponha que temos um contador binário regular, e queremos somar~1. Pela regularidade,~${x_0 < 2}$, e portanto é possível aumentar esse dígito sem causar um estouro. Ao fazer isso, o contador pode deixar de ser regular, apesar de ainda ser semirregular, pois é possível que não exista mais nenhum~0 antes do primeiro dígito~2. Encontramos então o primeiro dígito~2, se existir, e realizamos um procedimento~\textsc{Fix} nele. Se não existir nenhum~2, o contador é regular.
+Suponha que temos um contador binário regular, e queremos incrementá-lo de~1. Pela regularidade,~${x_0 < 2}$, e portanto é possível incrementar esse dígito sem causar um estouro. No entanto, ao fazer isso, o contador pode deixar de ser regular, apesar de ainda ser semirregular, pois é possível que não exista mais nenhum~0 antes do primeiro dígito~2. Procuramos então o primeiro dígito~2 e, se um tal dígito existir, realizamos um procedimento~\textsc{Fix} nele. Se não existir nenhum dígito~2, o contador é regular.
 
-Seja~$i$ o índice do primeiro~2. Um procedimento~\textsc{Fix} consiste em transformar esse dígito em~0 e adicionar~1 no dígito~$i+1$. Se isso for possível, é claro que o valor representado pelo contador continua o mesmo, pois~$2^i x_i + 2^{i+1} x_{i+1} = 2^i (x_i - 2) + 2^{i+1} (x_{i+1} + 1)$.
+Caso exista, seja~$i$ o índice do primeiro dígito~2. Um procedimento~\textsc{Fix} consiste em transformar esse dígito em~0 e incrementar de~1 o dígito~$i+1$. Se isso for possível, é claro que o valor representado pelo contador continua o mesmo, pois~$2^i x_i + 2^{i+1} x_{i+1} = 2^i (x_i - 2) + 2^{i+1} (x_{i+1} + 1)$.
 
-\begin{figure}
+A Figura~\ref{fig:cont_ex} mostra os casos possíveis em que se realiza o procedimento~\textsc{Fix}. O lado esquerdo representa como eram os dígitos antes do incremento e o lado direito, depois do incremento. O dígito na posição~$j$, nos Casos~2 e~3, é o segundo dígito~2. À direita do último dígito representado, temos que o contador é semirregular.
+
+No Caso~1, o resultado ou não tem dígito~2, ou tem um dígito~2 com um~0 imediatamente à sua esquerda, logo o contador continua regular. No Caso~2, quando o dígito~$i + 1$ é~0, o resultado tem o dígito~$i$ como~0, e o dígito~$j$ como o primeiro~2, logo a regularidade é respeitada. No Caso~3, o dígito~$i+1$ passa a ser o primeiro~2, mas como ele era anteriormente~1, ainda existe um~0 antes da posição~$j$. Além disso, o dígito~$i$ é~0, logo a regularidade é respeitada.
+
+O contador portanto continua regular, alterando no máximo três dígitos~($x_0,\ x_i$ e~$x_{i+1}$). Para encontrar o primeiro~2 em tempo constante, podemos manter uma pilha com todos os índices de dígitos que são~2. Vamos esboçar um código para fazer esse incremento. Suponha que temos uma pilha~$p$ implementada como a do~Capítulo~\ref{cap:pilha_persist}, e que o contador é armazenado em um vetor~$x$, indexado a partir de~0.
+
+\begin{figure}[h]
 \centering
 
 \begin{tikzpicture}[
@@ -71,14 +82,9 @@ Caso 3\ \  & \ldots & 2 & 1 & \ldots & 0 & \ldots & 2 & \hspace{.8cm}$\Rightarro
  };
 \end{tikzpicture}
 
-\caption{Casos possíveis para o procedimento~\textsc{Fix}.} \label{fig:cont_ex}
+\caption{Casos possíveis para o procedimento~\textsc{Fix}. O~``$\ldots$'' representa zero ou mais dígitos~0 ou~1.} \label{fig:cont_ex}
 \end{figure}
 
-A Figura~\ref{fig:cont_ex} mostra os casos possíveis em que se realiza o procedimento~\textsc{Fix}. Nesta figura,~``$\ldots$'' representa zero ou mais dígitos~0 ou~1. A esquerda representa como eram os dígitos antes e a direita, depois do procedimento. O dígito na posição~$j$, nos Casos~2 e~3, é o segundo dígito~2. À direita do último dígito representado, temos que o contador é semirregular. Como no máximo removemos o primeiro~0 do contador, é garantido que existe um~0 entre o primeiro e, se existir, o segundo~2.
-
-No Caso~1, o resultado ou não tem dígito~2, ou tem um dígito~2 com um~0 imediatamente à sua esquerda, logo o contador continua regular. No Caso~2, quando o dígito~$i + 1$ é~0, o resultado tem o dígito~$i$ como~0, e o dígito~$j$ como o primeiro~2, logo a regularidade é respeitada. No Caso~3, o dígito~$i+1$ passa a ser o primeiro~2, mas como ele era anteriormente~1, ainda existe um~0 antes da posição~$j$. Além disso, o dígito~$i$ é~0, logo a regularidade é respeitada.
-
-O contador portanto continua regular, mudando no máximo~3 dígitos. Para encontrar o primeiro~2 em tempo constante, podemos manter uma pilha com todos os índices de dígitos que são~2. Vamos esboçar um código para fazer essa adição. Supomos que temos uma pilha~$p$ implementada como a do~Capítulo~\ref{cap:pilha_persist}, e que o contador é armazenado em um vetor~$x$, indexado a partir de~0.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -101,16 +107,18 @@ O contador portanto continua regular, mudando no máximo~3 dígitos. Para encont
 \EndFunction
 
 \end{algorithmic}
-\caption{Adicionando 1 em contador binário regular. \label{lst:cnt_reg}}
+\caption{Incrementa de 1 o contador binário regular~$x$. \label{lst:cnt_reg}}
 \end{algorithm}
 
-A função~\func{Add1}{x, p} no Código~\ref{lst:cnt_reg} adiciona~1 ao contador redundante regular~$x$ que tem os índices de seus dígitos~2 armazenados em~$p$.
+A função~\func{Add1}{x, p} no Código~\ref{lst:cnt_reg} incrementa de~1 o contador redundante regular~$x$ que tem os índices de seus dígitos~2 armazenados em~$p$.
 
 \section{Visão geral}
 
-Como discutido na Seção~\ref{sec:contbin}, a implementação de deque apresentada no Capítulo~\ref{cap:deque2_persist} tem uma certa relação com contadores binários. Iremos então usar a ideia de contadores binários redundantes, também discutidos na Seção~\ref{sec:contbin}, para modificar a implementação da deque persistente para que qualquer operação da deque, exceto~\textsc{k-th}, consuma tempo~$\Oh(1)$.
+Como discutido na Subseção~\ref{subsec:contbin_simples}, a implementação de deque apresentada no Capítulo~\ref{cap:deque2_persist} tem uma certa relação com contadores binários. Iremos então usar a ideia de contadores binários redundantes, discutida na Subseção~\ref{subsec:contbin_redun}, para modificar a implementação da deque persistente para que qualquer operação da deque, exceto~\textsc{k-th}, consuma tempo~$\Oh(1)$.
 
-A representação se mantém parecida. Cada nível contém um prefixo e um sufixo da deque, com o nível~$i+1$ armazenando pares de elementos do nível~$i$. Os prefixos e sufixos, porém, são deques (não persistentes) que podem conter até~5 elementos.
+A representação se mantém parecida. Cada nível contém um prefixo e um sufixo da deque, com o nível~$i+1$ armazenando pares de elementos do nível~$i$. Os prefixos e sufixos, porém, são deques efêmeras que armazenam de zero a cinco elementos.
+
+% Explicar detalhadamente o que é uma sub-deque
 
 Cada nível será associado a um dígito~0,~1 ou~2, assim como um contador binário redundante. Durante o algoritmo, o contador formado pelos dígitos associados a cada nível é regular, considerando que o primeiro nível é o dígito menos significativo. Para garantir isso, usamos uma adaptação do procedimento~\textsc{Fix} discutida anteriormente. Note que o valor do contador não tem relação nenhuma com a estrutura, apenas usamos sua regularidade para conseguir aplicar todas as operações em tempo constante. Como veremos, a adaptação do procedimento~\textsc{Fix} pode até mudar o valor do contador, diferente da discutida anteriormente.
 
@@ -191,7 +199,7 @@ row 1/.style={nodes={draw=none, minimum size=5mm, font=\small, color=black!70}}
 
 Se copiarmos os nós modificados, a estrutura fica como na Figura~\ref{fig:func_ex1res}, que é inválida. Ao acessar o nível~4 a partir do nível~1 (em, por exemplo, uma operação~\API{k-th}), acessamos na verdade a versão antiga do nível~4 (que tinha dígito~2), em vez da nova versão copiada. Isso acontece pois copiamos um nó que era apontado por algum nó não copiado. No caso, o nó de nível~4 era apontado pelo nó de nível~3, que não foi copiado nem modificado, e portanto ainda aponta para a versão antiga do nível~4.
 
-Para implementar uma estrutura de forma funcional (e portanto persistente), é necessário copiar todos os nós que precisam ser modificados, e além disso garantir que~\emph{nenhum nó copiado é apontado por um nó não copiado}. Na nossa primeira implementação de deques persistentes, isso é sempre verdade pois copiamos um prefixo dos níveis, e cada nível apenas aponta para o próximo nível.
+Para implementar uma estrutura de forma funcional (e portanto persistente), é necessário copiar todos os nós que precisam ser modificados, e além disso garantir que~\emph{nenhum nó copiado é apontado por um nó não copiado}. Na nossa primeira implementação da deques persistentes, isso é sempre verdade pois copiamos um prefixo dos níveis, e cada nível apenas aponta para o próximo nível.
 
 Para consertar a implementação, precisamos garantir que os nós copiados não são apontados por nós não copiados. Para isso, separa-se os níveis em várias pilhas; em cada pilha o nível do topo tem dígito diferente de~1, ou é o nível~1, e todos os outros elementos da pilha tem dígito~1. Faz-se então uma pilha em que cada elemento é o topo de uma destas sub-pilhas. Então, o procedimento~\textsc{Fix} é sempre realizada no nível~1 ou no primeiro elemento da segunda pilha.
 
