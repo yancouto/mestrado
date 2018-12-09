@@ -108,7 +108,7 @@ Ambas as funções apresentadas não modificam a estrutura e consomem tempo~$\Oh
 \Function{\API{Front}}{$d$}
 	\If{$d.\V{prefix} \neq \Null$}
 		\State \Return $d.\V{prefix}$
-	\ElsIf{$d.\V{center} = \Null$}
+	\ElsIf{$d.\V{center} = \Null$} \label{line:deque2:degenerado}
 		\State \Return $d.\V{suffix}$
 	\Else
 		\State \Return \funcAPI{Front}{d.\V{center}}$.\V{first}$
