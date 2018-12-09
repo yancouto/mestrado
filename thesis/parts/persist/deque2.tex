@@ -50,9 +50,13 @@ $\V{prefix}$ &  &  &  & & & & & $\V{center}$ &  & & & & &  &  & $\V{suffix}$ \\[
  \draw[dashed] (array-3-9.south east) -- (array-4-14.north east);
 
 %\draw (root.south west) edge (root.north east);
- \newcommand{\dnull}[1] { \path[draw] (#1.south west) -- (#1.north east); }
+% \newcommand{\dnull}[1] { \path[draw] (#1.south west) -- (#1.north east); }
 
- \foreach \p in {2-17, 3-2, 3-3, 4-9, 4-11, 4-12, 4-13, 4-14} {\dnull{array-\p}}
+ %\foreach \p in {2-17, 3-2, 3-3, 4-9, 4-11, 4-12, 4-13, 4-14} {\dnull{array-\p}}
+ \path[draw] (array-2-17.south west) -- (array-2-17.north east);
+ \path[draw] (array-3-2.south west) -- (array-3-3.north east);
+ \path[draw] (array-4-9.south west) -- (array-4-9.north east);
+ \path[draw] (array-4-11.south west) -- (array-4-14.north east);
  
  \node[left of=array-2-1, xshift=-.2cm]{Nível 1};
  \node[left of=array-3-1, xshift=-.2cm]{Nível 2};

@@ -6,7 +6,7 @@
 
 Apresentaremos neste capítulo uma modificação da implementação do Capítulo~\ref{cap:deque2_persist} para que todas as operações, exceto~\textsc{k-th}, consumam tempo e espaço~$\Oh(1)$. Esta implementação foi inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}.
 
-Assim como na deque recursiva do Capítulo~\ref{cap:deque2_persist}, a estrutura da deque deste capítulo será composta por níveis, cada um armazenando um prefixo e um sufixo da deque, e um apontador para o próximo nível da deque, que armazena pares dos elementos desse nível. A diferença se dá pois, ao invés de o prefixo e sufixo armazenarem zero ou um elemento, como na deque recursiva, nesta estrutura o prefixo e sufixo armazenam de zero a cinco elementos. Uma estratégia é usada para tentar manter cada uma destas extremidades balanceadas, de forma que seja possível executar as operações de forma mais rápida, já que em geral será possível adicionar ou remover um elemento alterando apenas o primeiro nível.
+Assim como na deque recursiva do Capítulo~\ref{cap:deque2_persist}, a estrutura da deque deste capítulo será composta por níveis, cada um armazenando um prefixo e um sufixo da deque, e um apontador para o próximo nível da deque, que armazena pares dos elementos desse nível. A diferença se dá pois, ao invés de o prefixo e sufixo armazenarem zero ou um elemento, como na deque recursiva, nesta estrutura o prefixo e sufixo armazenam de zero a cinco elementos. Uma estratégia é usada para tentar manter cada uma destas extremidades balanceadas, de forma que seja possível executar as operações de forma mais rápida, já que em geral será possível adicionar ou remover um elemento alterando apenas o primeiro nível. Observe a Figura~\ref{fig:deque3_ex} e suas similaridades com a Figura~\ref{fig:deque_ex}.
 
 Para apresentar esta estratégia, na Seção~\ref{sec:contbin} observamos a similaridade das operações nessas estruturas com a operação de incremento em contadores binários e então, analisando um algoritmo mais eficiente de incremento em contadores binários, é possível utilizar a mesma ideia para tornar a implementação da deque mais eficiente.
 
@@ -116,15 +116,75 @@ A função~\func{Add1}{x, p} no Código~\ref{lst:cnt_reg} incrementa de~1 o cont
 
 Como discutido na Subseção~\ref{subsec:contbin_simples}, a implementação de deque apresentada no Capítulo~\ref{cap:deque2_persist} tem uma certa relação com contadores binários. Iremos então usar a ideia de contadores binários redundantes, discutida na Subseção~\ref{subsec:contbin_redun}, para modificar a implementação da deque persistente para que qualquer operação da deque, exceto~\textsc{k-th}, consuma tempo~$\Oh(1)$.
 
-A representação se mantém parecida. Cada nível contém um prefixo e um sufixo da deque, com o nível~$i+1$ armazenando pares de elementos do nível~$i$. Os prefixos e sufixos, porém, são deques efêmeras que armazenam de zero a cinco elementos.
+A representação se mantém parecida. Cada nível contém um prefixo e um sufixo da deque, com o nível~$i+1$ armazenando pares de elementos do nível~$i$. Os prefixos e sufixos, porém, são deques efêmeras que armazenam de zero a cinco elementos. Chamamos estas deques efêmeras de~\deff{sub-deques}.
 
-% Explicar detalhadamente o que é uma sub-deque
+Cada nível será associado a um dígito~0,~1 ou~2, assim como em um contador binário redundante. Durante o algoritmo, o contador formado pelos dígitos associados a cada nível é regular, considerando que o primeiro nível é o dígito menos significativo. Para garantir isso, usamos uma adaptação do procedimento~\textsc{Fix} discutida anteriormente. Note que o valor do contador não tem relação nenhuma com a estrutura. Apenas usamos sua regularidade para conseguir aplicar todas as operações em tempo constante. Como veremos, a adaptação do procedimento~\textsc{Fix} pode até mudar o valor do contador, diferente da implementação do Código~\ref{lst:cnt_reg}.
 
-Cada nível será associado a um dígito~0,~1 ou~2, assim como um contador binário redundante. Durante o algoritmo, o contador formado pelos dígitos associados a cada nível é regular, considerando que o primeiro nível é o dígito menos significativo. Para garantir isso, usamos uma adaptação do procedimento~\textsc{Fix} discutida anteriormente. Note que o valor do contador não tem relação nenhuma com a estrutura, apenas usamos sua regularidade para conseguir aplicar todas as operações em tempo constante. Como veremos, a adaptação do procedimento~\textsc{Fix} pode até mudar o valor do contador, diferente da discutida anteriormente.
+Para cada nível, associamos suas sub-deques (prefixo e sufixo) a algum dígito. O dígito associado ao nível é então o máximo entre estes dois dígitos. O dígito de uma sub-deque é~0 se essa tem dois ou três elementos,~1 se tem um ou quatro elementos, e~2 se tem zero ou cinco elementos. Intuitivamente, esses dígitos estão associados a quanto ``espaço livre'' uma sub-deque tem, tanto para adicionar quanto para remover elementos. Note que, se o dígito é~2, a sub-deque tem zero ou cinco elementos, então pode não ser possível remover ou adicionar algum elemento. De forma similar, se o dígito é~0, é sempre possível adicionar ou remover até dois elementos desta sub-deque. Como escolhemos o máximo entre os dois dígitos, temos que, se um nível tem dígito pequeno, é possível adicionar ou remover elementos tanto de seu prefixo quanto de seu sufixo.
 
-Para cada nível, associamos suas sub-deques (prefixo e sufixo) a algum dígito. O dígito associado ao nível é então o máximo entre estes dois dígitos. O dígito de uma sub-deque é~0 se essa tem~2 ou~3 elementos,~1 se tem~1 ou~4 elementos, e~2 se tem~0 ou~5 elementos. Intuitivamente, esses dígitos estão associados a quanto ``espaço livre'' uma sub-deque tem, tanto para adicionar quanto para remover elementos. Note que, se o dígito é~2, a sub-deque tem~0 ou~5 elementos, então pode não ser possível remover ou adicionar algum elemento. De forma similar, se o dígito é~0, é sempre possível adicionar ou remover até~2 elementos desta sub-deque. Como escolhemos o máximo entre os dois dígitos, temos que, se um nível tem dígito pequeno, é possível adicionar ou remover elementos de seu prefixo e sufixo.
+% Usar desenho para explicar
 
 Assim como na primeira implementação, pode ser necessário tratar separadamente o último nível, se este tem apenas seu prefixo ou sufixo. Nesse caso, o dígito associado a esse nível é o dígito de sua sub-deque não vazia. Isso se deve ao fato que, nesse caso, a sub-deque não vazia é tanto seu prefixo quanto seu sufixo. Dizemos que esse caso é degenerado.
+
+
+\tikzset{drawnode1/.style={row 1 column #1/.style={nodes={draw}}}}
+\tikzset{drawnode2/.style={row 2 column #1/.style={nodes={draw}}}}
+\tikzset{drawnode3/.style={row 3 column #1/.style={nodes={draw}}}}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[
+array/.style={matrix of nodes,nodes={draw=none, text centered, text width=2em, minimum height=3.1ex, font=\small, align=center, anchor=center}, nodes in empty cells, row sep=2cm},
+drawnode1/.list={1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13},
+drawnode2/.list={1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13},
+drawnode3/.list={1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13},
+row 2/.style={nodes={minimum height=6ex}},
+row 3/.style={nodes={minimum height=10.7ex}},
+]
+
+\matrix[array] (array) {
+0 & 1 &  &   &          & &     & &  &  &  & & \\
+{2 \\ 3} & & & & &  & &      & {8 \\ 9} & {9 \\ 10} & & & \\
+{4 \\ 5 \\ 6 \\ 7} & & & & &  & &      & & & & & \\
+ };
+ 
+\draw[dashed] (array-1-7.south west) -- (array-2-1.north west);
+\draw[dashed] (array-1-7.south east) -- (array-2-13.north east);
+\draw[dashed] (array-2-7.south west) -- (array-3-1.north west);
+\draw[dashed] (array-2-7.south east) -- (array-3-13.north east);
+
+%\draw (root.south west) edge (root.north east);
+\newcommand{\dnull}[1] { \path[draw] (#1.south west) -- (#1.north east); }
+
+\foreach \p in {1-3, 1-4, 1-5, 1-9, 1-10, 1-11, 1-12, 1-13, 2-2, 2-3, 2-4, 2-5, 2-11, 2-12, 2-13, 3-2, 3-3, 3-4, 3-5, 3-9, 3-10, 3-11, 3-12, 3-13, 3-7} {\dnull{array-\p}}
+
+% \path[draw] (array-2-17.south west) -- (array-2-17.north east);
+% \path[draw] (array-3-2.south west) -- (array-3-3.north east);
+% \path[draw] (array-4-9.south west) -- (array-4-9.north east);
+% \path[draw] (array-4-11.south west) -- (array-4-14.north east);
+ 
+ \node[left= 3pt of array-1-1, xshift=-.2cm]{\small Nível 1: Dígito~2};
+ \node[left= 3pt of array-2-1, xshift=-.2cm]{\small Nível 2: Dígito~1};
+ \node[left= 3pt of array-3-1, xshift=-.2cm]{\small Nível 3: Dígito~1};
+
+ \node[above=of array-1-3]{$\V{prefix}$};
+ \node[above=of array-1-7]{$\V{center}$};
+ \node[above=of array-1-11]{$\V{suffix}$};
+
+
+
+ \node[above = 3pt of array-1-3]{Dígito~0};
+ \node[above = 3pt of array-1-11]{Dígito~2};
+
+ \node[above = 3pt of array-2-3]{Dígito~1};
+ \node[above = 3pt of array-2-11]{Dígito~0};
+
+ \node[above = 3pt of array-3-3]{Dígito~1};
+ \node[above = 3pt of array-3-11]{Dígito~2};
+ 
+\end{tikzpicture}
+\caption{Deque persistente que armazena a sequência~$(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)$.} \label{fig:deque3_ex}
+\end{figure}
 
 \section{Regularidade e operações} \label{sec:reg_op}
 
