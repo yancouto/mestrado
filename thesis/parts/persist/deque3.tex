@@ -6,7 +6,7 @@
 
 Apresentaremos neste capítulo uma modificação da implementação do Capítulo~\ref{cap:deque2_persist} para que todas as operações, exceto~\textsc{k-th}, consumam tempo e espaço~$\Oh(1)$. Esta implementação foi inicialmente apresentada por Kaplan e Tarjan~\cite{KaplanT1999}.
 
-Assim como na deque recursiva do Capítulo~\ref{cap:deque2_persist}, a estrutura da deque deste capítulo será composta por níveis, cada um armazenando um prefixo e um sufixo da deque, e um apontador para o próximo nível da deque, que armazena pares dos elementos desse nível. A diferença se dá pois, ao invés de o prefixo e sufixo armazenarem zero ou um elemento, como na deque recursiva, nesta estrutura o prefixo e sufixo armazenam de zero a cinco elementos. Uma estratégia é usada para tentar manter cada uma destas extremidades balanceadas, de forma que seja possível executar as operações de forma mais rápida, já que em geral será possível adicionar ou remover um elemento alterando apenas o primeiro nível. Observe a Figura~\ref{fig:deque3_ex} e suas similaridades com a Figura~\ref{fig:deque_ex}.
+Assim como na deque recursiva do Capítulo~\ref{cap:deque2_persist}, a estrutura da deque deste capítulo será composta por níveis, cada um armazenando um prefixo e um sufixo da deque, e um apontador para o próximo nível da deque, que armazena pares dos elementos desse nível. A diferença se dá pois, em vez de o prefixo e sufixo armazenarem zero ou um elemento, como na deque recursiva, nesta estrutura o prefixo e sufixo armazenam de zero a cinco elementos. Uma estratégia é usada para tentar manter cada uma destas extremidades balanceadas, de forma que seja possível executar as operações de forma mais rápida, já que em geral será possível adicionar ou remover um elemento alterando apenas o primeiro nível. Observe a Figura~\ref{fig:deque3_ex} e suas similaridades com a Figura~\ref{fig:deque_ex}.
 
 Para apresentar esta estratégia, na Seção~\ref{sec:contbin} observamos a similaridade das operações nessas estruturas com a operação de incremento em contadores binários e então, analisando um algoritmo mais eficiente de incremento em contadores binários, é possível utilizar a mesma ideia para tornar a implementação da deque mais eficiente.
 
@@ -181,7 +181,7 @@ row 3/.style={nodes={minimum height=10.7ex}},
  \node[above = 3pt of array-3-11]{Dígito~2};
  
 \end{tikzpicture}
-\caption{Deque persistente que armazena a sequência~$(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)$.} \label{fig:deque3_ex}
+\caption{Deque persistente que armazena a sequência~$(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)$.} \label{fig:deque3_ex}
 \end{figure}
 
 \begin{figure}
@@ -199,7 +199,7 @@ row 1/.style={nodes={draw=none, minimum size=5mm, font=\small, color=black!70}},
 \foreach \i/\j in {1/2,2/3} {\draw[->, shorten >= 5pt, shorten <= 5pt] (array-2-\i) -- (array-2-\j);}
 
 \end{tikzpicture}
-\caption{Representação minimalista da deque da Figura~\ref{fig:deque3_ex}. Os números indicam os dígitos de cada nível.} \label{fig:deque3_ex2}
+\caption{Representação concisa da deque da Figura~\ref{fig:deque3_ex}: os números sobre as caixas indicam o nível e os números dentro das caixas indicam o dígito do nível. Omitem-se os elementos nessa representação.} \label{fig:deque3_ex2}
 \end{figure}
 
 \section{Regularidade e operações} \label{sec:reg_op}
@@ -215,7 +215,7 @@ Quando dizemos ``remover'' um elemento de uma sub-deque e ``inserir'' em outra, 
 
 \section{Pilha de pilhas, e implementações funcionais} \label{sec:implfunc}
 
-A partir desta seção, representaremos as deques de forma minimalista, já que não nos importa mais especificamente quantos ou quais elementos estão em cada prefixo ou sufixo de cada nível, apenas o dígito de cada nível. A Figura~\ref{fig:deque3_ex2} mostra a deque da Figura~\ref{fig:deque3_ex} em versão minimalista, e o restante das representações de deque neste capítulo serão desta forma.
+A partir desta seção, representaremos as deques de forma concisa, já que não nos importa mais especificamente quantos ou quais elementos estão em cada prefixo ou sufixo de cada nível, apenas o dígito de cada nível. A Figura~\ref{fig:deque3_ex2} mostra a deque da Figura~\ref{fig:deque3_ex} em versão concisa, e o restante das representações de deque neste capítulo serão desta forma.
 
 A primeira dificuldade é encontrar (e modificar) o primeiro nível com dígito~2, pois este nível pode estar arbitrariamente fundo na lista de níveis. Para a implementação dos contadores binários redundantes, usamos uma pilha com os índices dos dígitos que eram~2. Aquela implementação, porém, não era persistente, e temos que nos preocupar com isso nesta implementação. Assim como nas estruturas persistentes anteriores, vamos fazer uma implementação funcional.
 
