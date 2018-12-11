@@ -188,7 +188,7 @@ Os polígonos são dados em sentido anti-horário, como na Figura~\ref{fig:exemp
 \caption{Exemplo do polígono dado em sentido anti-horário.} \label{fig:exemplo_anti}
 \end{figure}
 
-A ordenação dos segmentos, que está implicitamente sendo usada pela ABB, é de baixo para cima, e pode ser feita usando produto cruzado de vetores~\cite{Rourke98}.
+A ordenação dos segmentos, que está implicitamente sendo usada pela ABB, é de baixo para cima, e pode ser feita usando produto cruzado de vetores~\cite[Sec 1.3.2]{Rourke98}.
 
 Por fim, a lista~$\slabs$ é usada para armazenar a correspondência entre faixas e versões da ABB. Ela armazena, em ordem, o ponto que iniciou a cada faixa e a versão da ABB que a representa (dada pelo campo $\current$ da ABB).
 
@@ -232,7 +232,7 @@ Para determinar a qual polígono pertence um dado ponto, precisamos determinar a
 \end{algorithm}
 
 A linha~\nref{line:conpl:bb} determina a faixa a qual~$p$ pertence, usando busca binária na lista~$\slabs$.
-Nas linhas~\mbox{\nref{line:conpl:ceilb}-\nref{line:conpl:ceile}}, buscamos o segmento imediatamente abaixo do ponto~$p$. Para isso usamos as funções apresentadas no Capítulo~\ref{cap:rubronegra_persist} e a função~\textsc{Cross}, que calcula o produto cruzado de dois vetores, cujo sinal é usado para determinar se o ponto está acima do segmento~\cite{Rourke98}. O procedimento é análogo ao procedimento de~\textsc{Floor}, descrito por Sedgewick e Wayne~\cite{Sedgewick}.
+Nas linhas~\mbox{\nref{line:conpl:ceilb}-\nref{line:conpl:ceile}}, buscamos o segmento imediatamente abaixo do ponto~$p$. Para isso usamos as funções apresentadas no Capítulo~\ref{cap:rubronegra_persist} e a função~\textsc{Cross}, que calcula o produto cruzado de dois vetores, cujo sinal é usado para determinar se o ponto está acima do segmento. O procedimento é análogo ao procedimento de~\textsc{Floor}, descrito por Sedgewick e Wayne~\cite{Sedgewick}.
 
 Com o segmento encontrado, podemos determinar o polígono a qual~$p$ pertence, nas linhas~\mbox{\nref{line:conpl:retb}-\nref{line:conpl:rete}}. Se não existe segmento abaixo de~$p$ ou ele está acima de um segmento que era da parte ``de cima'' do polígono, então~$p$ não está em nenhum polígono. Caso contrário, o polígono é dado pelo segmento.
 
