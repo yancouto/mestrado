@@ -242,7 +242,7 @@ O acesso a um campo de um nó em uma dada versão pode ser feito como no Código
 \caption{Acesso a um campo durante uma operação de acesso.} \label{lst:acc_acc}
 \begin{algorithmic}[1]
 
-\Require $u$ representa a versão~$\V{version}$, ou seja, $\version \geq u.\ts$ e~$\version < u.\cp.\ts$, se~$u.\cp$ é não-nulo.
+\Require $u$ representa a versão~$\V{version}$, ou seja, $\version \geq u.\ts$ e~$\version < u.\cp.\ts$, se~$u.\cp$ é não nulo.
 \Function{\API{Access}}{$u, \V{field}, \V{version}$}
 	\State $\V{value} = u.\V{field}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
@@ -423,7 +423,7 @@ Vamos considerar então nós criados pela função~\textsc{Copy} durante a~$i$-�
 
 Temos que~$C_i \leq M_i$, já que~\API{Modify} chama~\textsc{Copy} no máximo uma vez, e~\API{Modify} é chamada no máximo uma vez por passo de modificação. Além disso, quando~\Call{Copy}{$u$} é chamada recursivamente, isso ocorreu pois~$u$ tinha o vetor~$\changes$ cheio, logo o potencial diminui em~$\V{in}$ nesse caso, já que~$u$ deixa de ser ativo e um novo nó ativo é criado com~$\changes$ vazio.
 
-O~\keyword{for} da linha~\nref{line:copy:parents} do Código~\ref{lst:nc_copy} pode adicionar mudanças aos vetores~$\V{changes}$ dos nós que apontam para~$u$~(linha~\nref{line:copy:changes}), ou seja, aumentar o potencial. Seja~$y$ a quantidade de tais adições. Cada chamada de~\textsc{Copy} pode adicionar até~$\V{in}$ modificações, porém, quando~\textsc{Copy} é chamada recursivamente na linha~\nref{line:copy:copy}, essa adição não é feita, já que a linhha~\nref{line:copy:changes} não pode ser executada na mesma iteração em que a linha~\nref{line:copy:copy} é executada. Logo~${y \leq (C_i + D_i) \cdot \V{in} - D_i}$.
+O~\keyword{for} da linha~\nref{line:copy:parents} do Código~\ref{lst:nc_copy} pode adicionar mudanças aos vetores~$\V{changes}$ dos nós que apontam para~$u$~(linha~\nref{line:copy:changes}), ou seja, aumentar o potencial. Seja~$y$ a quantidade de tais adições. Cada chamada de~\textsc{Copy} pode adicionar até~$\V{in}$ modificações, porém, quando~\textsc{Copy} é chamada recursivamente na linha~\nref{line:copy:copy}, essa adição não é feita, já que a linha~\nref{line:copy:changes} não pode ser executada na mesma iteração em que a linha~\nref{line:copy:copy} é executada. Logo~${y \leq (C_i + D_i) \cdot \V{in} - D_i}$.
 
 Dessa forma, o potencial só se altera por causa de chamadas recursivas de~\textsc{Copy}, ou por causa de adições ao vetor~$\changes$ de algum nó ativo, ou seja, vale que~$\Phi(E_i) = \Phi(E_{i-1}) - D_i \cdot in + y$.
 Utilizando a notação definida acima temos:
