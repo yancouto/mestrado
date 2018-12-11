@@ -127,9 +127,7 @@ Em uma pilha efêmera, adicionamos apenas elementos no início da lista ligada, 
 
 A Figura~\ref{fig:pilha_ex1} mostra a arborescência criada para a sequência de operações do Exemplo~\ref{ex:pilha}. Em cada nó é indicado o valor armazenado naquele nó, e a flecha saindo de cada nó indica seu campo~$\V{next}$. Os valores~$p_0, \ldots, p_6$ apontam para os seus nós correspondentes. Note que é possível que~${p_i = p_j}$ para~${i \neq j}$. Isso ocorre no exemplo, onde~$p_4 = p_1$. Isso não ocorre sempre que as pilhas têm os mesmos valores; perceba que~$p_1 \neq p_6$, apesar destas duas pilhas terem os mesmos elementos na mesma ordem.
 
-Perceba também que a árvore de versões não é igual à árvore da estrutura. A Figura~\ref{fig:pilha_ex2} mostra a árvore de versões para essa sequência de operações. Nos nós estão os índices das versões~(a~$i$-ésima modificação cria a versão~$i$), e a versão~$i$ é o pai da versão~$j$ se a versão~$j$ foi criada usando a versão~$i$.
-
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\begin{tikzpicture}[sibling distance=25pt, nodes={draw, minimum size=6mm}, edge from parent/.append style={<-, shorten <= 5pt, shorten >= 5pt}, level distance=40pt]
 		\Tree [.\node[minimum size=6mm](root){};
@@ -150,7 +148,10 @@ Perceba também que a árvore de versões não é igual à árvore da estrutura.
 	\caption{Arborescência criada pela sequência de operações do Exemplo~\ref{ex:pilha}. A raiz na figura (o nó cortado) é a representação do valor~\keyword{null}.} \label{fig:pilha_ex1}
 \end{figure}
 
-\begin{figure}
+
+Perceba também que a árvore de versões não é igual à árvore da estrutura. A Figura~\ref{fig:pilha_ex2} mostra a árvore de versões para essa sequência de operações. Nos nós estão os índices das versões~(a~$i$-ésima modificação cria a versão~$i$), e a versão~$i$ é o pai da versão~$j$ se a versão~$j$ foi criada usando a versão~$i$.
+
+\begin{figure}[h]
 	\centering
 	\begin{tikzpicture}[sibling distance=15pt]
 		\Tree [.0
@@ -185,7 +186,7 @@ Se assumimos que a função~${\New \func{Node}{x, \V{nx}, \V{sz}}}$ também cham
 
 A Tabela~\ref{tab:pilha_persist} mostra o consumo de tempo e espaço de uma pilha persistente, usando o Ancestral de Nível dos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
 
-\begin{table} \centering
+\begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
 	& Representação Binária & Skew-Binary \\ \hline
@@ -263,7 +264,7 @@ O Código~\ref{lst:fila} mostra a implementação das operações da fila. A cor
 
 Desde que a implementação da pilha seja persistente, a implementação da fila é persistente pois nunca modifica nenhum par, apenas cria novos objetos. A Tabela~\ref{tab:fila_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
 
-\begin{table} \centering
+\begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
 	& Representação Binária & Skew-Binary \\ \hline

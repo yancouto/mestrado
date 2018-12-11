@@ -27,7 +27,7 @@ Uma deque persistente que armazena elementos do conjunto~$T$ é dada por um nó 
 \tikzset{drawnode2/.style={row 3 column #1/.style={nodes={draw}}}}
 \tikzset{drawnode3/.style={row 4 column #1/.style={nodes={draw}}}}
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw=none, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=2cm},
@@ -77,26 +77,6 @@ Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center
 Devido à forma recursiva como a estrutura foi definida, recursão é muito útil para lidar com esta estrutura.
 Assumimos sempre que todas as operações chamadas são válidas, ou seja,~\funcAPI{Front}{d} e~\funcAPI{Back}{d} são chamadas apenas quando~$d$ não é vazia, e consequentemente seu valor não é~\keyword{null}. Veja o Código~\ref{lst:deque_acesso}. Para questões de implementação, os elementos de~$T \x T$ são representados como um par com campos~$\V{first}$ e~$\V{second}$, ou seja, se~$a, b \in T$ então~$(a, b) \in T \x T$ e vale que~$(a, b).\V{first} = a$ e~$(a, b).\V{second} = b$.
 
-
-\begin{proposition}
-A operação~\funcAPI{Front}{d} funciona corretamente, devolvendo o primeiro elemento de~$d$.
-\end{proposition}
-
-\begin{proof}
-A prova será feita por indução no número de níveis da estrutura recursiva da deque.
-
-Pela maneira como definimos a deque, se~$\V{prefix}$ não é~\keyword{null} então ele é um prefixo de~$d$, logo este é a resposta de~\funcAPI{Front}{d}.
-
-Se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ também, o único elemento da deque é~$d.\V{suffix}$ e o valor devolvido está correto. A base da indução, quando a deque tem um nível, sempre satisfaz um destes casos, logo é tratada corretamente.
-
-Por fim, se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ não é, como não armazenamos deques vazias,~$\V{center}$ tem algum elemento. O valor devolvido é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos de~$T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$.
-\end{proof}
-
-Portanto, a função~\funcAPI{Front}{d} funciona corretamente.
-Note que~\funcAPI{Back}{d} é simétrica a~\funcAPI{Front}{d}. Basta trocar~$\V{prefix}$ com~$\V{suffix}$ e~$\V{first}$ com~$\V{second}$. O mesmo ocorrerá com as outras operações, pela simetria da estrutura. Então nas próximas seções apenas a versão~\textsc{Front} de~\API{Push} e~\API{Pop} será detalhada.
-
-Ambas as funções apresentadas não modificam a estrutura e consomem tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos na deque.
-
 \begin{algorithm}
 \caption{Operações de acesso.} \label{lst:deque_acesso}
 \begin{algorithmic}[1]
@@ -137,6 +117,27 @@ Ambas as funções apresentadas não modificam a estrutura e consomem tempo~$\Oh
 
 \end{algorithmic}
 \end{algorithm}
+
+
+
+\begin{proposition}
+A operação~\funcAPI{Front}{d} funciona corretamente, devolvendo o primeiro elemento de~$d$.
+\end{proposition}
+
+\begin{proof}
+A prova será feita por indução no número de níveis da estrutura recursiva da deque.
+
+Pela maneira como definimos a deque, se~$\V{prefix}$ não é~\keyword{null} então ele é um prefixo de~$d$, logo este é a resposta de~\funcAPI{Front}{d}.
+
+Se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ também, o único elemento da deque é~$d.\V{suffix}$ e o valor devolvido está correto. A base da indução, quando a deque tem um nível, sempre satisfaz um destes casos, logo é tratada corretamente.
+
+Por fim, se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ não é, como não armazenamos deques vazias,~$\V{center}$ tem algum elemento. O valor devolvido é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos de~$T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$.
+\end{proof}
+
+Portanto, a função~\funcAPI{Front}{d} funciona corretamente.
+Note que~\funcAPI{Back}{d} é simétrica a~\funcAPI{Front}{d}. Basta trocar~$\V{prefix}$ com~$\V{suffix}$ e~$\V{first}$ com~$\V{second}$. O mesmo ocorrerá com as outras operações, pela simetria da estrutura. Então nas próximas seções apenas a versão~\textsc{Front} de~\API{Push} e~\API{Pop} será detalhada.
+
+Ambas as funções apresentadas não modificam a estrutura e consomem tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos na deque.
 
 \section{Operações de modificação}
 
@@ -255,7 +256,7 @@ Como~$d.\V{center}$ é uma deque de pares, usamos~\funcAPI{k-th}{d.\V{center}, \
 
 A operação consome tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos da deque, pois o número máximo de níveis da estrutura recursiva é~$\Oh(\lg n)$. A Tabela~\ref{tab:deque2_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
 
-\begin{table}[H] \centering
+\begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
 	& Tempo/Espaço \\ \hline

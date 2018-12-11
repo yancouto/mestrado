@@ -131,7 +131,7 @@ Por esse motivo, o algoritmo pode ser implementado de forma online, com novas fo
 
 O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, quando se pode adicionar folhas à árvore. A operação~$\funcAPI{AddLeaf}{u}$ consome tempo~$\Oh(\lg \Dep(u))$ e a operação~$\funcAPI{LevelAncestor}{k, u}$ consome tempo~$\Oh(\lg k) = \Oh(\lg \Dep(u))$. Note que cada nó~$u$ deve armazenar um vetor de tamanho~$\floor{\lg \Dep(u)}$. Na literatura, essa técnica é chamada de Sparse Table, já que ``armazenamos'' uma tabela de tamanho~$|V| \times |V|$ usando apenas espaço~$|V| \lg |V|$, ou~Jump Pointers, neste caso mais específico do Ancestral de Nível em árvores~\cite{BenderM-F2004}. A Figura~\ref{fig:treejmppot2} ilustra os jump pointers de uma árvore.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 	\begin{tikzpicture}[nodes={draw, circle, minimum size=5mm}, sibling distance=25pt, edge from parent/.append style={<-, shorten <= 2pt, shorten >= 2pt}, level distance=35pt]
 	\Tree [.\node(v1){}; [.\node(v2){}; [.\node(v3){}; [.\node(v4){}; [.\node(v5){}; ] ] [.\node(v6){}; [.\node(v7){}; ] ] ] [.\node(v8){}; ] [.\node(v9){}; ] ] [.\node(v10){}; [.\node(v11){}; ] ] ]
@@ -206,7 +206,7 @@ Portanto, ao final da última iteração, o invariante vale para~$i = -1$, ou se
 
 A Tabela~\ref{tab:la_pot2} mostra o consumo de tempo e espaço das implementações discutidas nesse capítulo.
 
-\begin{table} \centering
+\begin{table}[h] \centering
 \begin{tabular}{|l|c|}
 	\hline
 	& Tempo/Espaço \\ \hline

@@ -201,7 +201,7 @@ Pelo Teorema~\ref{thm:csbj+1}, é fácil calcular~$\J(x)$ a partir dos valores~$
 A Proposição~\ref{prop:csbjj} nos dá uma maneira de verificar se a representação skew-binary de~$x$ tem algum dígito~2, se já tivermos calculado os valores de~$\J$ para números menores ou iguais a~$x$.
 
 \renewcommand{\root}{\mathit{root}}
-\begin{algorithm}
+\begin{algorithm}[h]
 \caption{Adição de uma folha à árvore com raiz~$r$.} \label{lst:addleafskew}
 \begin{algorithmic}[1]
 	\Function{\API{AddLeaf}}{$u$}
@@ -223,7 +223,7 @@ Para encontrar o ancestral comum mais profundo de dois vértices~$u$ e~$v$, usam
 
 Dessa forma, conseguimos encontrar o ancestral de~$u$ com profundidade~$\Dep(c) + 1$, e o pai deste será~$c$. Veja o Código~\ref{lst:lca_skew}, e note sua similaridade com o Código~\ref{lst:lcapot2}.
 
-\begin{algorithm}
+\begin{algorithm}[h]
 \caption{Ancestral Comum Mais Profundo usando representação skew-binary. \label{lst:lca_skew}}
 \begin{algorithmic}[1]
 	\Function{\API{LowestCommonAncestor}}{$u, v$}
@@ -251,7 +251,9 @@ Dessa forma, conseguimos encontrar o ancestral de~$u$ com profundidade~$\Dep(c) 
 
 A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementações discutidas nesse capítulo. A Tabela~\ref{tab:la_comp} compara o consumo de tempo das implementações de~Ancestral de Nível e Ancestral Comum Mais Profundo apresentadas nesse trabalho.
 
-\begin{table} \centering
+\newpage
+
+\begin{table}[t] \centering
 \begin{tabular}{|l|c|}
 	\hline
 	& Tempo/Espaço \\ \hline
@@ -262,7 +264,7 @@ A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementaç�
 	\caption{Consumo de tempo e espaço da solução com skew-binary, onde~$n$ é o tamanho da árvore.} \label{tab:la_skew}
 \end{table}
 
-\begin{table}[H] \centering
+\begin{table}[t] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
 	& Representação binária & Skew-binary \\ \hline

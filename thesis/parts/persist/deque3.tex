@@ -33,10 +33,6 @@ Caso exista, seja~$i$ o índice do primeiro dígito~2. Um procedimento~\textsc{F
 
 A Figura~\ref{fig:cont_ex} mostra os casos possíveis em que se realiza o procedimento~\textsc{Fix}. O lado esquerdo representa como eram os dígitos antes do incremento e o lado direito, depois do incremento. O dígito na posição~$j$, nos Casos~2 e~3, é o segundo dígito~2. À direita do último dígito representado, temos que o contador é semirregular.
 
-No Caso~1, o resultado ou não tem dígito~2, ou tem um dígito~2 com um~0 imediatamente à sua esquerda, logo o contador continua regular. No Caso~2, quando o dígito~$i + 1$ é~0, o resultado tem o dígito~$i$ como~0, e o dígito~$j$ como o primeiro~2, logo a regularidade é respeitada. No Caso~3, o dígito~$i+1$ passa a ser o primeiro~2, mas como ele era anteriormente~1, ainda existe um~0 antes da posição~$j$. Além disso, o dígito~$i$ é~0, logo a regularidade é respeitada.
-
-O contador portanto continua regular, alterando no máximo três dígitos~($x_0,\ x_i$ e~$x_{i+1}$). Para encontrar o primeiro~2 em tempo constante, podemos manter uma pilha com todos os índices de dígitos que são~2. Vamos esboçar um código para fazer esse incremento. Suponha que temos uma pilha~$p$ implementada como a do~Capítulo~\ref{cap:pilha_persist}, e que o contador é armazenado em um vetor~$x$, indexado a partir de~0.
-
 \begin{figure}[h]
 \centering
 
@@ -85,6 +81,10 @@ Caso 3\ \  & \ldots & 2 & 1 & \ldots & 0 & \ldots & 2 & \hspace{.8cm}$\Rightarro
 \caption{Casos possíveis para o procedimento~\textsc{Fix}. O~``$\ldots$'' representa zero ou mais dígitos~0 ou~1.} \label{fig:cont_ex}
 \end{figure}
 
+No Caso~1, o resultado ou não tem dígito~2, ou tem um dígito~2 com um~0 imediatamente à sua esquerda, logo o contador continua regular. No Caso~2, quando o dígito~$i + 1$ é~0, o resultado tem o dígito~$i$ como~0, e o dígito~$j$ como o primeiro~2, logo a regularidade é respeitada. No Caso~3, o dígito~$i+1$ passa a ser o primeiro~2, mas como ele era anteriormente~1, ainda existe um~0 antes da posição~$j$. Além disso, o dígito~$i$ é~0, logo a regularidade é respeitada.
+
+O contador portanto continua regular, alterando no máximo três dígitos~($x_0,\ x_i$ e~$x_{i+1}$). Para encontrar o primeiro~2 em tempo constante, podemos manter uma pilha com todos os índices de dígitos que são~2. Vamos esboçar um código para fazer esse incremento. Suponha que temos uma pilha~$p$ implementada como a do~Capítulo~\ref{cap:pilha_persist}, e que o contador é armazenado em um vetor~$x$, indexado a partir de~0.
+
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -118,18 +118,11 @@ Como discutido na Subseção~\ref{subsec:contbin_simples}, a implementação de 
 
 A representação se mantém parecida. Cada nível contém um prefixo e um sufixo da deque, com o nível~$i+1$ armazenando pares de elementos do nível~$i$. Os prefixos e sufixos, porém, são deques efêmeras que armazenam de zero a cinco elementos. Chamamos estas deques efêmeras de~\deff{sub-deques}. Na Figura~\ref{fig:deque3_ex}, a sub-deque de sufixo do nível~2 tem os pares~$(8, 9)$ e~$(9, 10)$.
 
-Cada nível será associado a um dígito~0,~1 ou~2, assim como em um contador binário redundante. Durante o algoritmo, o contador formado pelos dígitos associados a cada nível é regular, considerando que o primeiro nível é o dígito menos significativo. Para garantir isso, usamos uma adaptação do procedimento~\textsc{Fix} discutida anteriormente. Note que o valor do contador não tem relação nenhuma com a estrutura. Apenas usamos sua regularidade para conseguir aplicar todas as operações em tempo constante. Como veremos, a adaptação do procedimento~\textsc{Fix} pode até mudar o valor do contador, diferente da implementação do Código~\ref{lst:cnt_reg}. A deque da Figura~\ref{fig:deque3_ex} é associada ao contador com valor~$112$.
-
-Para cada nível, associamos suas sub-deques (prefixo e sufixo) a algum dígito. O dígito associado ao nível é então o máximo entre estes dois dígitos. O dígito de uma sub-deque é~0 se essa tem dois ou três elementos,~1 se tem um ou quatro elementos, e~2 se tem zero ou cinco elementos. Intuitivamente, esses dígitos estão associados a quanto ``espaço livre'' uma sub-deque tem, tanto para adicionar quanto para remover elementos. Note que, se o dígito é~2, a sub-deque tem zero ou cinco elementos, então pode não ser possível remover ou adicionar algum elemento. De forma similar, se o dígito é~0, é sempre possível adicionar ou remover até dois elementos desta sub-deque. Como escolhemos o máximo entre os dois dígitos, temos que, se um nível tem dígito pequeno, é possível adicionar ou remover elementos tanto de seu prefixo quanto de seu sufixo. Na Figura~\ref{fig:deque3_ex}, o prefixo do nível~2 tem um elemento, logo tem dígito~1, já seu sufixo tem dois elementos, logo dígito~0. O dígito do nível~2 é então o máximo destes valores~(ou seja,~1), indicando que tanto o prefixo quando o sufixo do nível~2 podem adicionar e remover pelo menos um elemento.
-
-Note que, na Figura~\ref{fig:deque3_ex}, o dígito do nível~3 não é o máximo dos dígitos de suas sub-deques. Isto se dá pois este é o último nível, e desta forma sua sub-deque não vazia é tanto prefixo quando sufixo deste nível. Neste caso específico, a quadrupla~$(4, 5, 6, 7)$ é tanto o primeiro quanto o último elemento do nível~3. Assim como na deque recursiva~(linha~\nref{line:deque2:degenerado} do Código~\ref{lst:deque_acesso}), é necessário tratar de forma especial esse caso. Dizemos então que o dígito do último nível é o dígito de sua sub-deque não vazia~(neste caso,~1). Dizemos que esse caso é~\deff{degenerado}.
-
-
 \tikzset{drawnode1/.style={row 1 column #1/.style={nodes={draw}}}}
 \tikzset{drawnode2/.style={row 2 column #1/.style={nodes={draw}}}}
 \tikzset{drawnode3/.style={row 3 column #1/.style={nodes={draw}}}}
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw=none, text centered, text width=2em, minimum height=3.1ex, font=\small, align=center, anchor=center}, nodes in empty cells, row sep=2cm},
@@ -184,7 +177,30 @@ row 3/.style={nodes={minimum height=10.7ex}},
 \caption{Deque persistente que armazena a sequência~$(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)$.} \label{fig:deque3_ex}
 \end{figure}
 
-\begin{figure}
+Cada nível será associado a um dígito~0,~1 ou~2, assim como em um contador binário redundante. Durante o algoritmo, o contador formado pelos dígitos associados a cada nível é regular, considerando que o primeiro nível é o dígito menos significativo. Para garantir isso, usamos uma adaptação do procedimento~\textsc{Fix} discutida anteriormente. Note que o valor do contador não tem relação nenhuma com a estrutura. Apenas usamos sua regularidade para conseguir aplicar todas as operações em tempo constante. Como veremos, a adaptação do procedimento~\textsc{Fix} pode até mudar o valor do contador, diferente da implementação do Código~\ref{lst:cnt_reg}. A deque da Figura~\ref{fig:deque3_ex} é associada ao contador com valor~$112$.
+
+Para cada nível, associamos suas sub-deques (prefixo e sufixo) a algum dígito. O dígito associado ao nível é então o máximo entre estes dois dígitos. O dígito de uma sub-deque é~0 se essa tem dois ou três elementos,~1 se tem um ou quatro elementos, e~2 se tem zero ou cinco elementos. Intuitivamente, esses dígitos estão associados a quanto ``espaço livre'' uma sub-deque tem, tanto para adicionar quanto para remover elementos. Note que, se o dígito é~2, a sub-deque tem zero ou cinco elementos, então pode não ser possível remover ou adicionar algum elemento. De forma similar, se o dígito é~0, é sempre possível adicionar ou remover até dois elementos desta sub-deque. Como escolhemos o máximo entre os dois dígitos, temos que, se um nível tem dígito pequeno, é possível adicionar ou remover elementos tanto de seu prefixo quanto de seu sufixo. Na Figura~\ref{fig:deque3_ex}, o prefixo do nível~2 tem um elemento, logo tem dígito~1, já seu sufixo tem dois elementos, logo dígito~0. O dígito do nível~2 é então o máximo destes valores~(ou seja,~1), indicando que tanto o prefixo quando o sufixo do nível~2 podem adicionar e remover pelo menos um elemento.
+
+Note que, na Figura~\ref{fig:deque3_ex}, o dígito do nível~3 não é o máximo dos dígitos de suas sub-deques. Isto se dá pois este é o último nível, e desta forma sua sub-deque não vazia é tanto prefixo quando sufixo deste nível. Neste caso específico, a quadrupla~$(4, 5, 6, 7)$ é tanto o primeiro quanto o último elemento do nível~3. Assim como na deque recursiva~(linha~\nref{line:deque2:degenerado} do Código~\ref{lst:deque_acesso}), é necessário tratar de forma especial esse caso. Dizemos então que o dígito do último nível é o dígito de sua sub-deque não vazia~(neste caso,~1). Dizemos que esse caso é~\deff{degenerado}.
+
+
+
+\section{Regularidade e operações} \label{sec:reg_op}
+
+Uma deque é \deff{regular} ou \deff{semirregular} quando os dígitos de seus níveis formam um contador regular ou semirregular, respectivamente. Vamos garantir que a deque devolvida por qualquer uma das operações é regular.
+
+Assuma que a deque é regular. Para realizar uma operação de~\API{Push} ou~\API{Pop}, note que, devido à regularidade, o primeiro nível tem dígito~0 ou~1, logo ambas suas sub-deques têm dígito~0 ou~1, e então é possível adicionar ou remover um elemento de qualquer uma dessas sub-deques. Se estamos no caso degenerado, ou seja se a deque tem apenas um nível, também é possível adicionar ou remover um elemento de sua sub-deque não vazia, o que é suficiente nesse caso.
+Após adicionar ou remover um elemento, o dígito associado ao primeiro nível pode ser~0,~1 ou~2 (ele pode diminuir, aumentar ou continuar igual). É possível que a deque não seja mais regular, passando a ser apenas semirregular; nesse caso, realizamos um procedimento~\textsc{Fix} no primeiro nível que tem dígito~2. Uma diferença dos contadores binários analisados anteriormente é que realizamos um~\textsc{Fix} apenas quando a estrutura não é mais regular.
+
+Um procedimento~\textsc{Fix} no nível~$i$ com dígito~2 transforma esse dígito em~0 e aumenta em no máximo~1 o dígito do próximo nível. Pela semirregularidade da estrutura, o nível~$i+1$ tem dígito~0 ou~1. Para cada uma das sub-deques do nível~$i$, se esta sub-deque tem pelo menos quatro elementos, removemos dois destes, formamos um par com eles e inserimos esse par na correspondente sub-deque do nível~$i+1$; se a sub-deque tem no máximo um elemento, removemos um par da sub-deque do nível~$i+1$, e inserimos os dois elementos do par na sub-deque em questão. Dessa forma, ao final do~\textsc{Fix}, cada uma das sub-deques do nível~$i$ tem dois ou três elementos, então o dígito do nível~$i$ é~0.
+
+Quando dizemos ``remover'' um elemento de uma sub-deque e ``inserir'' em outra, isto deve ser feito na extremidade correta. Por exemplo, remove-se elementos do \emph{final} do prefixo do nível~$i$ para adicionar um par no \emph{início} do prefixo do nível~$i+1$. O procedimento~\textsc{Fix} foi descrito de forma simples, mas na prática é necessário tratar muitos casos, que serão descritos a seguir. É importante notar que~\textsc{Fix} é o mesmo, não importando se o procedimento que o chamou foi~\API{Push} ou~\API{Pop}. Após um~\textsc{Fix} em uma estrutura semirregular, esta se torna regular, pelos mesmos argumentos discutidos na Seção~\ref{sec:contbin}.
+
+\section{Pilha de pilhas, e implementações funcionais} \label{sec:implfunc}
+
+A partir desta seção, representaremos as deques de forma concisa, já que não nos importa mais especificamente quantos ou quais elementos estão em cada prefixo ou sufixo de cada nível, apenas o dígito de cada nível. A Figura~\ref{fig:deque3_ex2} mostra a deque da Figura~\ref{fig:deque3_ex} em versão concisa, e o restante das representações de deque neste capítulo serão desta forma.
+
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=10pt, column sep = 30pt},
@@ -202,26 +218,13 @@ row 1/.style={nodes={draw=none, minimum size=5mm, font=\small, color=black!70}},
 \caption{Representação concisa da deque da Figura~\ref{fig:deque3_ex}: os números sobre as caixas indicam o nível e os números dentro das caixas indicam o dígito do nível. Omitem-se os elementos nessa representação.} \label{fig:deque3_ex2}
 \end{figure}
 
-\section{Regularidade e operações} \label{sec:reg_op}
-
-Uma deque é \deff{regular} ou \deff{semirregular} quando os dígitos de seus níveis formam um contador regular ou semirregular, respectivamente. Vamos garantir que a deque devolvida por qualquer uma das operações é regular.
-
-Assuma que a deque é regular. Para realizar uma operação de~\API{Push} ou~\API{Pop}, note que, devido à regularidade, o primeiro nível tem dígito~0 ou~1, logo ambas suas sub-deques têm dígito~0 ou~1, e então é possível adicionar ou remover um elemento de qualquer uma dessas sub-deques. Se estamos no caso degenerado, ou seja se a deque tem apenas um nível, também é possível adicionar ou remover um elemento de sua sub-deque não vazia, o que é suficiente nesse caso.
-Após adicionar ou remover um elemento, o dígito associado ao primeiro nível pode ser~0,~1 ou~2 (ele pode diminuir, aumentar ou continuar igual). É possível que a deque não seja mais regular, passando a ser apenas semirregular; nesse caso, realizamos um procedimento~\textsc{Fix} no primeiro nível que tem dígito~2. Uma diferença dos contadores binários analisados anteriormente é que realizamos um~\textsc{Fix} apenas quando a estrutura não é mais regular.
-
-Um procedimento~\textsc{Fix} no nível~$i$ com dígito~2 transforma esse dígito em~0 e aumenta em no máximo~1 o dígito do próximo nível. Pela semirregularidade da estrutura, o nível~$i+1$ tem dígito~0 ou~1. Para cada uma das sub-deques do nível~$i$, se esta sub-deque tem pelo menos quatro elementos, removemos dois destes, formamos um par com eles e inserimos esse par na correspondente sub-deque do nível~$i+1$; se a sub-deque tem no máximo um elemento, removemos um par da sub-deque do nível~$i+1$, e inserimos os dois elementos do par na sub-deque em questão. Dessa forma, ao final do~\textsc{Fix}, cada uma das sub-deques do nível~$i$ tem dois ou três elementos, então o dígito do nível~$i$ é~0.
-
-Quando dizemos ``remover'' um elemento de uma sub-deque e ``inserir'' em outra, isto deve ser feito na extremidade correta. Por exemplo, remove-se elementos do \emph{final} do prefixo do nível~$i$ para adicionar um par no \emph{início} do prefixo do nível~$i+1$. O procedimento~\textsc{Fix} foi descrito de forma simples, mas na prática é necessário tratar muitos casos, que serão descritos a seguir. É importante notar que~\textsc{Fix} é o mesmo, não importando se o procedimento que o chamou foi~\API{Push} ou~\API{Pop}. Após um~\textsc{Fix} em uma estrutura semirregular, esta se torna regular, pelos mesmos argumentos discutidos na Seção~\ref{sec:contbin}.
-
-\section{Pilha de pilhas, e implementações funcionais} \label{sec:implfunc}
-
-A partir desta seção, representaremos as deques de forma concisa, já que não nos importa mais especificamente quantos ou quais elementos estão em cada prefixo ou sufixo de cada nível, apenas o dígito de cada nível. A Figura~\ref{fig:deque3_ex2} mostra a deque da Figura~\ref{fig:deque3_ex} em versão concisa, e o restante das representações de deque neste capítulo serão desta forma.
-
 A primeira dificuldade é encontrar (e modificar) o primeiro nível com dígito~2, pois este nível pode estar arbitrariamente fundo na lista de níveis. Para a implementação dos contadores binários redundantes, usamos uma pilha com os índices dos dígitos que eram~2. Aquela implementação, porém, não era persistente, e temos que nos preocupar com isso nesta implementação. Assim como nas estruturas persistentes anteriores, vamos fazer uma implementação funcional.
+
+Uma ideia inicial é manter, além da deque persistente, uma pilha (persistente) de nós com dígitos~2 e, como nas implementações anteriores, sempre que for necessário modificar um campo de um nó, copiar esse nó. Isso, porém, não funciona.
 
 \tikzset{drawnode1/.style={row 1 column #1/.style={nodes={draw}}}}
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=10pt, column sep = 30pt},
@@ -243,11 +246,11 @@ drawnode1/.list={4, 7, 9}
 \caption{Primeira ideia de representação da deque persistente.} \label{fig:func_ex1}
 \end{figure}
 
-Uma ideia inicial é manter, além da deque persistente, uma pilha (persistente) de nós com dígitos~2 e, como nas implementações anteriores, sempre que for necessário modificar um campo de um nó, copiar esse nó. Isso, porém, não funciona.
-
 Considere a Figura~\ref{fig:func_ex1}. Os nós tracejados são os nós de entrada, ou seja, os nós que armazenamos nesta versão da deque; no caso, o primeiro nível e o topo da pilha de nós com dígito 2. Suponha que uma operação de~\API{Push} ou~\API{Pop} modifique o dígito do primeiro nível para~1, e então seja realizado um procedimento~\textsc{Fix} no primeiro dígito~2, no nível~4, e essa operação transforme esse dígito em~0 e o dígito do nível~5 em~1.
 
-\begin{figure}
+Se copiarmos apenas os nós modificados, a estrutura fica como na Figura~\ref{fig:func_ex1res}, que é inválida. Ao acessar o nível~4 a partir do nível~1 (em, por exemplo, uma operação~\API{k-th}), acessamos na verdade a versão antiga do nível~4 (que tinha dígito~2), em vez da nova versão copiada. Isso acontece pois copiamos um nó que era apontado por algum nó não copiado. No caso, o nó de nível~4 era apontado pelo nó de nível~3, que não foi copiado nem modificado, e portanto ainda aponta para a versão antiga do nível~4. Como não modificamos nenhum vértice, esta estrutura é funcional (e persistente), porém ela está errada, já que a nova versão não representa a deque corretamente.
+
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=10pt, column sep = 30pt},
@@ -275,13 +278,12 @@ row 1/.style={nodes={draw=none, minimum size=5mm, font=\small, color=black!70}}
 \caption{Deque inválida gerada depois de uma operação de modificação na deque da Figura~\ref{fig:func_ex1}, seguida de um~\textsc{Fix}.} \label{fig:func_ex1res}
 \end{figure}
 
-Se copiarmos apenas os nós modificados, a estrutura fica como na Figura~\ref{fig:func_ex1res}, que é inválida. Ao acessar o nível~4 a partir do nível~1 (em, por exemplo, uma operação~\API{k-th}), acessamos na verdade a versão antiga do nível~4 (que tinha dígito~2), em vez da nova versão copiada. Isso acontece pois copiamos um nó que era apontado por algum nó não copiado. No caso, o nó de nível~4 era apontado pelo nó de nível~3, que não foi copiado nem modificado, e portanto ainda aponta para a versão antiga do nível~4. Como não modificamos nenhum vértice, esta estrutura é funcional (e persistente), porém ela está errada, já que a nova versão não representa a deque corretamente.
 
-Para implementar corretamente uma estrutura de forma funcional (e portanto persistente), é necessário copiar todos os nós que precisam ser modificados, e além disso garantir que~\emph{nenhum nó copiado é apontado por um nó não copiado}. Na implementação da deques persistentes do Capítulo~\ref{cap:deque2_persist}, isso é sempre verdade pois copiamos um prefixo dos níveis, e cada nível apenas aponta para o próximo nível, e nas implementações de pilha, fila e deque dos Capítulos~\ref{cap:cap:pilha_persist} e~\ref{cap:deque1_persist}, isto também vale.
+Para implementar corretamente uma estrutura de forma funcional (e portanto persistente), é necessário copiar todos os nós que precisam ser modificados, e além disso garantir que~\emph{nenhum nó copiado é apontado por um nó não copiado}. Na implementação da deques persistentes do Capítulo~\ref{cap:deque2_persist}, isso é sempre verdade pois copiamos um prefixo dos níveis, e cada nível apenas aponta para o próximo nível, e nas implementações de pilha, fila e deque dos Capítulos~\ref{cap:pilha_persist} e~\ref{cap:deque1_persist}, isto também vale.
 
 Para consertar a implementação, precisamos garantir que os nós copiados não são apontados por nós não copiados. Para isso, separa-se os níveis em várias pilhas; em cada pilha o nível do topo tem dígito diferente de~1, ou é o nível~1, e todos os outros elementos da pilha têm dígito~1. Faz-se então uma pilha em que cada elemento é o topo de uma destas sub-pilhas. Desse modo, o procedimento~\textsc{Fix} é sempre realizado no nível~1 ou no primeiro elemento da segunda pilha, já que ou um deles é o primeiro dígito~2 ou a estrutura já é regular.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=3pt, column sep = 30pt},
@@ -312,7 +314,8 @@ row 1/.style={nodes={draw=none, minimum size=3mm, font=\footnotesize, color=blac
 
 A Figura~\ref{fig:func_ex2} mostra como seriam essas pilhas na mesma deque da Figura~\ref{fig:func_ex1}. Faremos a implementação destas pilhas adicionando um campo a cada nó, o campo~$\V{next}$, que, para nós que são topos de pilhas (ou seja, o nó do nível~1 e os nós com dígitos diferentes de~1), armazena o topo da próxima pilha, isto é, o próximo nó com dígito diferente de~1. Para todos os outros nós o campo~$\V{next}$ armazena~\keyword{null}.
 
-\begin{figure}
+
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=3pt, column sep = 30pt},
@@ -336,7 +339,11 @@ row 1/.style={nodes={draw=none, minimum size=3mm, font=\footnotesize, color=blac
 \caption{Mais detalhes da segunda ideia de representação da deque persistente.} \label{fig:func_ex3}
 \end{figure}
 
-\begin{figure}
+
+A Figura~\ref{fig:func_ex3} mostra como fica a estrutura, baseando-se nessa implementação, onde as flechas tracejadas indicam os ponteiros~$\V{next}$ não nulos. Removemos alguns ponteiros armazenados nos campos~$\V{child}$, mais precisamente os que apontam para a próxima sub-pilha, isso é feito pois a próxima sub-pilha deve ser acessada pelo ponteiro~$\V{next}$ do primeiro elemento da sub-pilha. Dessa forma, não é mais possível acessar nós de versões passadas. Com isso, a navegação pelos níveis fica um pouco mais complexa, já que um nó pode ter o campo~$\V{child}$ nulo e ainda assim existir um nó no próximo nível. A Figura~\ref{fig:func_ex3res} mostra a estrutura após as mesmas modificações que foram aplicadas na Figura~\ref{fig:func_ex1res}. Note que agora cada deque pode ser armazenada apenas com um ponteiro para o seu primeiro nível, já que não é mais necessário armazenar o ponteiro para a pilha separadamente.
+
+
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 array/.style={matrix of nodes,nodes={draw, minimum size=7mm, anchor=center}, nodes in empty cells, row sep=3pt, column sep = 30pt},
@@ -364,8 +371,6 @@ row 1/.style={nodes={draw=none, minimum size=3mm, font=\footnotesize, color=blac
 \end{tikzpicture}
 \caption{Deque da Figura~\ref{fig:func_ex3} após uma operação de modificação seguida de um~\textsc{Fix}.} \label{fig:func_ex3res}
 \end{figure}
-
-A Figura~\ref{fig:func_ex3} mostra como fica a estrutura, baseando-se nessa implementação, onde as flechas tracejadas indicam os ponteiros~$\V{next}$ não nulos. Removemos alguns ponteiros armazenados nos campos~$\V{child}$, mais precisamente os que apontam para a próxima sub-pilha, isso é feito pois a próxima sub-pilha deve ser acessada pelo ponteiro~$\V{next}$ do primeiro elemento da sub-pilha. Dessa forma, não é mais possível acessar nós de versões passadas. Com isso, a navegação pelos níveis fica um pouco mais complexa, já que um nó pode ter o campo~$\V{child}$ nulo e ainda assim existir um nó no próximo nível. A Figura~\ref{fig:func_ex3res} mostra a estrutura após as mesmas modificações que foram aplicadas na Figura~\ref{fig:func_ex1res}. Note que agora cada deque pode ser armazenada apenas com um ponteiro para o seu primeiro nível, já que não é mais necessário armazenar o ponteiro para a pilha separadamente.
 
 \section{Representação}
 

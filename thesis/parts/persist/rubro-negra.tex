@@ -41,7 +41,7 @@ b/.style = {fill=gray},
 edge from parent/.append style={-, shorten >= 0, shorten <= 0}
 }
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[
 ed/.style = {densely dashed, shorten >= 5pt}]
@@ -252,7 +252,7 @@ Se, no começo da iteração, a raiz é~$x$, então para arrumar esta violação
 
 Rotações são modificações locais de nós de uma ABB que mantém as propriedades de uma ABB. Elas serão usadas para ``subir'' a violação na árvore rubro-negra. Uma rotação troca um nó~$u$ por um de seus filhos, fazendo as modificações necessárias para manter as propriedades de uma~ABB.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{scope}[local bounding box=scope1]
@@ -282,15 +282,7 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 
 	O nó~$x$ não viola mais nenhuma propriedade, mas o nó~$z$ se tornou vermelho e pode ter o pai vermelho ou ser a raiz, logo a próxima iteração deve ter~$x' = z$.
 
-	\item[Caso 2.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquerdo de~$z$ e~$x$ é filho esquerdo de~$y$). Então realizamos uma rotação de~$z$ em direção a~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
-
-	Antes da transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, e os caminhos que passam por~$w$ passam pelos nós pretos~$z$ e~$w$ (se existir). Após a transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ passam pelos nós pretos~$y$ e $w$ (se existir). Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
-
-	\item[Caso 3.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de lados diferentes. A rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim transformamos este caso no~caso~2~(se trocamos~$x$ por~$y$).
-
-\end{description}
-
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{scope}
@@ -306,7 +298,12 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 \caption{Aplicação do caso~1. Não importa se~$x$ é filho direito ou esquerdo.} \label{fig:rb_ins_caso1}
 \end{figure}
 
-\begin{figure}
+
+	\item[Caso 2.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de mesmo lado (por exemplo,~$y$ é filho esquerdo de~$z$ e~$x$ é filho esquerdo de~$y$). Então realizamos uma rotação de~$z$ em direção a~$y$, e trocamos as cores de~$y$ e~$z$ (Figura~\ref{fig:rb_ins_caso2}).
+
+	Antes da transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$z$ nesta parte do caminho, e os caminhos que passam por~$w$ passam pelos nós pretos~$z$ e~$w$ (se existir). Após a transformação: os caminhos até links nulos que passam por~$x$ ou~$\alpha$ passam apenas pelo nó negro~$y$, e os caminhos que passam por~$w$ passam pelos nós pretos~$y$ e $w$ (se existir). Logo a propriedade~3 é mantida. O nó~$y$ é preto, logo não é possível que este viole as propriedades~1 ou~2, e por isso não existem mais iterações depois desta.
+
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{scope}
@@ -322,7 +319,10 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 \caption{Aplicação do caso~2, assumindo que~$x$ é filho esquerdo. Os nós~$x$ e~$w$ (se existir) podem ter filhos.} \label{fig:rb_ins_caso2}
 \end{figure}
 
-\begin{figure}
+
+	\item[Caso 3.] $w$ não existe ou é preto, e~$x$ e~$y$ são filhos de lados diferentes. A rotação feita no caso~2 não permite manter a propriedade~3, então primeiro fazemos uma rotação em~$y$ na direção de~$x$ (Figura~\ref{fig:rb_ins_caso3}), e assim transformamos este caso no~caso~2~(se trocamos~$x$ por~$y$).
+
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{scope}
@@ -337,6 +337,8 @@ Se a árvore ainda tem violações no começo da iteração do laço, se $x$ nã
 \end{tikzpicture}
 \caption{Aplicação do caso~3, assumindo que~$x$ é filho direito. O nó~$w$, se existir, pode ter filhos.} \label{fig:rb_ins_caso3}
 \end{figure}
+
+\end{description}
 
 Se o caso~2 ou~3 é executado, não existe mais violações de propriedade e o laço acaba. Se o caso~1 é executado, trocamos~$x$ por um nó de altura menor (que pode ser a raiz). Logo, o caso~1 ocorre no máximo~$h$ vezes, onde~$h$ é a altura da árvore. Como cada caso consiste apenas de rotações e mudanças de cores, e rotações podem ser feitas em tempo constante (são apenas algumas mudanças de ponteiros), a inserção em uma árvore rubro-negra efêmera de~$n$ nós consome tempo~$\Oh(\lg n)$, já que árvore é balanceada.
 
@@ -485,7 +487,7 @@ Se~$u$ tem filho direito, a linha~\nref{line:rmabb:minb} busca o nó~$x$, mínim
 
 Para remover um nó de uma árvore rubro-negra, fazemos como em uma ABB normal, mas é necessário se preocupar com as propriedades rubro-negras. Quando~$u$ tem filho direito, ao substituir~$u$ por~$x$, podemos copiar a cor de~$u$ para~$x$, e assim essa operação não viola nenhuma propriedade local a~$u$. Porém, a substituição de~$x$ por seu filho direito ou, no caso em que~$u$ não tem filho direito, a substituição de~$u$ por seu filho esquerdo, podem causar violações das propriedades em torno de~$x$ e~$u$. Nesses casos, porém, como~$x$ ou~$u$ não tem um dos filhos, a estrutura da subárvore é bem simples. Trataremos o caso de~$u$ não ter filho direito, o outro caso é simétrico.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 
@@ -590,8 +592,12 @@ Seja~$x$ o filho de~$y$ na direção~$\side$ (pode ser nulo), e~$z$ seu filho na
 anyc/.style = {pattern=dots, pattern color=black},
 banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 }
+
+\begin{description}
+	\item[Caso 1.] $z$ é preto,~$z_x$ e~$z_z$ ou não existem ou são negros.
+
 %%% CASO 1
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 
@@ -608,8 +614,17 @@ banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 \end{tikzpicture}
 \caption{Aplicação do caso~1, não importa se~$x$ é filho direito ou esquerdo.} \label{fig:rmrbc1}
 \end{figure}
+
+	A Figura~\ref{fig:rmrbc1} mostra esse caso. O nó pontilhado indica que este nó pode ser tanto vermelho quanto negro. Todas as figuras assumem que~$x$ é filho esquerdo. O nó~$x$ pode não existir, este representa apenas uma direção a partir de~$y$.
+
+	Pintamos~$z$ de vermelho e~$y$ de preto. Dessa forma, como os filhos de~$z$ são negros (ou não existem), a propriedade~2 não é quebrada, e temos um nó negro a mais nos caminhos que passam por~$y$ e~$x$. Se~$y$ é vermelho, o laço termina pois todas as propriedades foram restauradas, caso contrário, não é possível pintar~$y$ de preto duas vezes, e os caminhos que vão do pai de~$y$ para~$y$ têm um preto a menos. Assim, recomeçamos o laço trocando~$y$ por seu pai e~$\side$ pelo lado apropriado.
+
+	Se~$y$ for a raiz, o pai desta é~\keyword{null}, e o laço deve acabar neste caso, já que não é um problema todos os caminhos a partir da raiz terem um preto a menos. Isso apenas significa que a altura negra (quantidade de nós negros dos caminhos da raiz até qualquer link nulo) da árvore diminui após esta remoção. % TODO: traduzir link
+
+	\item[Caso 2.] $z$ é preto, $z_z$ é vermelho.
+
 %%% CASO 2
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 
@@ -626,8 +641,14 @@ banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 \end{tikzpicture}
 \caption{Aplicação do caso~2, assumindo que~$x$ é filho esquerdo.} \label{fig:rmrbc2}
 \end{figure}
+
+	Rotacionamos~$y$ em direção a~$z$, trocamos a cor destes dois nós e pintamos~$z_z$ de preto. A Figura~\ref{fig:rmrbc2} ilustra esse caso. Note que os caminhos nesta subárvore que passam por~$\alpha$ e~$z_z$ contém o mesmo número de nós negros (independentemente da cor de~$y$), e os caminhos que passam por~$x$ têm um nó negro a mais. Logo, a propriedade~3 volta a valer. Além disso, a propriedade~2 continua valendo pois os nós modificados são negros, exceto talvez por~$z$, mas este tem a mesma posição e cor que~$y$, e a propriedade~2 não era violada no início da iteração, logo continua não violada.
+
+
+	\item[Caso 3.] $z$ é preto,~$z_x$ é vermelho e~$z_z$ é preto ou não existe.
+
 %%% CASO 3
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 
@@ -644,8 +665,16 @@ banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 \end{tikzpicture}
 \caption{Aplicação do caso~3, assumindo que~$x$ é filho esquerdo.} \label{fig:rmrbc3}
 \end{figure}
+
+	Rotacionamos~$z$ em direção a~$z_x$, e trocamos a cor destes dois nós. A Figura~\ref{fig:rmrbc3} ilustra esse caso. Note que os caminhos que passam por~$\alpha$,~$\beta$ e~$z_z$ continuam com o mesmo número de nós negros, logo a propriedade~3 não é violada nesses nós (mas continua sendo violada por~$x$). Após estas modificações, o caso~2 pode ser aplicado, já que~$x$ tem um irmão negro~(este nó é~$z_z$) com filho do lado contrário a~$x$ vermelho~(este nó é~$z$).
+
+
+	\item[Caso 4.] $z$ é vermelho.
+
+	Como os caminhos até links nulos de~$y$ na direção de~$z$ têm pelo menos um nó negro,~$z_x$ e~$z_y$ existem e são negros (já que a propriedade~2 não é violada). Além disso,~$y$ é preto (já que~$z$ é vermelho). Assim, rotacionamos~$y$ na direção de~$z$ e trocamos a cor destes dois nós. Note que os caminhos que passam por~$x$,~$z_x$ e~$z_z$ continuam com o mesmo número de nós negros.
+
 %%% CASO 4
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 
@@ -662,27 +691,6 @@ banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 \end{tikzpicture}
 \caption{Aplicação do caso~4, assumindo que~$x$ é filho esquerdo.} \label{fig:rmrbc4}
 \end{figure}
-
-\begin{description}
-	\item[Caso 1.] $z$ é preto,~$z_x$ e~$z_z$ ou não existem ou são negros.
-
-	A Figura~\ref{fig:rmrbc1} mostra esse caso. O nó pontilhado indica que este nó pode ser tanto vermelho quanto negro. Todas as figuras assumem que~$x$ é filho esquerdo. O nó~$x$ pode não existir, este representa apenas uma direção a partir de~$y$.
-
-	Pintamos~$z$ de vermelho e~$y$ de preto. Dessa forma, como os filhos de~$z$ são negros (ou não existem), a propriedade~2 não é quebrada, e temos um nó negro a mais nos caminhos que passam por~$y$ e~$x$. Se~$y$ é vermelho, o laço termina pois todas as propriedades foram restauradas, caso contrário, não é possível pintar~$y$ de preto duas vezes, e os caminhos que vão do pai de~$y$ para~$y$ têm um preto a menos. Assim, recomeçamos o laço trocando~$y$ por seu pai e~$\side$ pelo lado apropriado.
-
-	Se~$y$ for a raiz, o pai desta é~\keyword{null}, e o laço deve acabar neste caso, já que não é um problema todos os caminhos a partir da raiz terem um preto a menos. Isso apenas significa que a altura negra (quantidade de nós negros dos caminhos da raiz até qualquer link nulo) da árvore diminui após esta remoção. % TODO: traduzir link
-
-	\item[Caso 2.] $z$ é preto, $z_z$ é vermelho.
-
-	Rotacionamos~$y$ em direção a~$z$, trocamos a cor destes dois nós e pintamos~$z_z$ de preto. A Figura~\ref{fig:rmrbc2} ilustra esse caso. Note que os caminhos nesta subárvore que passam por~$\alpha$ e~$z_z$ contém o mesmo número de nós negros (independentemente da cor de~$y$), e os caminhos que passam por~$x$ têm um nó negro a mais. Logo, a propriedade~3 volta a valer. Além disso, a propriedade~2 continua valendo pois os nós modificados são negros, exceto talvez por~$z$, mas este tem a mesma posição e cor que~$y$, e a propriedade~2 não era violada no início da iteração, logo continua não violada.
-
-	\item[Caso 3.] $z$ é preto,~$z_x$ é vermelho e~$z_z$ é preto ou não existe.
-
-	Rotacionamos~$z$ em direção a~$z_x$, e trocamos a cor destes dois nós. A Figura~\ref{fig:rmrbc3} ilustra esse caso. Note que os caminhos que passam por~$\alpha$,~$\beta$ e~$z_z$ continuam com o mesmo número de nós negros, logo a propriedade~3 não é violada nesses nós (mas continua sendo violada por~$x$). Após estas modificações, o caso~2 pode ser aplicado, já que~$x$ tem um irmão negro~(este nó é~$z_z$) com filho do lado contrário a~$x$ vermelho~(este nó é~$z$).
-
-	\item[Caso 4.] $z$ é vermelho.
-
-	Como os caminhos até links nulos de~$y$ na direção de~$z$ têm pelo menos um nó negro,~$z_x$ e~$z_y$ existem e são negros (já que a propriedade~2 não é violada). Além disso,~$y$ é preto (já que~$z$ é vermelho). Assim, rotacionamos~$y$ na direção de~$z$ e trocamos a cor destes dois nós. Note que os caminhos que passam por~$x$,~$z_x$ e~$z_z$ continuam com o mesmo número de nós negros.
 
 	A Figura~\ref{fig:rmrbc4} ilustra esse caso. O novo irmão de~$x$ é preto (este nó é~$z_x$), e por isso algum dos outros casos~(1, 2, ou 3) se aplica. Note que, se o caso~1 se aplica, como~$y$ é vermelho, este pode ser pintado de preto, e por isso o laço termina após a aplicação deste caso.
 
@@ -740,10 +748,10 @@ Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanç
 
 A implementação da função~\textsc{AddBlack} no Código~\ref{lst:addblack} segue os casos descritos nesta seção. É necessário cuidado ao modificar a cor de um nó, já que é necessário fazer essa modificação na versão mais atual do nó. Por isso, na aplicação dos casos, as mudanças de cores são feitas antes das rotações (que podem gerar cópias dos nós), e após as rotações as versões mais novas de cada nó são atualizadas.
 
-A primeira coluna da Tabela~\ref{tab:arb_comp} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
+A primeira coluna da Tabela~\ref{tab:arb_comp} mostra o consumo de tempo e espaço da implementação apresentada neste capítulo.
 
 
-\begin{table} \centering
+\begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
 	& Node copying & Funcional \\ \hline
