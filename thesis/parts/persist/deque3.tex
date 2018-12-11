@@ -530,7 +530,7 @@ O Código~\ref{lst:op_fix} apresenta a implementação de~\func{Fix}{a}, uma fun
 A função~\func{Digit}{a, \V{last}} devolve o dígito do nó~$a$, onde~$\V{last}$ é~\textbf{true} se não existe nível depois de~$a$, e~\textbf{false} caso contrário. O parâmetro~$\V{last}$ é necessário pois um nó pode ter o campo~$\V{child}$ nulo, mas ainda assim existir um nó no próximo nível. Nesse caso, o nó de próximo nível é o campo~$\V{next}$ da cabeça da sub-pilha que contém~$a$. Veja a Figura~\ref{fig:func_ex3}, onde o nó de nível~3 tem campo~$\V{child}$ nulo, mas existe nó de nível~4, e um ponteiro para este está armazenado apenas no nó de nível~1.
 
 As linhas~{\nref{line:fix:p1b}-\nref{line:fix:p1e}} copiam o nó de nível~$i+1$ na variável~$b$, criando um nó vazio se este não existir. Se o nó de nível~${i+1}$ existir, ele pode estar tanto no campo~$\V{child}$, se tiver dígito~1, quanto no campo~$\V{next}$, se tiver dígito~0.
-Também é armazenado na variável~$\V{last}$ o valor~\textbf{true} se não existe nível~$i+2$, e~\textbf{false} caso contrário. A notação~$[$\texttt{predicado}$]$ de Iverson devolve~\textbf{true} (ou~1) se \texttt{predicado} é verdade e~\textbf{false} (ou~0) se é falso.
+Também é armazenado na variável~$\V{last}$ o valor~\textbf{true} se não existe nível~$i+2$, e~\textbf{false} caso contrário. A notação~$[$\texttt{predicado}$]$ de Iverson devolve~\textbf{true} (ou~1) se~\texttt{predicado} é verdade e~\textbf{false} (ou~0) se é falso.
 
 As linhas~{\nref{line:fix:p2b}-\nref{line:fix:p2e}} resolvem o Caso~1, como discutido na Seção~\ref{sec:fix_det}, adicionando todos elementos das sub-deques dos níveis~$i$ e~$i+1$ no prefixo do nó~$a$, e apagando~$b$. Usamos o fato que cada sub-deque em ambos os níveis tem no máximo um elemento.
 

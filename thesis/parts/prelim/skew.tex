@@ -56,7 +56,7 @@ O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$
 	$$ \V(a) - \V(b) \stackrel{\text{(1)}}{\geq} (2^{i^\star} - 1) + \V(\beta) - \V(\gamma) \stackrel{\text{(2)}}{\geq} (2^{i^\star} - 1) - (2^{i^\star} - 2) = 1, $$
 	onde~(1) vale pois~$a_{i^\star} \geq b_{i^\star} + 1$,~(2) vale pois~$\V(\beta) \geq 0$ e usando o Lema~\ref{lem:csbdig} sobre~$\gamma$. Isso prova que~$\V(a) \neq \V(b)$, logo~$\V$ é injetora.
 
-	Para provar que~$\V$ é sobrejetora, precisamos provar que, para todo~$x \in \mathbb{N}$, existe~$a \in \CSB$ tal que~$\V(a) = x$. Por indução em~$n$, vamos provar que, para todo~$x \leq 2^{n+1} - 2$, existe~$a \in \CSB$ tal que~$\V(a) = x$. Se~$n = 0$, então~$a = 0$ é tal que~$\V(a) = 0$. Suponha que~$n \geq 1$ e todo~${x \leq 2^n - 2}$ tem uma representação em~$\CSB$. Seja~${2^n - 1 \leq y \leq 2^{n+1} - 2}$. Se~$y = 2^{n+1} - 2$, sabemos que~${a = 20^{n-1} \in \CSB}$ é tal que~$\V(a) = y$. Caso contrário,~
+	Para provar que~$\V$ é sobrejetora, precisamos provar que, para todo~$x \in \mathbb{N}$, existe~${a \in \CSB}$ tal que~${\V(a) = x}$. Por indução em~$n$, vamos provar que, para todo~${x \leq 2^{n+1} - 2}$, existe~${a \in \CSB}$ tal que~${\V(a) = x}$. Se~$n = 0$, então~$a = 0$ é tal que~$\V(a) = 0$. Suponha que~$n \geq 1$ e todo~${x \leq 2^n - 2}$ tem uma representação em~$\CSB$. Seja~${2^n - 1 \leq y \leq 2^{n+1} - 2}$. Se~$y = 2^{n+1} - 2$, sabemos que~${a = 20^{n-1} \in \CSB}$ é tal que~$\V(a) = y$. Caso contrário,~
 	$$y - (2^n - 1) < 2^{n+1} - 2 - (2^n - 1) = 2^n - 1.$$
 	Logo existe~$a \in \CSB$ tal que~${\V(a) = y - (2^n - 1)}$, mas então~$b = 1a \in \CSB$ e~$\V(b) = y$.
 \end{proof}

@@ -124,7 +124,7 @@ Essa solução tem alguns casos de borda, por exemplo, quando o ponto de consult
 \providecommand{\current}{\V{current}}
 \providecommand{\polygon}{\V{polygon}}
 
-São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~\mbox{$i$-ésimo} polígono e~$P_i^j$ é o~$j$-ésimo ponto do polígono~$P_i$. Para facilitar o código vale que ${P_i^{|P_i|+1} = P_i^1}$ e~${P_i^0 = P_i^{|P_i|}}$. Assumimos que os pontos dos polígonos são dados em sentido anti-horário.
+São dados polígonos~$\{P_1, \ldots, P_k\}$. No pseudocódigo, usamos que~$|P_i|$ é o número de pontos do~\mbox{$i$-ésimo} polígono e~$P_i^j$ é o~$j$-ésimo ponto do polígono~$P_i$. Para facilitar o código vale que~${P_i^{|P_i|+1} = P_i^1}$ e~${P_i^0 = P_i^{|P_i|}}$. Assumimos que os pontos dos polígonos são dados em sentido anti-horário.
 
 Um segmento é um objeto com quatro campos:~$\from$ e~$\tto$, seus pontos de início e fim,~$\polygon$, a qual polígono pertence este segmento, e~$\topp$, um booleano que indica se o segmento é da parte ``de cima'' do polígono, ou seja, se os pontos imediatamente acima desse segmento não pertencem a nenhum polígono. Assumimos que~$\from$ é sempre o ponto mais à esquerda do segmento. Usamos~$\Call{Segment}{\polygon, \from, \tto, \topp}$ para inicializar os campos de um segmento.
 

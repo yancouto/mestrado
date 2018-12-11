@@ -228,11 +228,11 @@ Como estamos lidando com estruturas de dados gerais, não apresentaremos pseudoc
 \newcommand{\cur}{\V{current}}
 Assumimos que um vetor~$\entry$ armazena todas as versões de nós de entrada. Dessa forma, operações de acesso podem acessar nós de entrada de qualquer versão em tempo constante. Além disso, assumimos que uma variável~$\cur$ armazena o número da versão atual da estrutura. No começo de toda operação de modificação esta variável deve ser incrementada, e os nós de entrada da versão anterior devem ser copiados para a nova versão.
 
-Na Subseção~\ref{subsec:nodecopying_acesso}, apresentaremos a função de interface~\API{Access}, que deve ser usada quando for necessário acessar um campo de um nó da estrutura, isto é, as operações de acesso devem usar~\funcAPI{Access}{u, \V{field}, i} para acessar o campo~$\V{field}$ de~$u$ na versão~$i$, em vez de acessar o campo diretamente, como em~$u.\V{field}$.
+Na Subseção~\ref{subsec:nodecopying_acesso}, apresentaremos a função de interface~\API{Access}, que deve ser usada quando for necessário acessar um campo de um nó da estrutura, isto é, as operações de acesso devem usar~\funcAPI{Access}{u, \V{field}, i} para acessar o campo~$\V{field}$ de~$u$ na versão~$i$, em vez de acessar o campo diretamente, como em~${u.\V{field}}$.
 
 \newcommand{\auxfunc}[1]{\underline{#1}}
 
-Na Subseção~\ref{subsec:nodecopying_modificacao}, apresentaremos uma versão de~\API{Access} para ser usada durante operações de modificação, e também a função de interface~\funcAPI{Modify}{u, \V{field}, \V{value}}, que deve ser usada para modificar o campo~$\V{field}$ de~$u$ para o valor~$\V{value}$, em vez de fazer isso diretamente, como em~$u.\V{field} = \V{value}$. As outras funções desenvolvidas nessa subseção são auxiliares, usadas direta ou indiretamente por~\API{Access} e~\API{Modify}. Para deixar isto claro, os nomes das funções de interface são~\API{sublinhadas}.
+Na Subseção~\ref{subsec:nodecopying_modificacao}, apresentaremos uma versão de~\API{Access} para ser usada durante operações de modificação, e também a função de interface~\funcAPI{Modify}{u, \V{field}, \V{value}}, que deve ser usada para modificar o campo~$\V{field}$ de~$u$ para o valor~$\V{value}$, em vez de fazer isso diretamente, como em~${u.\V{field} = \V{value}}$. As outras funções desenvolvidas nessa subseção são auxiliares, usadas direta ou indiretamente por~\API{Access} e~\API{Modify}. Para deixar isto claro, os nomes das funções de interface são~\API{sublinhadas}.
 
 \subsection{Acesso} \label{subsec:nodecopying_acesso}
 
