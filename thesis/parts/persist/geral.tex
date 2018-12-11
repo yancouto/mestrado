@@ -4,14 +4,14 @@
 
 \chapter{Técnicas gerais} \label{cap:geral_persist}
 
-Nos capítulos anteriores, discutimos como tornar persistentes estruturas de dados específicas (pilhas, filas, deques). Como dito na introdução, outro caminho é criar técnicas gerais para tornar qualquer ED persistente.
+Nos capítulos anteriores, discutimos como tornar persistentes estruturas de dados específicas (pilhas, filas e deques). Como dito na introdução, outro caminho é criar técnicas gerais para tornar qualquer ED persistente.
 
 
 \section{Modelo de computação} \label{sec:mod_comp}
 
-Para tomar uma abordagem tão geral, é necessário definir formalmente o conceito de estrutura de dados.  Usaremos o modelo de~\deff{estruturas ligadas}, no qual uma estrutura de dados é um conjunto de \emph{nós}, ou \emph{objetos}, cada um contendo um número constante de campos. Cada campo pode armazenar um valor (um inteiro ou booleano, por exemplo) ou um ponteiro para outro nó. Ponteiros também podem armazenar o valor especial~\keyword{null}.  Acesso à estrutura é dado por um número constante de~\deff{nós de entrada}.
+Para tomar uma abordagem tão geral, é necessário definir formalmente o conceito de estrutura de dados.  Usaremos o modelo de~\deff{estruturas ligadas}, no qual uma estrutura de dados é um conjunto de \emph{nós}, ou \emph{objetos}, cada um contendo um número constante de campos. Cada campo pode armazenar um valor (um inteiro ou booleano, por exemplo) ou um ponteiro para outro nó. Ponteiros também podem armazenar o valor especial~\keyword{null}, que indica que não estão apontando para nenhum nó.  Acesso à estrutura é dado por um número constante de~\deff{nós de entrada}.
 
-Uma pilha implementada com lista ligada, como no Capítulo~\ref{cap:pilha_persist}, é uma estrutura desse tipo, onde o primeiro elemento da lista é o nó de entrada. A estrutura recursiva para deques do Capítulo~\ref{cap:deque2_persist} também é dessa forma, e tem nós de dois tipos: os nós da estrutura e nós que são os pares. O nó de entrada também é o primeiro nó da estrutura.  Uma árvore de busca binária também é deste tipo, já que cada nó tem dois ponteiros (para o filho esquerdo e direito), e um valor; e a raiz é o nó de entrada. A estrutura para resolver o problema do Ancestral de Nível no Capítulo~\ref{cap:ancestrais} não é deste tipo, pois o pré-processamento armazena em cada nó um vetor de tamanho~$\floor{\lg d}$, onde~$d$ é a altura do nó.
+Uma pilha implementada com lista ligada, como no Capítulo~\ref{cap:pilha_persist}, é uma estrutura desse tipo, onde o primeiro elemento da lista é o nó de entrada. A estrutura recursiva para deques do Capítulo~\ref{cap:deque2_persist} também é dessa forma, e tem nós de dois tipos: os nós da estrutura e nós que são os pares. O nó de entrada também é o primeiro nó da estrutura.  Uma árvore de busca binária também é deste tipo, já que cada nó tem dois ponteiros (para o filho esquerdo e direito), e um valor; e a raiz é o nó de entrada. A estrutura para resolver o problema do Ancestral de Nível no Capítulo~\ref{cap:ancestrais} \textbf{não} é deste tipo, pois o pré-processamento armazena em cada nó um vetor de tamanho~$\floor{\lg d}$, onde~$d$ é a altura do nó.
 
 Vamos formalizar também as definições de operações de acesso e modificação. Uma~\deff{operação de acesso} produz um~\deff{conjunto de acessos}. No início da operação, este conjunto está vazio.  A cada passo, chamado de~\deff{passo de acesso}, adiciona-se um nó a este conjunto. O nó adicionado deve ser um nó de entrada ou deve ser indicado por um ponteiro em algum nó já no conjunto de acessos. O tempo consumido por uma operação de acesso é o número de passos de acesso. Operações também devolvem valores, calculados usando seu conjunto de acessos.
 
@@ -21,14 +21,14 @@ Uma~\deff{operação de modificação} é parecida com uma de acesso. Ela consis
 \begin{itemize}
 	\item Cria-se um novo nó, e este é adicionado ao conjunto de acessos.
 	\item Modifica-se um campo de algum nó do conjunto de acessos. Se um ponteiro foi modificado, seu novo valor deve ser~\keyword{null} ou deve ser um dos nós do conjunto de acessos.
-	\item Troca-se um nó de entrada. Seu novo valor deve ser~\keyword{null} ou um nó do conjunto de acessos.
+	\item Altera-se um nó de entrada. Seu novo valor deve ser~\keyword{null} ou um nó do conjunto de acessos.
 \end{itemize}
 
-O tempo consumido por esta operação de modificação é o número total de passos, e o tempo de modificação é o número de passos de modificação.
+O tempo consumido por uma operação de modificação é o número total de passos, e o tempo de modificação é o número de passos de modificação.
 
-Adicionar um elemento em uma ABB, por exemplo, consiste de achar sua posição, que pode levar até~$h$ passos de acesso, onde~$h$ é a altura da árvore, e criar um novo vértice ali, modificando um dos ponteiros desse nó. Logo esta operação consome tempo~$\Oh(h)$ e tempo de modificação~$\Oh(1)$.
+Adicionar um elemento em uma ABB, por exemplo, consiste de achar sua posição, que pode levar até~$h$ passos de acesso, onde~$h$ é a altura da árvore, e criar um novo nó ali, modificando o ponteiro do nó do conjunto de acessos que deve apontar para ele. Logo esta operação consome tempo~$\Oh(h)$ e tempo de modificação~$\Oh(1)$.
 
-Essas definições descrevem uma estrutura de dados efêmera, ou seja, uma ED na qual operações de acesso e modificação podem apenas ser feitas na versão mais atual da estrutura. Nosso objetivo é tornar esta estrutura genérica em uma estrutura total ou parcialmente persistente.
+Essas definições descrevem uma estrutura de dados efêmera. Nosso objetivo é tornar esta estrutura genérica em uma estrutura total ou parcialmente persistente.
 
 Consideramos que o número total de operações de modificação é~$m$, e o número de operações de acesso é~$a$. Da mesma forma, o número total de passos de modificação é~$M$ e de passos de acesso é~$A$. A $i$-ésima operação de modificação cria a versão~$i$ da estrutura. A versão~0 é a estrutura vazia. Se estamos considerando uma estrutura totalmente persistente, temos uma árvore de versões, caso contrário, uma lista.
 
@@ -41,7 +41,7 @@ Note que, apesar de estarmos tratando apenas de estruturas ligadas, a versão pe
 Em geral, estamos interessados em implementações online das estruturas persistentes, ou seja, uma operação deve ser completada para se ter acesso à próxima, porém, vamos considerar o caso offline, em que todas as~$m+a$ operações são conhecidas de antemão. Obteremos uma implementação totalmente persistente que não faz nenhuma suposição adicional sobre a estrutura de dados, não aumenta assintoticamente o tempo consumido pelas operações, e gasta apenas~$\Oh(1)$ de espaço adicional por passo de modificação, que é o melhor que pode-se esperar. A versão original desta solução foi dada por meu amigo, Arthur Nascimento, enquanto discutíamos sobre como implementar uma deque persistente.
 
 Inicialmente, constrói-se a árvore de versões. O vértice~$v_i$ representa a versão~$i$. Neste deve-se armazenar, além da lista de adjacência~($v_k$ tal que~$i \rightarrow k$), a operação de modificação que criou a versão~$i$ (seus parâmetros), e uma lista das operações de acesso que são feitas na versão~$i$. Isso pode ser feito em tempo e espaço~$\Oh(m+a)$, ou seja, proporcional ao número de operações.
-A Figura~\ref{fig:vertree_ex} mostra a árvore de versões do exemplo de pilha do Capítulo~\ref{cap:pilha_persist}.
+A Figura~\ref{fig:vertree_ex} mostra a árvore de versões do Exemplo~\ref{ex:pilha} da página~\pageref{ex:pilha}.
 
 \tikzset{
 nodes = {draw, minimum size = 7mm},
@@ -51,7 +51,7 @@ n/.style = {draw=none},
 gr/.style = {color=gray},
 edge from parent/.append style={-, shorten >= 0, shorten <= 0}
 }
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\begin{tikzpicture}
 \Tree
@@ -77,17 +77,17 @@ edge from parent/.append style={-, shorten >= 0, shorten <= 0}
 
 Após montar a árvore de versões, realizamos uma busca em profundidade (DFS) nesta árvore, seguindo a seguinte ideia:
 \begin{enumerate}
-	\item Ao acessar um vértice~$v_i$ pela DFS, a estrutura está na versão~$j$, onde~$j \rightarrow i$.
+	\item Ao acessar um vértice~$v_i$ na DFS, a estrutura está na versão~$j$, onde~$j \rightarrow i$.
 	\item Aplicamos a operação, transformando a versão~$j$ em~$i$.
-	\item Calculamos o valor de retorno para as operações de acesso feitas na versão~$i$ e em todas as versões descendentes de~$i$ recursivamente.
+	\item Calculamos o valor de retorno para as operações de acesso feitas na versão~$i$ e recursivamente em todas as versões descendentes de~$i$.
 	\item Ao final do acesso ao vértice~$v_i$, revertemos as mudanças feitas, como explicado adiante, e a estrutura está novamente na versão~$j$.
 \end{enumerate}
 
-Dessa forma, no passo~3, podemos acessar os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a eles terminar, a versão da estrutura será a versão~$i$, e no passo~4 de~$v_i$ basta reverter as mudanças feitas nessa versão.
+Dessa forma, no passo~3, podemos processar uma  um os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a cada um deles termina, a estrutura volta a estar na versão~$i$. No passo~4 de~$v_i$, revertemos as mudanças feitas no passo~2 para~$v_i$.
 
 Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um objeto, guardamos uma tripla~$(\V{obj}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do objeto~$\V{obj}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma, por exemplo, usando um objeto para armazenar os nós de entrada.
 
-Como não impusemos restrições nas operações de mudança, elas podem modificar um mesmo campo muitas vezes. Logo, é necessário que o valor original seja restaurado, e não um valor intermediário. Para isso, desfazemos as mudanças na ordem inversa que foram feitas, usando uma pilha.
+Como não impusemos restrições nas operações de mudança, elas podem modificar um mesmo campo muitas vezes, ou utilizar o valor de um campo previamente modificado. Logo, a ordem em que as operações ocorreram é relevante e, em particular, é necessário que o valor original seja restaurado, e não um valor intermediário. Para isso, desfazemos as mudanças na ordem inversa que foram feitas, usando uma pilha.
 
 \begin{algorithm}
 \caption{Persistência total offline} \label{lst:geraloffline}
@@ -121,24 +121,24 @@ O Código~\ref{lst:geraloffline} mostra uma implementação, em alto nível, do 
 \end{proposition}
 
 \begin{proof}
-A prova é por indução na altura de~$v_i$. No início da função, estamos na versão~$j$, então ao aplicar a operação~$i$, a estrutura muda para a versão~$i$. Além disso, todas as mudanças para reverter a versão~$i$ para~$j$ estão armazenadas em~$\V{mod}$.
+A prova é por indução na altura de~$v_i$. No início da função, estamos na versão~$j$. Então ao aplicar a operação~$i$, a estrutura muda para a versão~$i$. Além disso, todas as mudanças para reverter a versão~$i$ para~$j$ estão armazenadas em~$\V{mod}$.
 
-A linha~\nref{line:off:opac} aplica as operações de acesso da versão~$i$. O~\keyword{for} da linha~\nref{line:off:for} chama, para cada filho de~$v_i$, a função~\textsc{DFS} neste. Seja~$v_x$ o primeiro filho acessado; pela hipótese de indução, como~$v_x$ tem altura menor que~$v_i$ e a estrutura está na versão~$i$ e~${i \rightarrow x}$, temos que a função aplica corretamente as operações de acesso das versões na subárvore de~$v_x$, e ao final da chamada de~\Call{DFS}{$v_x$}, a estrutura está novamente no estado~$i$.
+A linha~\nref{line:off:opac} aplica as operações de acesso da versão~$i$. O~\keyword{for} da linha~\nref{line:off:for} aciona, para cada filho de~$v_i$, a função~\textsc{DFS} neste recursivamente. Seja~$v_x$ o primeiro filho acessado; pela hipótese de indução, como~$v_x$ tem altura menor que~$v_i$ e a estrutura está na versão~$i$ e~${i \rightarrow x}$, temos que a função aplica corretamente as operações de acesso das versões na subárvore de~$v_x$, e ao final da chamada de~\Call{DFS}{$v_x$}, a estrutura está novamente na versão~$i$.
 
-Dessa forma, as chamadas da função~\textsc{DFS} para todos os filhos de~$v_i$ funcionam corretamente, e por isso as operações de acesso de todos os descendentes de~$v_i$ são realizadas. Por último, o~\keyword{while} da linha~\nref{line:off:while} desfaz as mudanças feitas na versão~$i$ e devolve a estrutura para a versão~$j$, completando a prova.
+Dessa forma, as chamadas da função~\textsc{DFS} para todos os filhos de~$v_i$ funcionam corretamente, e por isso as operações de acesso de todos os descendentes de~$v_i$ são realizadas. Por último, o~\keyword{while} da linha~\nref{line:off:while} desfaz as mudanças feitas na versão~$i$ e restaura a estrutura para a versão~$j$, completando a prova.
 \end{proof}
 
 Então, é possível transformar qualquer estrutura ligada em totalmente persistente, de forma offline, com aumento no consumo de tempo de~$\Oh(M+A)$ e de espaço~$\Oh(M + a)$.
 
 \section{Implementação funcional} \label{sec:implfuncional}
 
-A técnica que usamos nas estruturas apresentadas até agora é tornar a implementação funcional, ou seja, nunca modificar nenhum campo de um nó já criado. Esse tipo de implementação é bastante ligada a linguagens funcionais, e implementações desta forma vão de pilhas a ABBBs~\cite{HoodMelville,KaplanT1999,Myers83,Myers84}.
+A técnica que usamos nas estruturas apresentadas até o Capítulo~\ref{cap:deque3_persist} é tornar a implementação funcional, ou seja, nunca modificar nenhum campo de um nó já criado. Esse tipo de implementação é bastante ligada a linguagens funcionais, e implementações desta forma vão de pilhas a ABBBs~\cite{HoodMelville,KaplanT1999,Myers83,Myers84}.
 
 Se for possível implementar a estrutura desta forma, ela se torna totalmente persistente. De fato, se temos os nós de entrada da versão~$i$, e nenhum nó foi modificado, os nós que podem ser acessados a partir desses são exatamente os mesmos de quando a versão~$i$ foi criada, independente de versões criadas posteriormente. Logo, apenas armazenando os nós de entrada (e não apagando nenhum nó), tornamos nossa estrutura totalmente persistente.
 
-Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha_persist}, onde nunca é necessário alterar nenhum nó. Quando a estrutura não funciona dessa forma, é possível tentar ``forçar'' isso, copiando os nós que seriam modificados (e seus ancestrais). A estrutura recursiva de deque do Capítulo~\ref{cap:deque2_persist} faz isso, copiando todos os nós acessados durante um~\API{Push} ou~\API{Pop}.
+Algumas estruturas ligadas já funcionam naturalmente dessa forma, como por exemplo a pilha implementada no Capítulo~\ref{cap:pilha_persist}, onde nunca é necessário alterar nenhum nó após a sua criação. Quando a estrutura não funciona dessa forma, podemos tentar impor isso, copiando os nós que seriam modificados (e seus ancestrais). A estrutura recursiva de deque do Capítulo~\ref{cap:deque2_persist} faz isso, copiando todos os nós acessados durante um~\API{Push} ou~\API{Pop}.
 
-Para fazer isso em uma estrutura qualquer, supomos que, sempre que adicionamos um nó~$u$ ao conjunto de acessos, todos seus ancestrais já estão neste conjunto. Ao adicionar esse nó, na verdade adicionamos uma cópia~$u'$ dele, e para todo nó~$v$ no conjunto de acessos que tem um ponteiro para~$u$, trocamos este ponteiro por~$u'$.
+Para fazer isso em uma estrutura qualquer, supomos que, sempre que adicionamos um nó~$u$ ao conjunto de acessos, todos os seus ancestrais já estão neste conjunto. Ao adicionar esse nó, na verdade adicionamos uma cópia~$u'$ dele, e para todo nó~$v$ no conjunto de acessos que tem um ponteiro para~$u$, trocamos este ponteiro por~$u'$.
 
 Note que nós no conjunto de acessos podem ser modificados, mas o importante é que nenhum nó criado em uma versão anterior é modificado, logo todas essas versões continuam funcionando.
 
@@ -149,7 +149,7 @@ b/.style = {fill=gray!40},
 be/.style = {color=gray},
 edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt}
 }
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\begin{tikzpicture}
 		\Tree [.\node(a){$a$}; [.\node(b){$b$}; \node(d){$d$}; \edge[n];\node[n]{}; ] [.\node(c){$c$}; \node(e){$e$}; \edge[n];\node[n]{}; ] ]
@@ -180,32 +180,31 @@ edge from parent/.append style={->, shorten >= 2pt, shorten <= 2pt}
 	\caption{Adição de um nó~$f$ à direita de~$b$ com uma implementação totalmente funcional. Em cinza, os nós criados ou copiados durante a adição.} \label{fig:totfunc_ex}
 \end{figure}
 
-A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir de~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, uma implementação dessa forma não seria possível.
+A Figura~\ref{fig:totfunc_ex} mostra cada passo de uma operação de inserção em uma ABB usando esse método. Os nós que existiam no começo da operação não foram modificados, então a árvore ``visível'' a partir do nó~$a$ continua a mesma. Note que alguns nós são visíveis nas duas versões, como o~$d$ e o~$e$, já que não foram modificados (nem nenhum de seus descendentes). Se quiséssemos armazenar também ponteiros de pai em cada nó, uma implementação dessa forma não seria possível.
 
-Supusemos que, ao adicionar um nó ao conjunto de acessos, todos seus ancestrais já estavam neste conjunto (na verdade, suas cópias), portanto não existe caminho de um nó não copiado para um nó que tem uma cópia no conjunto de acessos. Assim, todos os nós atingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, são exatamente os nós que seriam atingíveis se tivéssemos copiado a estrutura inteira. Logo, a estrutura ligada funciona e é totalmente persistente. Note que na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado (os nós~$a$ e~$b$).
+Supusemos que, ao adicionar um nó ao conjunto de acessos, todos os seus ancestrais já estavam neste conjunto (na verdade, suas cópias), portanto não existe caminho de um nó não copiado para um nó que tem uma cópia no conjunto de acessos. Assim, todos os nós atingíveis a partir da nova versão ou são as cópias criadas ou são nós que nunca foram adicionados ao conjunto de acessos, ou seja, são exatamente os nós que seriam atingíveis se tivéssemos copiado a estrutura inteira. Logo, a estrutura ligada funciona e é totalmente persistente. Note que na Figura~\ref{fig:totfunc_ex} não é possível acessar, a partir de~$a'$, a versão anterior de um nó copiado (os nós~$a$ e~$b$).
 
 Sem essa suposição, poderia ser possível alcançar a versão antiga de um nó que já foi copiado. Este foi o problema encontrado na primeira ideia de implementação da deque de Kaplan e Tarjan, como discutido na Seção~\ref{sec:implfunc}.
 
-Note que, se os ponteiros da estrutura formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, cada nó tem exatamente um caminho até ele, logo a suposição sobre adicionar um nó ao conjunto de acessos é sempre satisfeita, não importa a ordem na qual são feitas as adições ao conjunto de acessos. A estrutura discutida no Capítulo~\ref{cap:deque2_persist} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a implementação inicial discutida para a estrutura do Capítulo~\ref{cap:deque3_persist} é modificada para também se tornar uma árvore direcionada.
+Note que, se os ponteiros de uma estrutura ligada em particular formam uma floresta direcionada, onde os nós de entrada são as raízes e as arestas vão em direção contrária às raízes, para cada nó~$u$ existe exatamente um caminho de um nó de acesso até~$u$, logo se~$u$ é adicionado ao conjunto de acesso, temos a garantia que todos os nós que apontam pra ele já estão no conjunto de acesso, não importando a ordem na qual foram feitas as adições ao conjunto de acessos. Dessa forma, basta copiar os nós visitados durante operações de modificação e a estrutura em questão se torna funcional e persistente. A estrutura discutida no Capítulo~\ref{cap:deque2_persist} é uma árvore direcionada, e na Seção~\ref{sec:implfunc} a implementação inicial discutida para a estrutura do Capítulo~\ref{cap:deque3_persist} é modificada para também se tornar uma árvore direcionada.
 
-Assumindo que, ao adicionar um nó ao conjunto de acessos, as mudanças de ponteiros possam ser feitas em tempo constante (trivial em uma floresta direcionada), se a estrutura segue as restrições discutidas, esse método torna a estrutura totalmente persistente com aumento no consumo de tempo de~$\Oh(M+A)$ e espaço de~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar o nó mesmo que este não seja modificado.
-
+Esse método torna a estrutura totalmente persistente com aumento no consumo de tempo de~$\Oh(M+A)$, levando em conta o tempo de copiar os nós visitados em operações de modificação e o tempo de modificar os ponteiros que apontam para tais nós, e espaço de~$\Oh(M+A_m)$, onde~$A_m$ é o número de passos de acesso que ocorrem durante operações de modificação, já que é necessário copiar um nó acessado em uma operação de modificação mesmo que nenhum campo deste tenha sido alterado.
 
 \section{Fat node}
 
-É possível tornar uma estrutura ligada parcialmente persistente aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll, Sarnak, Sleator e Tarjan~\cite{DriscollSST1989}.
+É possível tornar uma estrutura ligada parcialmente persistente aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll et al.~\cite{DriscollSST1989}.
 
-Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor de pares, que guarda pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou aquele campo para o valor~$v$. Em vez de modificar um campo de um objeto, adiciona-se um par no vetor correspondente, indicando a versão atual e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado (considerando apenas os índices).
+Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor que armazena pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou o valor daquele campo para~$v$. Em vez de modificar um campo de um objeto, adiciona-se um par no vetor correspondente, indicando a versão da estrutura que está sendo criada e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado pelos índices.
 
-Para realizar um acesso ao campo~$c$ na versão~$i$, é necessário procurar no vetor associado a~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Isso pode ser feito com busca binária em tempo logarítmico no tamanho do vetor, já que a informação é armazenada em ordem. Diferente das outras técnicas, esta também aumenta o tempo de um passo de acesso.
+Para realizar um acesso ao campo~$c$ na versão~$i$, é necessário procurar no vetor associado a~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Isso pode ser feito com busca binária em tempo logarítmico no tamanho do vetor, já que a informação está armazenada em ordem. Diferente das outras técnicas, esta aumenta também o tempo de um passo de acesso.
 
 Utilizar esta técnica transforma qualquer estrutura ligada em uma estrutura parcialmente persistente, com aumento no consumo de tempo de~$\Oh((M+A) \lg{M})$ e espaço de~$\Oh(M)$.
 
 \section{Node copying} \label{sec:nodecopying}
 
-No método Fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método~\deff{Node copying} também consegue persistência parcial, mas diminui esse tempo, armazenando apenas um número constante de modificações em um mesmo nó, e fazendo uma cópia do nó quando este ficar muito grande. Este método também foi apresentado por Driscoll et al.~\cite{DriscollSST1989}.
+No método fat node, ao armazenar todas as modificações de um campo, precisamos de tempo logarítmico para descobrir o valor desse campo em uma dada versão. O método~\deff{node copying} também garante persistência parcial, mas diminui esse tempo, armazenando apenas um número constante de modificações em um mesmo nó, e fazendo uma cópia do nó quando este fica muito grande. Este método também foi apresentado por Driscoll et al.~\cite{DriscollSST1989}.
 
-Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada têm grau de entrada constante, ou seja, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de campos que tem ponteiros que apontam para~$u$, entre todos os nós da estrutura, é no máximo~$\V{in}$.
+Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os nós da estrutura ligada têm grau de entrada limitado por uma constante. Especificamente, existe uma constante~$\V{in}$ tal que, a qualquer momento, para qualquer sequência de operações, vale que, para qualquer nó~$u$, o número de campos que têm ponteiros que apontam para~$u$, entre todos os nós da estrutura, é no máximo~$\V{in}$.
 
 \newcommand{\changes}{\V{changes}}
 \newcommand{\parents}{\V{parents}}
@@ -214,13 +213,13 @@ Precisamos, contudo, fazer mais suposições sobre a estrutura. Supomos que os n
 \newcommand{\version}{\V{version}}
 \newcommand{\entry}{\V{entry}}
 
-Cada nó deve armazenar, além de seus campos usuais, um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos seus campos, ou seja, se este vetor tem a tripla~${(\V{version}, \V{field}, \V{value})}$ então na versão~$\V{version}$ o campo~$\V{field}$ foi modificado para o valor~$\V{value}$. Esse vetor é inicialmente vazio, e armazena mudanças feitas ao nó depois de sua criação.
+Cada nó deve armazenar, além de seus campos usuais, um vetor de triplas~$\V{changes}$ de tamanho~$\V{in}$ que armazena mudanças feitas nos seus campos, ou seja, se este vetor tem a tripla~${(\V{version}, \V{field}, \V{value})}$ então na versão~$\V{version}$ o campo~$\V{field}$ foi modificado para o valor~$\V{value}$. Esse vetor está inicialmente vazio, e armazena mudanças feitas ao nó depois de sua criação.
 
-O método Node copying copia um nó~$u$ sempre que este é modificado em um passo de modificação. Após isso, é necessário modificar os ponteiros que apontam para~$u$. Para evitar ter que copiar todos os ancestrais de~$u$, guardamos estas modificações de ponteiros em seus campos~$\changes$, se estes tiverem espaço.
+O método node copying copia um nó~$u$ sempre que este é alterado em um passo de modificação. Após isso, é necessário modificar os nós que apontam para~$u$. Para evitar ter que copiar todos os ancestrais de~$u$, guardamos estas modificações de ponteiros em seus vetores~$\changes$, se estes tiverem espaço.
 
-Se algum dos nós que apontam para~$u$ não tiver espaço livre em seu campo~$\changes$, uma cópia deste nó deve ser feita, armazenando a versão mais nova de cada campo (e deixando o vetor~$\changes$ vazio, no novo nó). Além disso, os nós que apontam para este devem ser modificados, o que pode gerar mais cópias.
+Se algum dos nós que apontam para~$u$ não tiver espaço livre em seu vetor~$\changes$, uma cópia deste nó deve ser feita, armazenando a versão mais nova de cada campo (e deixando o vetor~$\changes$ vazio, no novo nó). Além disso, os nós que apontam para este devem ser modificados, o que pode gerar mais cópias.
 
-Adicionamos um campo~$\ts$ a cada nó da estrutura, que é o índice da versão em que o nó foi criado, e um campo~$\cp$ que é um ponteiro para a cópia criada diretamente a partir deste nó, ou~\keyword{null} se não existir. Quando uma cópia é criada, a versão antiga do nó nunca mais é modificada, logo nenhuma outra cópia é criada diretamente a partir deste nó. Dessa forma, cada nó~$u$ representa o nó correspondente da estrutura no intervalo de versões~${[u.\ts, u.\cp.\ts - 1]}$ se este tiver cópia, caso contrário o nó representa a versão atual do nó correspondente na estrutura, e é chamado de~\emph{nó ativo}. Como estamos tratando de persistência parcial, apenas nós ativos são modificados.
+Adicionamos um campo~$\ts$ a cada nó da estrutura, que é o índice da versão em que o nó foi criado, e um campo~$\cp$ que é um ponteiro para a cópia criada diretamente a partir deste nó, ou~\keyword{null} se tal cópia ainda não existir. Quando uma cópia é criada, a versão antiga do nó nunca mais é modificada, logo nenhuma outra cópia é criada diretamente a partir deste nó. Dessa forma, dizemos que cada nó~$u$ \deff{representa} o nó correspondente da estrutura efêmera no intervalo de versões~${[u.\ts, u.\cp.\ts - 1]}$ se este tiver cópia. Caso contrário, o nó \deff{representa} as versões desde~$u.\ts$ até a versão atual do nó correspondente na estrutura efêmera, e é chamado de~\emph{nó ativo}. Como estamos tratando de persistência parcial, apenas nós ativos são modificados.
 
 \subsection{Implementações}
 
@@ -243,11 +242,11 @@ O acesso a um campo de um nó em uma dada versão pode ser feito como no Código
 \caption{Acesso a um campo durante uma operação de acesso.} \label{lst:acc_acc}
 \begin{algorithmic}[1]
 
-\Require $u$ representa a versão~$\V{version}$.
+\Require $u$ representa a versão~$\V{version}$, ou seja, $\version \geq u.\ts$ e~$\version < u.\cp.\ts$, se~$u.\cp$ é não-nulo.
 \Function{\API{Access}}{$u, \V{field}, \V{version}$}
 	\State $\V{value} = u.\V{field}$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
-		\If{$\V{field} = \V{field}' \AND \V{version} \geq \V{version}'$}
+		\If{$\V{field} = \V{field}' \AND \V{version}' \leq \V{version}$}
 			\State $\V{value} = \V{value}'$
 		\EndIf
 	\EndFor
@@ -257,11 +256,11 @@ O acesso a um campo de um nó em uma dada versão pode ser feito como no Código
 \end{algorithmic}
 \end{algorithm}
 
-Para devolver o valor do campo na versão~$\version$, aplicamos todas as modificações realizadas a este campo em versões que são no máximo~$\version$. Como o vetor~$\V{entry}$ armazena os nós de entrada de cada versão, com a função de interface~\API{Access} é possível realizar uma operação de acesso em qualquer versão da estrutura com aumento constante no tempo por passo de acesso.
+Para devolver o valor do campo na versão~$\version$, aplicamos todas as modificações realizadas a este campo em versões que são no máximo~$\version$. Para realizar uma operação de acesso na versão~$i$, basta acessar os nós de entrada da versão~$i$, utilizando o vetor~$\V{entry}$, e realizar os acessos usando a função de interface~\API{Access}. O aumento de complexidade de tempo é constante por passo de acesso.
 
 \subsection{Modificação} \label{subsec:nodecopying_modificacao}
 
-Em uma operação de modificação, modificar um nó do conjunto de acessos pode levar à cópia de outros nós que já estão no conjunto de acessos. Para evitar que isso nos traga problemas, vamos garantir que no máximo uma cópia de cada nó seja feita. Dessa forma, quando um passo de modificação da estrutura tentar acessar ou modificar um campo do nó~$u$, ou~$u$ é ativo ou~$u.\cp$ existe e foi criado nesta versão.
+Em uma operação de modificação, alterar um nó do conjunto de acessos pode levar à cópia de outros nós que já estão no conjunto de acessos. Vamos garantir que no máximo uma cópia de cada nó seja feita por operação de modificação. Dessa forma, quando um passo de modificação da estrutura tentar acessar ou modificar um campo do nó~$u$, ou~$u$ é ativo ou~$u.\cp$ existe e foi criado nesta versão.
 
 A função~\funcAPI{Access}{u, \V{field}} do Código~\ref{lst:acc_mod} funciona de forma parecida com a função~\funcAPI{Access}{u, \V{field}, \version} do Código~\ref{lst:acc_acc}, mas sempre acessa a versão mais recente~($\cur$) do campo. Esta função não é usada em nenhuma das funções apresentadas no resto da seção, mas, como discutido, deve ser usada pelos~\emph{passos de acesso} durante uma \emph{operação de modificação} da estrutura de dados. A função~\func{Active}{u} é usada como função auxiliar em muitas funções apresentadas nesta seção, e devolve a versão ativa do nó~$u$ (ou seja,~$u$ ou~$u.\cp$).
 
@@ -321,7 +320,7 @@ Quando um campo de ponteiro de um nó~$x$ é alterado de~$y$ para~$z$, é necess
 A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ está atualizado pois, ao trocar~$a$ por~$b$, se~$a \neq \Null$, então~$a$ apontava para~$u$, logo estava em~$\parents$; se~$a = \Null$, então, como~$\V{in}$ é o grau de entrada máximo de um nó, pelo menos uma posição do vetor tem o valor~$\Null$.
 
 \begin{algorithm}
-\caption{Modificação feita por um passo de modificação.} \label{lst:modify}
+\caption{Alteração feita por um passo de modificação.} \label{lst:modify}
 \begin{algorithmic}[1]
 
 \Require $u$ é ativo ou sua cópia foi criada na versão atual~($\cur$).
@@ -341,7 +340,7 @@ A função~\Call{ChangeParent}{$u, a, b$} funciona se o vetor~$\V{parents}$ est�
 \end{algorithmic}
 \end{algorithm}
 
-A função~\funcAPI{Modify}{u, \V{field}, \V{value}} modifica o campo~$\V{field}$ de~$u$, e deve ser chamada em passos de modificação da operação com índice~$\cur$. A função cria uma cópia do nó~$u$, se esta não existe e~$u$ não foi criado nessa versão (usando a função~\textsc{Copy}), e depois modifica o campo~$\V{field}$ diretamente, utilizando~\textsc{ChangePointer} se necessário.
+A função~\funcAPI{Modify}{u, \V{field}, \V{value}} altera o campo~$\V{field}$ de~$u$, e deve ser chamada em passos de modificação da operação com índice~$\cur$. A função cria uma cópia do nó~$u$, se esta não existe e~$u$ não foi criado nessa versão (usando a função~\textsc{Copy}), e depois modifica o campo~$\V{field}$ diretamente, utilizando~\textsc{ChangePointer} se necessário.
 O Código~\ref{lst:modify} mostra a implementação da função~\API{Modify}. O nó~$u$ é um nó do conjunto de acessos e, como discutido anteriormente, um destes casos ocorre:
 \begin{itemize}
 	\item $u$ tem uma cópia --- A chamada a~\textsc{Active} na linha~\nref{line:modify:active} troca~$u$ por esta cópia; ou
@@ -349,7 +348,7 @@ O Código~\ref{lst:modify} mostra a implementação da função~\API{Modify}. O 
 	\item $u$ foi criado nessa versão --- $u$ não é modificado.
 \end{itemize}
 
-Após qualquer um destes casos,~$u$ é um nó que foi criado nesta versão, e então as linhas~\nref{line:modify:chngb}-\nref{line:modify:chnge} mudam o campo~$\V{field}$.
+Após qualquer um destes casos,~$u$ é um nó que foi criado nesta versão, e então as linhas~\nref{line:modify:chngb}-\nref{line:modify:chnge} alteram o campo~$\V{field}$.
 Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica os ponteiros em nós ativos que apontam para ele.
 
 \begin{algorithm}
@@ -358,7 +357,7 @@ Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica 
 
 \Function{Copy}{$u$}
 	\State $u' = \Call{RawCopy}{u}$ \Comment{A função~\Call{RawCopy}{$u$} copia todos os campos de~$u$.}
-	\State $u'.\V{changes} = \{\}$ \label{line:copy:chngb} \Comment{Inicializando $\V{changes}$ com vetor vazio.}
+	\State $u'.\V{changes} = \{\}$ \label{line:copy:chngb} \Comment{Inicializa~$\V{changes}$ com vetor vazio.}
 	\State $u'.\ts = \cur$
 	\For{$(\V{version}', \V{field}', \V{value}') \in u.\V{changes}$}
 		\State $u'.\V{field}' = \V{value}'$
@@ -396,7 +395,7 @@ Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica 
 Assumimos que a função~\Call{RawCopy}{$u$} faz e devolve um novo nó com todos os campos com valores idênticos aos de~$u$. As linhas~\nref{line:copy:chngb}-\nref{line:copy:chnge} então modificam~$u'$ para este representar a versão mais atual de~$u$, aplicando todas as modificações de~$u.\changes$ e atualizando o campo~$\ts$. O~\keyword{if} da linha~\nref{line:copy:if1} lida com o caso em que~$u$ era um nó de entrada da versão~$\cur-1$, já que neste caso~$u'$ passa a ser o nó de entrada correspondente para a versão~$\cur$. O~\keyword{for} da linha~\nref{line:copy:for1} então muda os ponteiros de volta dos nós apontados por~$u$, já que agora~$u'$ é o nó ativo que aponta para eles. Por último, o~\keyword{for} da linha~\nref{line:copy:parents} modifica os ponteiros de nós ativos que apontavam para~$u$, fazendo-os apontar para~$u'$. Seja~$v$ um nó ativo tal que~$\funcAPI{Access}{v, \V{field}} = u$, queremos que~$\funcAPI{Access}{v, \V{field}} = u'$. Isso se reduz a três casos:
 \begin{enumerate}
 \item $v$ foi criado nessa versão --- Basta modificar diretamente o campo~$\V{field}$ em~$v$.
-\item $v$ tem espaço livre em~$v.\changes$ --- Adicionamos a modificação ao vetor~$\changes$, ou seja, adicionamos a tripla~$(\V{field}, \cur, u')$ a~$\changes$.
+\item $v$ tem espaço livre em~$v.\changes$ --- Adicionamos a modificação ao vetor~$\changes$, ou seja, adicionamos a tripla~$(\cur, \V{field}, u')$ a~$\changes$.
 \item $v$ não tem espaço livre em~$v.\changes$ --- Criamos uma cópia de~$v$, usando recursivamente a função~\textsc{Copy}, modificamos o campo~$\V{field}$ desta cópia, e atualizamos o vetor~$\parents$ de~$u'$ (que ainda aponta para~$v$ e não para~$v.\cp$).
 \end{enumerate}
 
@@ -404,23 +403,30 @@ Como cada nó é copiado no máximo uma vez por versão, a função sempre termi
 
 \subsection{Análise de espaço e tempo}
 
-A ideia do método é copiar os nós quando fazemos modificações em passos de modificação, mas guardam-se algumas modificações no mesmo nó para diminuir o número de cópias necessárias. É claro que, aumentando o tamanho do vetor~$\V{changes}$, o número de cópias diminui. Vamos mostrar que ter tamanho~$\V{in}$ é o bastante para que o método consuma espaço amortizado~$\Oh(1)$ por passo de modificação.
+A ideia do método é copiar os nós quando fazemos alterações em passos de modificação, mas registram-se algumas alterações no próprio nó para diminuir o número de cópias necessárias. É claro que, aumentando o tamanho do vetor~$\V{changes}$, o número de cópias diminui. Vamos mostrar que ter tamanho~$\V{in}$ é o bastante para que o método consuma espaço amortizado~$\Oh(1)$ por passo de modificação.
 
 Utilizaremos o método do potencial. Seja~$E_i$ o estado da estrutura (persistente) na~$i$-ésima versão, ou seja, depois da~$i$-ésima operação de modificação. Vamos associar um valor~$\Phi(E_i)$ a cada uma das versões da estrutura, com~$\Phi(E_0) = 0$ e~$\Phi(E_i) \geq 0$ para todo~$i > 0$. Seja~$O_i$ o número de nós criados pelo método descrito na~$i$-ésima operação de modificação. Então
 $$ \sum\limits_{i=1}^{m}{\left(O_i + \Phi(E_i) - \Phi(E_{i-1})\right)} = \left(\sum\limits_{i=1}^m{O_i}\right) + \Phi(E_m) - \Phi(E_0) \geq \sum\limits_{i=1}^m{O_i}. $$
 
 Dessa forma, ainda que calcular~$O_i$ seja complicado, se escolhemos~$\Phi$ tal que o cálculo de~${O_i + \Phi(E_i) - \Phi(E_{i-1})}$ seja simples, conseguimos assim um limite superior para o número de nós criados pelo método, que é~$\sum\limits_{i=1}^m{O_i}$.
 
-Queremos escolher~$\Phi$ de forma que~${O_i + \Phi(E_i) - \Phi(E_{i-1})}$ seja~$\Oh(M_i)$, onde~$M_i$ é o número de passos de modificação durante a~$i$-ésima operação de modificação. Para isso, queremos que o potencial ``cancele'' o número de nós adicionais criados indiretamente pelas chamadas recursivas de~\textsc{Copy}~(já que o número de nós criados diretamente em passos de modificação é no máximo~$M_i$). A escolha do potencial é~$\Phi(E_i) = A_i \cdot \V{in} - L_i$, onde~$A_i$ é o número de nós ativos em~$E_i$ e~$L_i$ é o número de espaços de modificação vazios em todos os nós ativos, ou seja, a soma do valor~$\V{in} - |u.\V{changes}|$ para todo nó ativo~$u$. Note que, como cada nó ativo tem no máximo~$\V{in}$ espaços livres,~$\Phi(E_i)$ nunca é negativo, e claramente~$\Phi(E_0) = 0$.
+Queremos escolher~$\Phi$ de forma que~${O_i + \Phi(E_i) - \Phi(E_{i-1})}$ seja~$\Oh(M_i)$, onde~$M_i$ é o número de passos de modificação durante a~$i$-ésima operação de modificação. Para isso, queremos que o potencial ``cancele'' o número de nós adicionais criados indiretamente pelas chamadas recursivas de~\textsc{Copy}~(já que o número de nós criados diretamente em passos de modificação é no máximo~$M_i$). A escolha do potencial é~$$\Phi(E_i) = \sum\limits_{u \text{ é ativo}}{|u.\changes|},$$ ou seja, o número de alterações armazenadas em todos os vetores~$\changes$ de todos os nós ativos em~$E_i$. É fácil ver que~$\Phi(E_i)$ nunca é negativo, e claramente~$\Phi(E_0) = 0$.
 
-Segundo a definição na Seção~\ref{sec:mod_comp}, um passo de modificação cria um novo nó, modifica um campo de um nó existente, usando para isso a função de interface~\API{Modify}, ou troca um nó de entrada. Se um passo de modificação cria um novo nó, o potencial não se modifica, já que~$A_i$ aumenta em~1 e~$L_i$ aumenta em~$\V{in}$. Além disso,~$O_i$ aumenta em~1. Seja~$N_i$ o número de tais nós criados durante a~$i$-ésima operação de modificação. Se um nó de entrada é trocado, nem o potencial nem~$O_i$ se alteram.
+Segundo a definição na Seção~\ref{sec:mod_comp}, um passo de modificação pode criar um novo nó, alterar um nó de entrada, ou, alterar um campo de um nó existente, usando para isso a função de interface~\API{Modify}. Vamos analisar cada um destes casos.
 
-Vamos considerar então nós criados pela função~\textsc{Copy} durante a~$i$-ésima operação de modificação. Esta função é uma função é uma função auxiliar e não é chamada diretamente durante os passos de modificação, apenas por~\API{Modify}~(linha~\nref{line:modify:copy}) e recursivamente pela própria~\textsc{Copy}~(linha~\nref{line:copy:copy}). Seja~$C_i$ o número de chamadas de~\textsc{Copy} feitas por~\API{Modify} e~$D_i$ o número de chamadas de~\textsc{Copy} feitas por~\textsc{Copy}.
+Se um passo de modificação cria um novo nó, o potencial não se modifica, já que o novo nó tem~$\changes$ vazio. Seja~$N_i$ o número de nós criados de tal forma durante a~$i$-ésima operação de modificação. É óbvio que~$O_i \geq N_i$.
 
-Temos que~$C_i \leq M_i$, já que~\API{Modify} chama~\textsc{Copy} no máximo uma vez, e~\API{Modify} é chamada no máximo uma vez por passo de modificação. Além disso, quando~\Call{Copy}{$u$} é chamada recursivamente, isso ocorreu pois~$u$ tinha o vetor~$\changes$ cheio, logo o potencial diminui em~$\V{in}$ nesse caso, já que o número de nós ativos~($A_i$) não muda, mas temos~$\V{in}$ mais espaços livres~($L_i$).
+Se um nó de entrada é trocado, o potencial não se altera, e nenhum nó é criado ou copiado.
 
-O~\keyword{for} da linha~\nref{line:copy:parents} pode adicionar mudanças aos vetores~$\V{changes}$ dos nós que apontam para~$u$~(linha~\nref{line:copy:changes}). Cada adição aumenta~$\Phi$ em 1. Seja~$y$ a quantidade de tais adições. Cada chamada de~\textsc{Copy} pode adicionar até~$\V{in}$ modificações, porém, quando~\textsc{Copy} é chamada recursivamente na linha~\nref{line:copy:copy}, essa adição não é feita, logo~$y \leq (C_i + D_i) \cdot \V{in} - D_i$. Utilizando a notação definida acima temos:
+Por fim, ao alterar um campo de um nó existente, usando a função de interface~\API{Modify}, nós podem ser copiados pelo uso da função~\textsc{Copy}.
+Vamos considerar então nós criados pela função~\textsc{Copy} durante a~$i$-ésima operação de modificação. Esta é uma função auxiliar e não é chamada diretamente durante os passos de modificação, apenas por~\API{Modify}~(linha~\nref{line:modify:copy} do Código~\ref{lst:modify}) e recursivamente pela própria~\textsc{Copy}~(linha~\nref{line:copy:copy} do Código~\ref{lst:nc_copy}). Seja~$C_i$ o número de chamadas de~\textsc{Copy} feitas por~\API{Modify} e~$D_i$ o número de chamadas de~\textsc{Copy} feitas por~\textsc{Copy}. Vale que~$O_i = N_i + C_i + D_i$.
 
+Temos que~$C_i \leq M_i$, já que~\API{Modify} chama~\textsc{Copy} no máximo uma vez, e~\API{Modify} é chamada no máximo uma vez por passo de modificação. Além disso, quando~\Call{Copy}{$u$} é chamada recursivamente, isso ocorreu pois~$u$ tinha o vetor~$\changes$ cheio, logo o potencial diminui em~$\V{in}$ nesse caso, já que~$u$ deixa de ser ativo e um novo nó ativo é criado com~$\changes$ vazio.
+
+O~\keyword{for} da linha~\nref{line:copy:parents} do Código~\ref{lst:nc_copy} pode adicionar mudanças aos vetores~$\V{changes}$ dos nós que apontam para~$u$~(linha~\nref{line:copy:changes}), ou seja, aumentar o potencial. Seja~$y$ a quantidade de tais adições. Cada chamada de~\textsc{Copy} pode adicionar até~$\V{in}$ modificações, porém, quando~\textsc{Copy} é chamada recursivamente na linha~\nref{line:copy:copy}, essa adição não é feita, já que a linhha~\nref{line:copy:changes} não pode ser executada na mesma iteração em que a linha~\nref{line:copy:copy} é executada. Logo~${y \leq (C_i + D_i) \cdot \V{in} - D_i}$.
+
+Dessa forma, o potencial só se altera por causa de chamadas recursivas de~\textsc{Copy}, ou por causa de adições ao vetor~$\changes$ de algum nó ativo, ou seja, vale que~$\Phi(E_i) = \Phi(E_{i-1}) - D_i \cdot in + y$.
+Utilizando a notação definida acima temos:
 \begin{align*}
 	O_i + \Phi(E_i) - \Phi(E_{i-1}) & \stackrel{\text{(1)}}{=} N_i + C_i + D_i - D_i \cdot \V{in} + y
 	\\ &\stackrel{\text{(2)}}{\leq} N_i + (1 + \V{in})\cdot C_i
@@ -428,10 +434,10 @@ O~\keyword{for} da linha~\nref{line:copy:parents} pode adicionar mudanças aos v
 	\\ &\stackrel{\text{(4)}}{=} \Oh(M_i)
 \end{align*}
 
-A igualdade~(1) vale pois~$O_i = N_i + C_i + D_i$ e pelas mudanças em~$\Phi$ discutidas,~(2) vale pois~$y \leq (C_i + D_i) \cdot \V{in} - D_i$, e assim cancelamos~$D_i$, (3) vale pois~$C_i \leq M_i$ e~(4) usa que~$N_i \leq M_i$ e~$\V{in}$ é uma constante.
+A igualdade~(1) vale pois~${O_i = N_i + C_i + D_i}$ e~${\Phi(E_i) = \Phi(E_{i-1}) - D_i \cdot in + y}$ discutidas,~(2) vale pois~${y \leq (C_i + D_i) \cdot \V{in} - D_i}$, e assim cancelamos~$D_i$, (3) vale pois~${C_i \leq M_i}$ e~(4) usa que~${N_i \leq M_i}$ e~${\V{in}}$ é uma constante.
 
 Isto prova que o espaço total gasto pela estrutura é~${\Oh(\sum\limits_{i=1}^m{M_i}) = \Oh(M)}$, ou seja, espaço amortizado constante por passo de modificação. Além disso, gasta-se tempo constante para criar cada nó, e cada chamada de~\textsc{Copy} cria um novo nó. Logo o consumo de tempo dos passos de modificação é limitado pela criação de nós, e os passos de acesso funcionam em tempo~$\Oh(1)$ usando a função~\API{Access}. Portanto, o tempo total consumido por esse método é~$\Oh(M+A)$, ou seja, tempo amortizado constante por passo de acesso ou modificação.
 
-Concluindo, este método transforma qualquer estrutura ligada com grau de entrada limitado por uma constante em uma estrutura parcialmente persistente, sem aumentar o consumo de tempo assintoticamente, apenas deixando esse tempo amortizado (se já não era). Variações desta técnica também permitem deixar a estrutura totalmente persistente~\cite{DriscollSST1989}, porém, são bem mais complicadas e usam EDs adicionais.
+Concluindo, este método transforma qualquer estrutura ligada com grau de entrada limitado por uma constante em uma estrutura parcialmente persistente, sem aumentar o consumo de tempo assintoticamente, apenas deixando esse tempo amortizado (se já não era). Variações desta técnica também permitem deixar a estrutura totalmente persistente~\cite{DriscollSST1989}, porém são bem mais complexos e usam EDs adicionais.
 
 \end{document}

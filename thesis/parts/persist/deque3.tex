@@ -606,7 +606,7 @@ Note que as operações~\API{PushFront} e~\API{PopFront} copiam o topo da deque,
 
 Os~\keyword{if}s das operações~\API{PopFront} e~\API{Front} checam os casos degenerados, já que, como a estrutura é regular, se uma das sub-deques de~$a$ é vazia então~$a$ é tanto o topo quanto o último nível da estrutura.
 
-A operação~\funcAPI{k-th}{d, k} não foi implementada, mas pode ser feita de forma um pouco mais complexa porém similar ao Código~\ref{lst:deque_kth}. A Tabela~\ref{tab:deque3_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo. A Tabela~\ref{tab:deque_persist_comp} compara o consume de tempo e espaço de todas as deques persistentes apresentadas neste trabalho.
+A operação~\funcAPI{k-th}{d, k} não foi implementada, mas pode ser feita de forma um pouco mais complexa porém similar ao Código~\ref{lst:deque_kth}. A Tabela~\ref{tab:deque3_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo. A Tabela~\ref{tab:deque_persist_comp} compara o consumo de tempo e espaço de todas as deques persistentes apresentadas neste trabalho.
 
 \begin{table} \centering
 \begin{tabular}{|l|c|c|c|c|}
@@ -621,7 +621,7 @@ A operação~\funcAPI{k-th}{d, k} não foi implementada, mas pode ser feita de f
 	\funcAPI{PopBack}{q}  & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Comparação do consumo de tempo e espaço das deques implementadas nos Capítulos~\ref{cap:deque1_persist},~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}, onde~$n$ é o tamanho da deque. \label{tab:deque_persist_comp}}
+	\caption{Comparação do consumo de tempo e espaço das implementações das deques descritas nos Capítulos~\ref{cap:deque1_persist},~\ref{cap:deque2_persist} e~\ref{cap:deque3_persist}, onde~$n$ é o tamanho da deque. \label{tab:deque_persist_comp}}
 \end{table}
 
 \end{document}
