@@ -284,7 +284,7 @@
 	\vfill
 	\begin{figure}
 		\centering
-		\begin{tikzpicture}[sibling distance=40pt, nodes={draw, minimum size=6mm}, edge from parent/.append style={<-, shorten <= 5pt, shorten >= 5pt}, level distance=40pt, level 3/.style={sibling distance=80pt}, level 1/.style={sibling distance=80pt}, scale=0.8]
+		\begin{tikzpicture}[sibling distance=30pt, nodes={draw, minimum size=6mm}, edge from parent/.append style={<-, shorten <= 5pt, shorten >= 5pt}, level distance=40pt, level 3/.style={sibling distance=80pt}, level 1/.style={sibling distance=80pt}, scale=0.8]
 
 			\Tree [.\node[minimum size=6mm](root){};
 			[.\node[orange](v3){3}; \edge[orange]; [.\node[orange](v2){2}; \edge[orange, visible on=<2->]; \node[visible on=<2->, orange](v1){1}; [.\node(v9){9}; ] ] \edge[alt={<1-2>{orange}{}}]; \node[alt={<1-2>{orange}{}}](v4){4}; ]
@@ -415,5 +415,105 @@
 	\end{tikzpicture}
 	\end{figure}
 \end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Árvore rubro-negra}
+	Implementação funcional: Totalmente persistente,~$\Oh(n \lg n)$ tempo e espaço.
+	\vfill
+	Implementação Node copying: Parcialmente persistente,~$\Oh(n \lg n)$ tempo e~$\Oh(n)$ espaço.
+	\vfill
+
+	\begin{tikzpicture}[
+	ed/.style = {densely dashed, shorten >= 5pt},
+	nodes = {draw, circle, minimum size = 8mm},
+	edge from parent path = {(\tikzparentnode) -- (\tikzchildnode)},
+	sibling distance=20pt,
+	n/.style = {draw=none},
+	r/.style = {fill=white},
+	b/.style = {fill=gray},
+	edge from parent/.append style={-, shorten >= 0, shorten <= 0}
+	]
+	\Tree [.\node[b]{7}; [.\node[b]{5}; [.\node[r]{1}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] [.\node[b]{10}; [.\node[r]{8}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] ]
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Localização de ponto}
+
+	\only<1>{
+	\begin{figure}
+	\centering
+	\begin{tikzpicture}[]
+
+	\newcounter{size}
+	\newcommand\polyg[2]{
+		\setcounter{size}{0}
+		\foreach \point [count=\i] in #1 {
+			\stepcounter{size}
+			\node[coordinate] (p1-\i) at \point {};
+		}
+		\fill[#2, opacity=0.3] (p1-1) \foreach \i in {2, ..., \value{size}} {-- (p1-\i)} -- cycle;
+		\draw[#2, opacity=1] (p1-1) \foreach \i in {2, ..., \value{size}} {-- (p1-\i)} -- cycle;
+	}
+
+	%\draw[opacity=0.2, dashed] (-8, 0) grid (2, 6);
+
+	\polyg {{(-7, 4), (-5, 5), (-3, 4), (-5, 1), (-7, 1)}}{blue};
+	\polyg {{(-2, 5), (-1, 4), (-1, 1), (0, 1), (1, 5)}}{violet};
+	\polyg {{(-2, 4), (-4, 1), (-2, 1)}}{brown};
+
+	\newcommand\drawpts[2]{ \foreach \point in #1 { \draw[fill=#2, color=#2] \point circle (0.075); }}
+
+	\drawpts{{(-5, 3)}}{blue};
+	\drawpts{{(-2.5, 2)}}{brown};
+	\drawpts{{(0, 4), (0, 2)}}{violet};
+	\drawpts{{(-3, 5), (-7, 5), (-2, 0)}}{black};
+
+	\draw[dashed, black] (-3, 5) -- (-3, 4);
+	\draw[dashed, black] (-7, 5) -- (-7, 4);
+	\draw[dashed, blue]  (-5, 3) -- (-5, 1);
+	\draw[dashed, brown]  (-2.5, 2) -- (-2.5, 1);
+	\draw[dashed, violet]  (0, 4) -- (0, 2);
+	\draw[dashed, violet]  (0, 2) -- (0, 1);
+
+	\end{tikzpicture}
+	\end{figure}}
+
+	\only<2>{
+	\begin{figure}
+	\centering
+	\begin{tikzpicture}[]
+
+	\newcommand\polyg[2]{
+		\setcounter{size}{0}
+		\foreach \point [count=\i] in #1 {
+			\stepcounter{size}
+			\node[coordinate] (p1-\i) at \point {};
+		}
+		\fill[#2, opacity=0.3] (p1-1) \foreach \i in {2, ..., \value{size}} {-- (p1-\i)} -- cycle;
+		\draw[#2, opacity=1] (p1-1) \foreach \i in {2, ..., \value{size}} {-- (p1-\i)} -- cycle;
+	}
+
+	%\draw[opacity=0.2, dashed] (-8, 0) grid (2, 6);
+
+	\polyg {{(-7, 4), (-5, 5), (-3, 4), (-5, 1), (-7, 1)}}{blue};
+	\polyg {{(-2, 5), (-1, 4), (-1, 1), (0, 1), (1, 5)}}{violet};
+	\polyg {{(-2, 4), (-4, 1), (-2, 1)}}{brown};
+
+	\draw[dashed] (-7, 0) -- (-7, 6);
+	\draw[dashed] (-5, 0) -- (-5, 6);
+	\draw[dashed] (-4, 0) -- (-4, 6);
+	\draw[dashed] (-3, 0) -- (-3, 6);
+	\draw[dashed] (-2, 0) -- (-2, 6);
+	\draw[dashed] (-1, 0) -- (-1, 6);
+	\draw[dashed] (0, 0) -- (0, 6);
+	\draw[dashed] (1, 0) -- (1, 6);
+
+	\end{tikzpicture}
+	\end{figure}
+	}
+\end{frame}
+
+
 
 \end{document}
