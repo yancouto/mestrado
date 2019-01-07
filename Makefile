@@ -8,4 +8,6 @@ endif
 ifndef NO_QUALI
 	$(MAKE) full -C quali
 endif
-
+ifndef NO_DEFESA
+	$(MAKE) full -C defesa
+endif

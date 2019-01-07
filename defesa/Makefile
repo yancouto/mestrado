@@ -3,9 +3,9 @@ all:
 	latexmk --pdf -lualatex -shell-escape main.tex
 
 full:
-	texliveonfly -c lualatex --arguments="-shell-escape -interaction=nonstopmode" main.tex
-	latexmk --pdf -lualatex -shell-escape main.tex
-	cp main.pdf ../../docs/html/quali-slides.pdf
+	-texliveonfly -c lualatex --arguments="-shell-escape -interaction=nonstopmode" main.tex
+	-latexmk --pdf -lualatex -shell-escape -interaction=nonstopmode main.tex
+	cp main.pdf ../docs/html/defesa-slides.pdf
 
 pvc:
 	latexmk --pdf -lualatex -shell-escape -pvc -interaction=nonstopmode main.tex
