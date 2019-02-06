@@ -17,11 +17,13 @@
 
 Neste capítulo, apresentamos uma outra solução para o problema do Ancestral de Nível. Esta solução, apesar de um pouco mais complicada, requer processamento que consome espaço e tempo constante por nó adicionado. Esta solução foi dada inicialmente por Myers~\cite{Myers83}.
 
+Como lidaremos com representações numéricas em grande detalhe, neste capítulo usaremos também notação de cadeias, na qual~$21^5$ representa a cadeia~$211111$ e não o número~$4084101$.
+
 \section{Definição e propriedades}
 
-Um número \deff{skew-binary} de tamanho~$n$ é uma string~${a = a_n a_{n-1} \cdots a_1}$ tal que~${a_i \in \{0, 1, 2\}}$ e~$a_n \neq 0$. Denotamos o tamanho de~$a$ por~$|a| = n$. O valor de tal número é~${\V(a) \coloneqq \sum\limits_{i = 1}^n{a_i (2^i - 1)}}$. Note que múltiplas strings podem ter o mesmo valor, por exemplo, ambos~21 e~100 têm valor~7.
+Um número \deff{skew-binary} de tamanho~$n$ é uma cadeia~${a = a_n a_{n-1} \cdots a_1}$ tal que~${a_i \in \{0, 1, 2\}}$ e~$a_n \neq 0$. Denotamos o tamanho de~$a$ por~$|a| = n$. O valor de tal número é~${\V(a) \coloneqq \sum\limits_{i = 1}^n{a_i (2^i - 1)}}$. Note que múltiplas cadeias podem ter o mesmo valor, por exemplo, tanto~21 quanto~100 têm valor~7.
 
-Para todo~$a$ tal que~$\V(a) \neq 0$, defina~$\NZ(a) \coloneqq \min\{i \in [n] : a_i \neq 0\}$, ou seja, a posição do dígito não nulo menos significativo de~$a$. Dizemos que um número skew-binary é \deff{canônico} se todos os seus dígitos são~0 ou~1 exceto, possivelmente, o dígito não nulo menos significativo. Mais formalmente, se~${a_i = 2}$ implica que ${i = \NZ(a)}$. Seja~$\CSB$ o conjunto de todos os números skew-binary.
+Para todo~$a$ tal que~$\V(a) \neq 0$, defina~$\NZ(a) \coloneqq \min\{i \in [n] : a_i \neq 0\}$, ou seja, a posição do dígito não nulo menos significativo de~$a$. Dizemos que um número skew-binary é \deff{canônico} se todos os seus dígitos são~0 ou~1 exceto, possivelmente, o dígito não nulo menos significativo. Mais formalmente, se~${a_i = 2}$ implica que ${i = \NZ(a)}$. Seja~$\CSB$ o conjunto de todos os números skew-binary canônicos.
 
 Esta igualdade será útil na prova dos lemas:
 
@@ -47,7 +49,7 @@ Esta igualdade será útil na prova dos lemas:
 O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$ e~$20^{n-1}$, respectivamente, e também que qualquer representação de~$x$ em CSB usa~$\floor{\lg(x + 1)}$ dígitos.
 
 \begin{theorem} \label{thm:csbbij}
-	Cada número tem uma representação única em CSB. Equivalentemente,~${\V: \CSB \rightarrow \mathbb{N}}$ é uma função bijetora.
+	Cada número natural tem uma representação única em CSB. Equivalentemente,~${\V: \CSB \rightarrow \mathbb{N}}$ é uma função bijetora.
 \end{theorem}
 \begin{proof}
 	Vamos provar que~$\V$ é injetora, ou seja, se~${a \neq b}$ então~${\V(a) \neq \V(b)}$. Suponha, sem perda de generalidade, que~$|a| \geq |b|$. Se~$|a| > |b|$, então, pelo~Lema~\ref{lem:csbdig},
@@ -61,7 +63,7 @@ O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$
 	Logo existe~$a \in \CSB$ tal que~${\V(a) = y - (2^n - 1)}$, mas então~$b = 1a \in \CSB$ e~$\V(b) = y$.
 \end{proof}
 
-Como cada número tem uma representação única em~CSB, podemos definir uma função~${\R: \mathbb{N} \rightarrow \CSB}$ tal que~$\V(\R(x)) = x$ para todo~$x \in \mathbb{N}$.
+Como cada número natural tem uma representação única em~CSB, podemos definir uma função~${\R: \mathbb{N} \rightarrow \CSB}$ tal que~$\V(\R(x)) = x$ para todo~$x \in \mathbb{N}$, ou seja,~$\R(x)$ é a representação skew-binary canônica de~$x$.
 
 \begin{lemma} \label{lem:csbsub}
 	Seja~$a \in \CSB$ tal que~$\V(a) > 0$. Se~$\NZ(a) = 1$ então~$\V(a_n \cdots a_2 (a_1-1)) = \V(a) - 1$, caso contrário~${\V(a_n \cdots a_{\NZ(a)+1} (a_{\NZ(a)} - 1) 2 0^{\NZ(a) - 2}) = \V(a) - 1}$.
@@ -81,7 +83,59 @@ No problema do Ancestral de Nível, para avaliar~$\LA(k, u)$, temos um nó~$u$ d
 
 Este problema pode ser interpretado de outra forma. Temos um número~$x$ e queremos transformá-lo em~$y \leq x$, a cada passo diminuindo o valor de~$x$. Com esta interpretação, na solução da Subseção~\ref{subsec:pot2}, que tenta transformar~$\Dep(u)$ em~$\Dep(v)$, a partir de cada número podíamos subtrair qualquer potência de dois. Note que diminuir o valor de um número por~$z$ é equivalente a escolher o~$z$-ésimo ancestral de um nó.
 
-Vamos considerar uma solução alternativa para este problema, na qual a partir de um número~$x$ positivo podemos pular para os números~$x-1$ ou~$\J(x)$, onde~${\J(x) \coloneqq x - (2^{\NZ(\R(x))} - 1)}$, ou seja, se considerarmos~$\R(x)$, a representação em~skew-binary canônico de~$x$,~$\J(x)$ consiste em diminuir de um o dígito não nulo menos significativo de~$\R(x)$. Por exemplo, se~$x = 13$, então~${\R(x) = 120}$ e~${\J(x) = \V(110) = 10}$.
+Vamos considerar uma solução alternativa para este problema, na qual a partir de um número~$x$ positivo podemos pular para os números~$x-1$ ou~$\J(x)$, onde~${\J(x) \coloneqq x - (2^{\NZ(\R(x))} - 1)}$, ou seja, se considerarmos~$\R(x)$, a representação skew-binary canônica de~$x$,~$\J(x)$ consiste em diminuir de um o dígito não nulo menos significativo de~$\R(x)$. Por exemplo, se~$x = 13$, então~${\R(x) = 120}$ e~${\J(x) = \V(110) = 10}$. A Figura~\ref{fig:ex_rj} dá os valores de~$\R$ e~$\J$ para números pequenos.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{tabular}{|c||c|c|}
+\hline
+$x$ & $\R(x)$ & \J(x) \\ \hline
+$0$ & $0$ & $0$ \\
+$1$ & $1$ & $0$ \\
+$2$ & $2$ & $1$ \\
+$3$ & $10$ & $1$ \\
+$4$ & $11$ & $3$ \\
+$5$ & $12$ & $4$ \\
+$6$ & $20$ & $3$ \\
+$7$ & $100$ & $0$ \\
+$8$ & $101$ & $7$ \\
+$9$ & $102$ & $8$ \\
+$10$ & $110$ & $7$ \\
+$11$ & $111$ & $10$ \\
+$12$ & $112$ & $11$ \\
+$13$ & $120$ & $10$ \\
+$14$ & $200$ & $7$ \\
+$15$ & $1000$ & $0$ \\
+\hline
+\end{tabular}
+
+\begin{scope}[-latex', xshift=0.05cm, yshift=3.5cm, y=0.48cm, out=30, in=-30]
+\newcommand{\dedges}[2]{\path (0, -#1) edge[out=20, in=-20] (0, -#2); }
+\newcommand{\dedge}[2]{\path (0, -#1) edge[shorten >=0.175cm] (0, -#2); }
+\newcommand{\dedgel}[2]{\path (0, -#1) edge[shorten >=0.35cm] (0, -#2); }
+\dedges{1}{0}
+\dedges{2}{1}
+\dedge{3}{1}
+\dedges{4}{3}
+\dedges{5}{4}
+\dedge{6}{3}
+\path (0, -7) edge[shorten >=0.175cm] (0, 0);
+%\dedgel{7}{0}
+\dedges{8}{7}
+\dedges{9}{8}
+\dedge{10}{7}
+\dedges{11}{10}
+\dedges{12}{11}
+\dedge{13}{10}
+\dedgel{14}{7}
+\path (0, -15) edge[shorten >=0.38cm] (0, 0);
+%\dedge{15}{0}
+\path (1, -2) rectangle (0, 16);
+\end{scope}
+\end{tikzpicture}
+\caption{Valores das funções~$\R$ e~$\J$ para valores pequenos. \label{fig:ex_rj}}
+\end{figure}
 
 Considere o seguinte algoritmo, que transforma~$x$ em~$y$ (inicialmente~$x > y$):
 \begin{algorithm}[h]
