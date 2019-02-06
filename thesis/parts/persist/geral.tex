@@ -9,7 +9,7 @@ Nos capítulos anteriores, discutimos como tornar persistentes estruturas de dad
 
 \section{Modelo de computação} \label{sec:mod_comp}
 
-Para tomar uma abordagem tão geral, é necessário definir formalmente o conceito de estrutura de dados.  Usaremos o modelo de~\deff{estruturas ligadas}, no qual uma estrutura de dados é um conjunto de \emph{nós}, ou \emph{objetos}, cada um contendo um número constante de campos. Cada campo pode armazenar um valor (um inteiro ou booleano, por exemplo) ou um ponteiro para outro nó. Ponteiros também podem armazenar o valor especial~\keyword{null}, que indica que não estão apontando para nenhum nó.  Acesso à estrutura é dado por um número constante de~\deff{nós de entrada}.
+Para tomar uma abordagem tão geral, é necessário definir formalmente o conceito de estrutura de dados.  Usaremos o modelo de~\deff{estruturas ligadas}, no qual uma estrutura de dados é um conjunto de \emph{nós}, cada um contendo um número constante de campos. Cada campo pode armazenar um valor (um inteiro ou booleano, por exemplo) ou um ponteiro para outro nó. Ponteiros também podem armazenar o valor especial~\keyword{null}, que indica que não estão apontando para nenhum nó.  Acesso à estrutura é dado por um número constante de~\deff{nós de entrada}.
 
 Uma pilha implementada com lista ligada, como no Capítulo~\ref{cap:pilha_persist}, é uma estrutura desse tipo, onde o primeiro elemento da lista é o nó de entrada. A estrutura recursiva para deques do Capítulo~\ref{cap:deque2_persist} também é dessa forma, e tem nós de dois tipos: os nós da estrutura e nós que são os pares. O nó de entrada também é o primeiro nó da estrutura.  Uma árvore de busca binária também é deste tipo, já que cada nó tem dois ponteiros (para o filho esquerdo e direito), e um valor; e a raiz é o nó de entrada. A estrutura para resolver o problema do Ancestral de Nível no Capítulo~\ref{cap:ancestrais} \textbf{não} é deste tipo, pois o pré-processamento armazena em cada nó um vetor de tamanho~$\floor{\lg d}$, onde~$d$ é a altura do nó.
 
@@ -85,7 +85,7 @@ Após montar a árvore de versões, realizamos uma busca em profundidade (DFS) n
 
 Dessa forma, no passo~3, podemos processar uma  um os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a cada um deles termina, a estrutura volta a estar na versão~$i$. No passo~4 de~$v_i$, revertemos as mudanças feitas no passo~2 para~$v_i$.
 
-Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um objeto, guardamos uma tripla~$(\V{obj}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do objeto~$\V{obj}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma, por exemplo, usando um objeto para armazenar os nós de entrada.
+Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um nó, guardamos uma tripla~$(\V{u}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do nó~$\V{u}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma, por exemplo, usando um nó para armazenar os nós de entrada.
 
 Como não impusemos restrições nas operações de mudança, elas podem modificar um mesmo campo muitas vezes, ou utilizar o valor de um campo previamente modificado. Logo, a ordem em que as operações ocorreram é relevante e, em particular, é necessário que o valor original seja restaurado, e não um valor intermediário. Para isso, desfazemos as mudanças na ordem inversa que foram feitas, usando uma pilha.
 
@@ -101,8 +101,8 @@ Como não impusemos restrições nas operações de mudança, elas podem modific
 		\State \Call{DFS}{$v_k$}
 	\EndFor
 	\While{$\V{mod}.\Call{Size}{\null} > 0$} \label{line:off:while}
-		\State $(\V{obj}, \V{field}, \V{oldValue}) = \V{mod}.\Call{Pop}{\null}$
-		\State $\V{obj}.\V{field} = \V{oldValue}$
+		\State $(\V{u}, \V{field}, \V{oldValue}) = \V{mod}.\Call{Pop}{\null}$
+		\State $\V{u}.\V{field} = \V{oldValue}$
 	\EndWhile
 \EndFunction
 
@@ -194,7 +194,7 @@ Esse método torna a estrutura totalmente persistente com aumento no consumo de 
 
 É possível tornar uma estrutura ligada parcialmente persistente aumentando os seus nós para armazenar todas as mudanças já feitas. Essa técnica foi inicialmente apresentada por Driscoll et al.~\cite{DriscollSST1989}.
 
-Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor que armazena pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou o valor daquele campo para~$v$. Em vez de modificar um campo de um objeto, adiciona-se um par no vetor correspondente, indicando a versão da estrutura que está sendo criada e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado pelos índices.
+Modifica-se cada nó da estrutura para que cada campo seja substituído por um vetor que armazena pares~$(i, v)$, indicando que a~$i$-ésima operação de modificação alterou o valor daquele campo para~$v$. Em vez de modificar um campo de um nó, adiciona-se um par no vetor correspondente, indicando a versão da estrutura que está sendo criada e o novo valor para o campo. Como estamos fazendo uma implementação parcialmente persistente, o índice de versão adicionado é sempre maior que todos os anteriores, dessa forma o vetor se mantém ordenado pelos índices.
 
 Para realizar um acesso ao campo~$c$ na versão~$i$, é necessário procurar no vetor associado a~$c$ o par com maior índice que não excede~$i$, ou seja, a última atualização feita até no máximo a versão~$i$. Isso pode ser feito com busca binária em tempo logarítmico no tamanho do vetor, já que a informação está armazenada em ordem. Diferente das outras técnicas, esta aumenta também o tempo de um passo de acesso.
 
