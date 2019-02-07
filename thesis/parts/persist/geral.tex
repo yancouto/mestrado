@@ -32,7 +32,7 @@ Essas definições descrevem uma estrutura de dados efêmera. Nosso objetivo é 
 
 Consideramos que o número total de operações de modificação é~$m$, e o número de operações de acesso é~$a$. Da mesma forma, o número total de passos de modificação é~$M$ e de passos de acesso é~$A$. A $i$-ésima operação de modificação cria a versão~$i$ da estrutura. A versão~0 é a estrutura vazia. Se estamos considerando uma estrutura totalmente persistente, temos uma árvore de versões, caso contrário, uma lista.
 
-Consideramos que cada operação recebe também, além de seus parâmetros normais (por exemplo, um valor para ser encontrado, no caso de uma busca em ABB) , um inteiro que indica sob qual versão deve ser feita essa operação. Dizemos que~$i \rightarrow j$ se a operação que cria a versão~$j$ é feita sobre a versão~$i$.
+Consideramos que cada operação recebe também, além de seus parâmetros normais (por exemplo, um valor para ser encontrado, no caso de uma busca em ABB), um inteiro que indica sob qual versão deve ser feita essa operação. Dizemos que~$i \rightarrow j$ se a operação que cria a versão~$j$ é feita sobre a versão~$i$.
 
 Note que, apesar de estarmos tratando apenas de estruturas ligadas, a versão persistente desta estrutura pode não ser ligada. Por exemplo, um dos métodos poderia armazenar um vetor de tamanho variável em cada nó, logo a estrutura deixaria de ser ligada.
 
@@ -75,7 +75,7 @@ edge from parent/.append style={-, shorten >= 0, shorten <= 0}
 	\caption{Árvore de versões do Exemplo~\ref{ex:pilha}, com argumentos para fazer cada operação de modificação indicados. Os nós mais claros (cinzentos) indicam as operações de acesso, conectadas à versão na qual são realizadas.} \label{fig:vertree_ex}
 \end{figure}
 
-Após montar a árvore de versões, realizamos uma busca em profundidade (DFS) nesta árvore, seguindo a seguinte ideia:
+Após montar a árvore de versões, realizamos uma busca em profundidade (DFS) nesta árvore, seguindo a ideia abaixo:
 \begin{enumerate}
 	\item Ao acessar um vértice~$v_i$ na DFS, a estrutura está na versão~$j$, onde~$j \rightarrow i$.
 	\item Aplicamos a operação, transformando a versão~$j$ em~$i$.
@@ -83,7 +83,7 @@ Após montar a árvore de versões, realizamos uma busca em profundidade (DFS) n
 	\item Ao final do acesso ao vértice~$v_i$, revertemos as mudanças feitas, como explicado adiante, e a estrutura está novamente na versão~$j$.
 \end{enumerate}
 
-Dessa forma, no passo~3, podemos processar uma  um os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a cada um deles termina, a estrutura volta a estar na versão~$i$. No passo~4 de~$v_i$, revertemos as mudanças feitas no passo~2 para~$v_i$.
+Dessa forma, no passo~3, podemos processar um a um os nós que são filhos de~$v_i$ recursivamente, já que, devido ao passo~4, quando o acesso a cada um deles termina, a estrutura volta a estar na versão~$i$. No passo~4 de~$v_i$, revertemos as mudanças feitas no passo~2 para~$v_i$.
 
 Para reverter mudanças de forma genérica, sempre que um passo de modificação altera um campo de um nó, guardamos uma tripla~$(\V{u}, \V{field}, \V{oldValue})$ indicando que o campo~$\V{field}$ do nó~$\V{u}$ mudou de valor, e seu valor anterior era~$\V{oldValue}$. Isso é informação o bastante para, ao final do procedimento, reverter essa mudança. Se o passo de modificação altera um nó de entrada, este também pode ser armazenado desta forma, por exemplo, usando um nó para armazenar os nós de entrada.
 
@@ -392,7 +392,7 @@ Resta detalhar a função~\textsc{Copy}, que cria a cópia de um nó e modifica 
 \end{algorithmic}
 \end{algorithm}
 
-Assumimos que a função~\Call{RawCopy}{$u$} faz e devolve um novo nó com todos os campos com valores idênticos aos de~$u$. As linhas~\nref{line:copy:chngb}-\nref{line:copy:chnge} então modificam~$u'$ para este representar a versão mais atual de~$u$, aplicando todas as modificações de~$u.\changes$ e atualizando o campo~$\ts$. O~\keyword{if} da linha~\nref{line:copy:if1} lida com o caso em que~$u$ era um nó de entrada da versão~$\cur-1$, já que neste caso~$u'$ passa a ser o nó de entrada correspondente para a versão~$\cur$. O~\keyword{for} da linha~\nref{line:copy:for1} então muda os ponteiros de volta dos nós apontados por~$u$, já que agora~$u'$ é o nó ativo que aponta para eles. Por último, o~\keyword{for} da linha~\nref{line:copy:parents} modifica os ponteiros de nós ativos que apontavam para~$u$, fazendo-os apontar para~$u'$. Seja~$v$ um nó ativo tal que~$\funcAPI{Access}{v, \V{field}} = u$, queremos que~$\funcAPI{Access}{v, \V{field}} = u'$. Isso se reduz a três casos:
+Assumimos que a função~\Call{RawCopy}{$u$} cria e devolve um novo nó com todos os campos com valores idênticos aos de~$u$. As linhas~\nref{line:copy:chngb}-\nref{line:copy:chnge} então modificam~$u'$ para este representar a versão mais atual de~$u$, aplicando todas as modificações de~$u.\changes$ e atualizando o campo~$\ts$. O~\keyword{if} da linha~\nref{line:copy:if1} lida com o caso em que~$u$ era um nó de entrada da versão~$\cur-1$, já que neste caso~$u'$ passa a ser o nó de entrada correspondente para a versão~$\cur$. O~\keyword{for} da linha~\nref{line:copy:for1} então muda os ponteiros de volta dos nós apontados por~$u$, já que agora~$u'$ é o nó ativo que aponta para eles. Por último, o~\keyword{for} da linha~\nref{line:copy:parents} modifica os ponteiros de nós ativos que apontavam para~$u$, fazendo-os apontar para~$u'$. Seja~$v$ um nó ativo tal que~$\funcAPI{Access}{v, \V{field}} = u$, queremos que~$\funcAPI{Access}{v, \V{field}} = u'$. Isso se reduz a três casos:
 \begin{enumerate}
 \item $v$ foi criado nessa versão --- Basta modificar diretamente o campo~$\V{field}$ em~$v$.
 \item $v$ tem espaço livre em~$v.\changes$ --- Adicionamos a modificação ao vetor~$\changes$, ou seja, adicionamos a tripla~$(\cur, \V{field}, u')$ a~$\changes$.

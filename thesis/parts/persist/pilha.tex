@@ -189,7 +189,7 @@ A Tabela~\ref{tab:pilha_persist} mostra o consumo de tempo e espaço de uma pilh
 \begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
-	& Representação Binária & Skew-Binary \\ \hline
+	Operação & Representação Binária & Skew-Binary \\ \hline
 	\funcAPI{Stack}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Push}{p, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Pop}{p} & $\Oh(1)$ & $\Oh(1)$ \\
@@ -197,7 +197,7 @@ A Tabela~\ref{tab:pilha_persist} mostra o consumo de tempo e espaço de uma pilh
 	\funcAPI{Size}{p} & $\Oh(1)$ & $\Oh(1)$ \\
 	\funcAPI{k-th}{p, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Consumo de tempo e espaço da implementação de uma pilha de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho atual da pilha. \label{tab:pilha_persist}}
+	\caption{Consumo de tempo e espaço da implementação de uma pilha de acesso aleatório persistente, usando cada uma das implementações de Ancestral de Nível, onde~$n$ é o tamanho atual da estrutura da pilha persistente. \label{tab:pilha_persist}}
 \end{table}
 
 \section{Filas persistentes}
@@ -221,7 +221,7 @@ Filas são estruturas quase tão simples quanto pilhas. Elas são listas, e perm
 		\\ Devolve o~\mbox{$k$-ésimo} elemento da fila~$q$.
 \end{itemize}
 
-É possível, como com pilhas, implementar uma fila usando lista ligada. A lista torna-se uma árvore quando se adiciona a persistência. Seria então necessário usar a solução para o problema do~Ancestral de Nível nas operações~\funcAPI{k-th}{q, k} e~\funcAPI{Last}{q}.
+É possível, como com pilhas, implementar uma fila usando lista ligada. A lista torna-se uma árvore quando se adiciona a persistência. Seria então necessário usar a solução para o problema do~Ancestral de Nível nas operações~\funcAPI{k-th}{q, k} e~\funcAPI{First}{q}.
 Utilizaremos, entretanto, as próprias funções de pilha para implementar uma fila.
 
 Uma fila é representada por um par em que o primeiro elemento é uma pilha e o segundo é o número de elementos que já foram removidos da fila. No pseudocódigo, usaremos que~$(p,\,r)$ cria um par ordenado contendo a pilha~$p$ e um inteiro~$r$, e todo par tem os campos~$\V{stack}$ e~$\V{rem}$ contendo cada um de seus elementos.
@@ -267,7 +267,7 @@ Desde que a implementação da pilha seja persistente, a implementação da fila
 \begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
-	& Representação Binária & Skew-Binary \\ \hline
+	Operação & Representação Binária & Skew-Binary \\ \hline
 	\funcAPI{Queue}{} & $\Oh(1) / \Oh(1)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Enqueue}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{Dequeue}{q} & $\Oh(1)$ & $\Oh(1)$ \\
@@ -275,7 +275,7 @@ Desde que a implementação da pilha seja persistente, a implementação da fila
 	\funcAPI{First}{q} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\
 	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Consumo de tempo e espaço da implementação de uma fila de acesso aleatório persistente, usando cada uma das implementações de pilha persistente, onde~$n$ é o tamanho atual da fila. \label{tab:fila_persist}}
+	\caption{Consumo de tempo e espaço da implementação de uma fila de acesso aleatório persistente, usando cada uma das implementações de pilha persistente, onde~$n$ é o tamanho atual da estrutura da fila persistente. \label{tab:fila_persist}}
 \end{table}
 
 \end{document}

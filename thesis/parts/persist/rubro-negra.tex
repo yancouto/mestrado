@@ -47,7 +47,7 @@ edge from parent/.append style={-, shorten >= 0, shorten <= 0}
 ed/.style = {densely dashed, shorten >= 5pt}]
 \Tree [.\node[b]{7}; [.\node[b]{5}; [.\node[r]{1}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] [.\node[b]{10}; [.\node[r]{8}; \edge[ed];\node[n]{}; \edge[ed];\node[n]{}; ] \edge[ed];[.\node[n]{}; ] ] ]
 \end{tikzpicture}
-\caption{Exemplo de árvore rubro-negra. Como no resto das figuras do capítulo, os nós negros têm fundo cinza e os nós vermelhos têm fundo branco. Nas próximas figuras, o valor armazenado em cada nó não é especificado.} \label{fig:arv_bin_ex}
+\caption{Exemplo de árvore rubro-negra. Como nas outras figuras do capítulo, os nós negros têm fundo cinza e os nós vermelhos têm fundo branco. Nas próximas figuras, o valor armazenado em cada nó não é especificado.} \label{fig:arv_bin_ex}
 \end{figure}
 
 Uma árvore rubro-negra satisfaz as seguintes propriedades rubro-negras:
@@ -242,7 +242,7 @@ Para arrumar a possível violação da propriedade~1 ou~2, vamos fazer um laço 
 \item $x$ é vermelho.
 \item Se~$x$ é a raiz, a propriedade~1 é violada.
 \item Se~$x$ tem pai vermelho, a propriedade~2 é violada.
-\item Nenhuma propriedades é violada por outros nós.
+\item Nenhuma propriedade é violada por outros nós.
 \end{enumerate}
 
 Numa iteração deste laço, vamos ou acabar com todas as violações, ou mudar~$x$ para um nó de altura menor. Dessa forma ``subimos'' a violação, e conseguimos acabar com todas as violações em tempo~$\Oh(\lg n)$, pois a árvore é balanceada.
@@ -479,7 +479,7 @@ A função~\Call{MinElement}{$u$} devolve um nó com menor valor da subárvore d
 
 A função~\Call{Transplant}{$u, x$} substitui o nó~$u$ pelo nó~$x$. Para fazer isso, ela faz o pai de~$u$ apontar para~$x$ em vez de~$u$ (tratando o caso quando~$u$ é raiz). A função não modifica os filhos de~$u$ ou~$x$.
 
-A linha~\nref{line:rmabb:findb} busca pelo nó~$u$ com valor~$\val$. O~\keyword{if} da linha~\nref{line:rmabb:if1} trata o caso em que~$u$ não tem filho direito, substituindo-o por seu filho esquerdo, usando a função~\textsc{Transplant}. Note que, ao final da função, o nó~$u$ aponta para um filho que não tem ponteiro de pai para~$u$, mas isto não é um problema pois o nó~$u$ foi removido da árvore.
+Na operação~\funcAPI{Remove}{\V{value}}, a linha~\nref{line:rmabb:findb} busca pelo nó~$u$ com valor~$\val$. O~\keyword{if} da linha~\nref{line:rmabb:if1} trata o caso em que~$u$ não tem filho direito, substituindo-o por seu filho esquerdo, usando a função~\mbox{\textsc{Transplant}}. Note que, ao final da função, o nó~$u$ aponta para um filho que não tem ponteiro de pai para~$u$, mas isto não é um problema pois o nó~$u$ foi removido da árvore.
 
 Se~$u$ tem filho direito, a linha~\nref{line:rmabb:minb} busca o nó~$x$, mínimo da subárvore direita de~$u$. Este nó é trocado por seu filho direito e~$u$ é trocado por este nó. Após a chamada de~\Call{Transplant}{$u, x$}, o nó~$x$ é inválido pois, apesar de estar no lugar de~$u$, tem ponteiros em~$\child$ que não são válidos, por isso a linha~\nref{line:rmabb:cpchild} copia os filhos de~$u$ para~$x$. Note que o código funciona mesmo quando~$x$ é o próprio filho direito de~$u$.
 
@@ -510,7 +510,7 @@ Para remover um nó de uma árvore rubro-negra, fazemos como em uma ABB normal, 
 
 Pelas propriedades~2 e~3, quando um nó~$u$ não tem o filho direito, a estrutura de sua subárvore pode ser apenas uma das três ilustradas na Figura~\ref{fig:rbnorchild}.
 Se a versão~\Call{Transplant}{$u, x$} de árvores rubro-negras também copiar a cor de~$u$ para~$x$, caso este não seja nulo, todas as propriedades rubro-negras continuam a ser respeitadas nas árvores~(b) e~(c), quando~$u$ é substituído por seu filho esquerdo. Na árvore~(a),~$u$ é removido e substituído por~\keyword{null}, logo os caminhos até links nulos que passavam por~$u$ agora têm um nó negro a menos. Se~$u$ for raiz, a árvore final é vazia e segue todas as propriedades.
-Usamos então a função auxiliar~\textsc{AddBlack}, que arruma a violação da propriedade~3, e será discutida na próxima seção.
+Usamos então a função auxiliar~\textsc{AddBlack}, que corrige a violação da propriedade~3, e será discutida na próxima seção.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -617,7 +617,7 @@ banyc/.style = {pattern=dots, pattern color=black, preaction={fill, gray}}
 
 	A Figura~\ref{fig:rmrbc1} mostra esse caso. O nó pontilhado indica que este nó pode ser tanto vermelho quanto negro. Todas as figuras assumem que~$x$ é filho esquerdo. O nó~$x$ pode não existir, este representa apenas uma direção a partir de~$y$.
 
-	Pintamos~$z$ de vermelho e~$y$ de preto. Dessa forma, como os filhos de~$z$ são negros (ou não existem), a propriedade~2 não é quebrada, e temos um nó negro a mais nos caminhos que passam por~$y$ e~$x$. Se~$y$ é vermelho, o laço termina pois todas as propriedades foram restauradas, caso contrário, não é possível pintar~$y$ de preto duas vezes, e os caminhos que vão do pai de~$y$ na direção de~$y$ têm um nó preto a menos que os caminhos que vão na outra direção. Assim, recomeçamos o laço trocando~$y$ por seu pai e~$\side$ pelo lado apropriado.
+	Pintamos~$z$ de vermelho e~$y$ de preto. Dessa forma, como os filhos de~$z$ são negros (ou não existem), a propriedade~2 não é violada, e temos um nó negro a mais nos caminhos que passam por~$y$ e~$x$. Se~$y$ é vermelho, o laço termina pois todas as propriedades foram restauradas, caso contrário, não é possível pintar~$y$ de preto duas vezes, e os caminhos que vão do pai de~$y$ na direção de~$y$ têm um nó preto a menos que os caminhos que vão na outra direção. Assim, recomeçamos o laço trocando~$y$ por seu pai e~$\side$ pelo lado apropriado.
 
 	Se~$y$ for a raiz, o pai desta é~\keyword{null}, e o laço deve acabar neste caso, já que não é um problema todos os caminhos a partir da raiz terem um preto a menos. Isso apenas significa que a altura negra (quantidade de nós negros dos caminhos da raiz até qualquer link nulo) da árvore diminui após esta remoção. % TODO: traduzir link
 
@@ -748,13 +748,13 @@ Dessa forma, exceto por mudanças de cor, apenas um número constante de mudanç
 
 A implementação da função~\textsc{AddBlack} no Código~\ref{lst:addblack} segue os casos descritos nesta seção. É necessário cuidado ao modificar a cor de um nó, já que é necessário fazer essa modificação na versão mais atual do nó. Por isso, na aplicação dos casos, as mudanças de cores são feitas antes das rotações (que podem gerar cópias dos nós), e após as rotações as versões mais novas de cada nó são atualizadas.
 
-A primeira coluna da Tabela~\ref{tab:arb_comp} mostra o consumo de tempo e espaço da implementação apresentada neste capítulo.
+A segunda coluna da Tabela~\ref{tab:arb_comp} mostra o consumo de tempo e espaço da implementação apresentada neste capítulo. Em ambas implementações, a operação~\API{Find} consome temporariamente espaço~$\Oh(\lg n)$, devido a sua pilha de recursão.
 
 
 \begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
-	& Node copying & Funcional \\ \hline
+	Operação & Node copying & Funcional \\ \hline
 	\funcAPI{Insert}{\V{value}} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ \\
 	\funcAPI{Remove}{\V{value}} & $\Oh(\lg n) / \Oh(1)$ & $\Oh(\lg n) / \Oh(\lg n)$ \\
 	\funcAPI{Find}{\V{value}} & $\Oh(\lg n)$ & $\Oh(\lg n)$ \\ \hline

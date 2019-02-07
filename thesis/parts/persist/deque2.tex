@@ -14,9 +14,9 @@ Neste capítulo, apresentaremos uma segunda implementação persistente de deque
 
 \section{Representação}
 
-A implementação usual de uma deque usando lista ligada utiliza uma lista duplamente ligada, e portanto para adicionar um elemento é necessário \emph{alterar} campos de nós já existentes da lista, o que não resulta numa implementação funcional como ocorreu no caso da pilha. Uma solução é fazer como na implementação de deque do Capítulo~\ref{cap:deque1_persist}, utiliza uma arborescência para simular esta lista ligada. Neste capítulo, trataremos isto de outra forma.
+A implementação usual de uma deque usando lista ligada utiliza uma lista duplamente ligada, e portanto para adicionar um elemento é necessário \emph{alterar} campos de nós já existentes da lista, o que não resulta numa implementação funcional como ocorreu no caso da pilha. Uma solução é fazer como na implementação de deque do Capítulo~\ref{cap:deque1_persist}, que utiliza uma arborescência para simular esta lista ligada. Neste capítulo, trataremos isto de outra forma.
 
-Para conseguirmos manter a implementação funcional, mudaremos a representação de uma deque, usando um esquema recursivo. Para facilitar a descrição, é necessário deixar claro o conjunto de elementos que a deque pode armazenar. Seja~$T$ esse conjunto, ou seja, operações de~\API{Push} recebem elementos de~$T$ como argumento e as operações~\API{First} e~\API{Last} devolvem elementos desse conjunto~$T$.
+Para conseguirmos manter a implementação funcional, mudaremos a representação de uma deque, usando um esquema recursivo. Para facilitar a descrição, é necessário deixar claro o conjunto de elementos que a deque pode armazenar. Seja~$T$ esse conjunto, ou seja, operações de~\API{Push} recebem elementos de~$T$ como argumento e as operações~\API{Front} e~\API{Back} devolvem elementos desse conjunto~$T$.
 
 Uma deque persistente que armazena elementos do conjunto~$T$ é dada por um nó com três campos opcionais:~$\V{prefix}, \V{center}$, e $\V{suffix}$; além de um campo obrigatório~$\V{size}$. Um campo opcional pode não estar presente, e neste caso o campo assume o valor~\keyword{null}. Os campos~$\V{prefix}$ e~$\V{suffix}$ armazenam valores de~$T$, o campo~$\V{center}$ aponta para uma deque persistente que armazena elementos do conjunto~$T \times T$, ou seja, pares ordenados de~$T$, e o campo~$\V{size}$ armazena o tamanho da deque.
 
@@ -64,12 +64,12 @@ $\V{prefix}$ &  &  &  & & & & & $\V{center}$ &  & & & & &  &  & $\V{suffix}$ \\[
 
  
 \end{tikzpicture}
-\caption{Deque persistente.} \label{fig:deque_ex}
+\caption{Representação de uma de/que persistente.} \label{fig:deque_ex}
 \end{figure}
 
-Como indicado pelos nomes,~$\V{prefix}$ armazena um prefixo da sequência de elementos que está na deque,~$\V{suffix}$ representa um sufixo, e~$\V{center}$ os elementos do meio. A Figura~\ref{fig:deque_ex} mostra uma possível deque persistente, que armazena a sequência é~$(2,3,4,5,6,7,8)$. Note que os campos~\keyword{null} (nós cortados) são ignorados.
+Como indicado pelos nomes,~$\V{prefix}$ armazena um prefixo da sequência de elementos que está na deque,~$\V{suffix}$ representa um sufixo, e~$\V{center}$ os elementos do meio. A Figura~\ref{fig:deque_ex} mostra uma possível deque persistente, que armazena a sequência~$(2,3,4,5,6,7,8)$. Note que os campos~\keyword{null} (nós cortados) são ignorados.
 
-Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center}$ guarda uma deque vazia, o número máximo de níveis nessa estrutura é~$\lg n$, onde~$n$ é o número de elementos na deque, já que no~$i$-ésimo da estrutura nível cada elemento~$\V{prefix}$ e~$\V{suffix}$ armazena~$2^{i-1}$ elementos.
+Observe que, para uma deque não vazia, considerando que nenhum campo~$\V{center}$ guarda uma deque vazia, o número máximo de níveis nessa estrutura é~$\lg n$, onde~$n$ é o número de elementos na deque, já que no~$i$-ésimo nível da estrutura cada elemento~$\V{prefix}$ e~$\V{suffix}$ armazena~$2^{i-1}$ elementos.
 
 
 \section{Operações de acesso}
@@ -131,13 +131,13 @@ Pela maneira como definimos a deque, se~$\V{prefix}$ não é~\keyword{null} ent�
 
 Se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ também, o único elemento da deque é~$d.\V{suffix}$ e o valor devolvido está correto. A base da indução, quando a deque tem um nível, sempre satisfaz um destes casos, logo é tratada corretamente.
 
-Por fim, se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ não é, como não armazenamos deques vazias,~$\V{center}$ tem algum elemento. O valor devolvido é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares de elementos de~$T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$.
+Por fim, se~$\V{prefix}$ é~\keyword{null} e~$\V{center}$ não é, como não armazenamos deques vazias,~$\V{center}$ tem algum elemento. O valor devolvido é então o primeiro elemento de~$d.\V{center}$, e como esta é uma deque de pares ordenados de elementos de~$T$, temos que o primeiro elemento do primeiro par de~$d.\V{center}$ é o primeiro elemento de~$d$.
 \end{proof}
 
 Portanto, a função~\funcAPI{Front}{d} funciona corretamente.
 Note que~\funcAPI{Back}{d} é simétrica a~\funcAPI{Front}{d}. Basta trocar~$\V{prefix}$ com~$\V{suffix}$ e~$\V{first}$ com~$\V{second}$. O mesmo ocorrerá com as outras operações, pela simetria da estrutura. Então nas próximas seções apenas a versão~\textsc{Front} de~\API{Push} e~\API{Pop} será detalhada.
 
-Ambas as funções apresentadas não modificam a estrutura e consomem tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos na deque.
+Ambas as funções apresentadas não modificam a estrutura e consomem tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos na estrutura da deque persistente.
 
 \section{Operações de modificação}
 
@@ -190,9 +190,9 @@ A operação~\funcAPI{PushFront}{d, x} funciona corretamente, devolvendo uma có
 \begin{proof}
 A prova será feita por indução no número de níveis da estrutura recursiva da deque.
 
-A base se dá quando~$d$ é nulo. Nesse caso a deque está vazia e a linha~\nref{line:dm:puf1} devolve uma deque com~$x$ em seu campo~$\V{prefix}$ e os outros campos nulos. Assuma então que~$d$ não é nulo e que a proposição vale para todas as deques com menos níveis que~$d$.
+A base se dá quando~$d$ é nulo. Nesse caso a deque está vazia e a linha~\nref{line:dm:puf1} devolve uma deque com~$x$ em seu campo~$\V{prefix}$, o campos~$\V{size}$ com valor~1, e os outros campos nulos. Assuma então que~$d$ não é nulo e que a proposição vale para todas as deques com menos níveis que~$d$.
 
-Se~$d.\V{prefix}$ é nulo, podemos armazenar~$x$ nessa posição e teremos adicionado~$x$ como primeiro elemento. Como não podemos modificar os campos de~$d$, criamos um novo nó com~$x$ no campo~$\V{prefix}$ e os outros campos iguais aos de~$d$. Esse caso é então tratado corretamente no~\keyword{if} das linhas~\nref{line:dm:puf2} e~\nref{line:dm:puf2_1}.
+Se~$d.\V{prefix}$ é nulo, queremos armazenar~$x$ nessa posição e teremos adicionado~$x$ como primeiro elemento. Como não podemos modificar os campos de~$d$, criamos um novo nó com~$x$ no campo~$\V{prefix}$ e os outros campos iguais aos de~$d$. Esse caso é então tratado corretamente no~\keyword{if} das linhas~\nref{line:dm:puf2} e~\nref{line:dm:puf2_1}.
 
 Caso contrário, juntamos~$x$ e~$d.\V{prefix}$ em um par e adicionamos esse par recursivamente no início de~$d.\V{center}$. Como a deque~$d.\V{center}$ tem menos níveis que~$d$, a hipótese de indução vale para~$d.\V{center}$ e a operação funciona nesse caso.
 \end{proof}
@@ -208,12 +208,12 @@ A prova também será feita por indução no número de níveis da estrutura da 
 
     Se~$d.\V{prefix}$ não é nulo, basta remover e devolver este elemento, assim como uma cópia da deque sem ele. Se~$d.\V{prefix}$ era o único nó da estrutura, devolve-se uma deque vazia. Este caso é tratado no~\keyword{if} das linhas~\nref{line:dm:pof0} e~\nref{line:dm:pof00}. Caso contrário, o~\keyword{if} das linhas~\nref{line:dm:pof1} e~\nref{line:dm:pof1_2} devolve~$d.\V{prefix}$ e cria um novo nó que tem~\keyword{null} nesse campo, sem modificar~$d$, portanto trata corretamente este caso.
 
-Caso contrário, se~$d.\V{center}$ é nulo, sabemos que~$d$ é uma deque com apenas um elemento, armazenado em~$d.\V{suffix}$, pois assumimos que~\func{PopFrontAux}{d} não é chamada se~$d$ é vazia. O~\keyword{if} das linhas~\nref{line:dm:pof2} e~\nref{line:dm:pof2-0} trata corretamente esse caso, devolvendo~$d.\V{suffix}$ e uma nova deque vazia. A base da indução, quando a deque tem um nível, sempre satisfaz um destes casos, logo é tratada corretamente.
+Se~$d.\V{prefix}$ é nulo e, se~$d.\V{center}$ também é nulo, sabemos que~$d$ é uma deque com apenas um elemento, armazenado em~$d.\V{suffix}$, pois assumimos que~\func{PopFrontAux}{d} não é chamada se~$d$ é vazia. O~\keyword{if} das linhas~\nref{line:dm:pof2} e~\nref{line:dm:pof2-0} trata corretamente esse caso, devolvendo~$d.\V{suffix}$ e uma nova deque vazia. A base da indução, quando a deque tem um nível, sempre satisfaz um destes casos, logo é tratada corretamente.
 
-No último caso, acionamos~\func{PopFrontAux}{d.\V{center}}, que funciona corretamente pois~$d.\V{center}$ tem menos níveis que~$d$, para remover recursivamente o primeiro elemento de~$d.\V{center}$. Esse elemento é um par de elementos de~$d$. Retornamos o primeiro elemento desse par, que é o primeiro elemento de~$d$, e colocamos o segundo elemento no campo~$\V{prefix}$, removendo assim o primeiro elemento da deque. Também é necessário substituir~$\V{center}$ pela nova deque devolvida pela chamada recursiva. A linha~\nref{line:dm:pof3} devolve então um novo nó com os campos assim ajustados.
+No último caso, quando~$d.\V{prefix}$ é nulo mas~$d.\V{center}$ não é, acionamos~\func{PopFrontAux}{d.\V{center}}, que funciona corretamente pois~$d.\V{center}$ tem menos níveis que~$d$, para remover recursivamente o primeiro elemento de~$d.\V{center}$. Esse elemento é um par de elementos de~$d$. Retornamos o primeiro elemento desse par, que é o primeiro elemento de~$d$, e colocamos o segundo elemento no campo~$\V{prefix}$, removendo assim o primeiro elemento da deque. Também é necessário substituir~$\V{center}$ pela nova deque devolvida pela chamada recursiva. A linha~\nref{line:dm:pof3} devolve então um novo nó com os campos assim ajustados.
 \end{proof}
 
-As duas operações consomem tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o número de elementos da deque, pois apenas percorrem a estrutura dos nós, que tem altura~$\Oh(\lg n)$, e realizam operações que consomem tempo e espaço constante por nível.
+As duas operações consomem tempo e espaço~$\Oh(\lg n)$, onde~$n$ é o número de elementos da estrutura da deque persistente, pois apenas percorrem a estrutura dos nós, que tem altura~$\Oh(\lg n)$, e realizam operações que consomem tempo e espaço constante por nível.
 
 \section{Acesso a outros elementos}
 
@@ -249,17 +249,17 @@ A função~\func{k-th}{d, k} devolve o~$k$-ésimo elemento de~$d$, para~$k \leq 
 \end{proposition}
 
 \begin{proof}
-As linhas~\nref{line:kth:if1} a~\nref{line:kth:if2} tratam o caso em que estamos buscando, respectivamente, o primeiro e o último elemento, e esses estão no prefixo ou sufixo. Caso contrário, o~$k$-ésimo elemento está em~$d.\V{center}$ e o~\keyword{if} das linhas~\nref{line:kth:if3} e~\nref{line:kth:if3e} arruma~$k$ para indicar qual elemento de~$d.\V{center}$ deve ser buscado, já que, se~$d.\V{prefix}$ é não nulo, temos que encontrar o~$(k-1)$-ésimo elemento dos que estão em~$d.\V{center}$.
+As linhas~\nref{line:kth:if1} a~\nref{line:kth:if2} tratam o caso em que estamos buscando, respectivamente, o primeiro e o último elemento, e esses estão no prefixo ou sufixo. Caso contrário, o~$k$-ésimo elemento está em~$d.\V{center}$ e o~\keyword{if} das linhas~\nref{line:kth:if3} e~\nref{line:kth:if3e} corrige~$k$ para indicar qual elemento de~$d.\V{center}$ deve ser buscado, já que, se~$d.\V{prefix}$ é não nulo, temos que encontrar o~$(k-1)$-ésimo elemento dos que estão em~$d.\V{center}$.
 
 Como~$d.\V{center}$ é uma deque de pares, usamos~\funcAPI{k-th}{d.\V{center}, \ceil*{\frac{k}{2}}} para encontrar o~$\ceil*{\frac{k}{2}}$-ésimo par desta deque, pois o primeiro par guarda os elementos com índice 1 e 2, o segundo guarda os elementos com índice 3 e 4, e assim por diante. Se~$k$ é ímpar, queremos o primeiro elemento desse par, senão o segundo. De fato, se~$k$ é ímpar, o par tem os elementos com índice~$k$ e~$k+1$, senão tem os elementos com índice~$k-1$ e~$k$.
 \end{proof}
 
-A operação consome tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos da deque, pois o número máximo de níveis da estrutura recursiva é~$\Oh(\lg n)$. A Tabela~\ref{tab:deque2_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo.
+A operação consome tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos da deque, pois o número máximo de níveis da estrutura recursiva é~$\Oh(\lg n)$. A Tabela~\ref{tab:deque2_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo. Embora as operações de acesso~\API{Front},~\API{Back} e~\API{k-th} não indiquem consumo de espaço, já que não usam nenhum espaço~\emph{permanentemente}, estas ainda usam~$\Oh(\lg n)$ de espaço temporariamente, devido a sua pilha de recursão.
 
 \begin{table}[h] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
-	& Tempo/Espaço \\ \hline
+	Operação & Tempo/Espaço \\ \hline
 	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{PushFront}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ \\
 	\funcAPI{PushBack}{q, x} & $\Oh(\lg n) / \Oh(\lg n)$ \\
@@ -269,7 +269,7 @@ A operação consome tempo~$\Oh(\lg n)$, onde~$n$ é o número de elementos da d
 	\funcAPI{PopBack}{q} & $\Oh(\lg n) / \Oh(\lg n)$ \\
 	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ \\ \hline
 \end{tabular}
-	\caption{Consumo de tempo e espaço da implementação de deque deste capítulo, onde~$n$ é o número de elementos na deque. \label{tab:deque2_persist}}
+	\caption{Consumo de tempo e espaço da implementação de deque deste capítulo, onde~$n$ é o número de elementos na estrutura da deque persistente. \label{tab:deque2_persist}}
 \end{table}
 
 \end{document}

@@ -13,9 +13,9 @@
 
 \begin{document}
 
-\chapter{LA com representação skew binary} \label{cap:skew}
+\chapter{Ancestrais com representação skew binary} \label{cap:skew}
 
-Neste capítulo, apresentamos uma outra solução para o problema do Ancestral de Nível. Esta solução, apesar de um pouco mais complicada, requer processamento que consome espaço e tempo constante por nó adicionado. Esta solução foi dada inicialmente por Myers~\cite{Myers83}.
+Neste capítulo, apresentamos uma outra solução para o problema do Ancestral de Nível. Esta solução, apesar de um pouco mais complicada, requer processamento que consome espaço e tempo constante por nó adicionado. Esta solução foi dada inicialmente por Myers~\cite{Myers83}. No final do capítulo, apresentamos também uma solução para o problema de Primeiro Ancestral Comum utilizando a mesma técnica.
 
 Como lidaremos com representações numéricas em grande detalhe, neste capítulo usaremos também notação de cadeias, na qual~$21^5$ representa a cadeia~$211111$ e não o número~$4084101$.
 
@@ -23,7 +23,7 @@ Como lidaremos com representações numéricas em grande detalhe, neste capítul
 
 Um número \deff{skew-binary} de tamanho~$n$ é uma cadeia~${a = a_n a_{n-1} \cdots a_1}$ tal que~${a_i \in \{0, 1, 2\}}$ e~$a_n \neq 0$. Denotamos o tamanho de~$a$ por~$|a| = n$. O valor de tal número é~${\V(a) \coloneqq \sum\limits_{i = 1}^n{a_i (2^i - 1)}}$. Note que múltiplas cadeias podem ter o mesmo valor, por exemplo, tanto~21 quanto~100 têm valor~7.
 
-Para todo~$a$ tal que~$\V(a) \neq 0$, defina~$\NZ(a) \coloneqq \min\{i \in [n] : a_i \neq 0\}$, ou seja, a posição do dígito não nulo menos significativo de~$a$. Dizemos que um número skew-binary é \deff{canônico} se todos os seus dígitos são~0 ou~1 exceto, possivelmente, o dígito não nulo menos significativo. Mais formalmente, se~${a_i = 2}$ implica que ${i = \NZ(a)}$. Seja~$\CSB$ o conjunto de todos os números skew-binary canônicos.
+Para todo~$a$ tal que~$\V(a) \neq 0$, defina~$\NZ(a) \coloneqq \min\{i \in [n] : a_i \neq 0\}$, ou seja, a posição do dígito não nulo menos significativo de~$a$. Dizemos que um número skew-binary é \deff{canônico} se todos os seus dígitos são~0 ou~1 exceto, possivelmente, o dígito não nulo menos significativo. Mais formalmente,~${a_i = 2}$ implica que ${i = \NZ(a)}$. Seja~$\CSB$ o conjunto de todos os números skew-binary canônicos.
 
 Esta igualdade será útil na prova dos lemas:
 
@@ -75,7 +75,7 @@ Como cada número natural tem uma representação única em~CSB, podemos definir
 	$$ \V(a) - \V(b) = (a_{\NZ(a)} - b_{\NZ(a)}) (2^{\NZ(a)} - 1) - 2 (2^{\NZ(a) - 1} - 1) = 2^{\NZ(a)} - 1 - (2^{\NZ(a)} - 2) = 1. $$
 \end{proof}
 
-O lema mostra que subtração por~1 em skew-binary canônico consiste de diminuir em 1 o dígito não nulo menos significativo e, se existir, aumentar para~2 o dígito à direita deste.
+O lema mostra que subtração por~1 no valor de um número skew-binary canônico consiste de diminuir em 1 o dígito não nulo menos significativo e, se existir, aumentar para~2 o dígito à direita deste.
 
 \section{Jump pointers}
 
@@ -171,7 +171,7 @@ O algoritmo é guloso no sentido que sempre escolhe usar~$\J$ quando possível (
 	\end{itemize}
 \end{proof}
 
-A Figura~\ref{fig:exxysub} mostra um exemplo de aplicação do algoritmo no Código~\ref{lst:xysub}. A transformação de~$x = 59$ até~$x = 46$ corresponde à primeira parte da prova do Teorema~\ref{thm:xysub}, e o resto corresponde à segunda.
+A Figura~\ref{fig:exxysub} mostra um exemplo de aplicação do algoritmo no Código~\ref{lst:xysub}. A transformação de~$x = 59$ até~$x = 46$ corresponde à primeira parte da prova do Teorema~\ref{thm:xysub}. O resto corresponde à segunda parte.
 
 \begin{figure}[H]
 \begin{tikzpicture}
@@ -245,7 +245,7 @@ Pelo Teorema~\ref{thm:csbj+1}, é fácil calcular~$\J(x)$ a partir dos valores~$
 	$${a_{\NZ(a)} = 2 \iff \J(\V(a)) \neq 0 \text{ e } \V(a) - \J(\V(a)) = \J(\V(a)) - \J(\J(\V(a))).}$$
 \end{proposition}
 \begin{proof}
-	Seja~$b \coloneqq \R(\J(\V(a)))$ e~${c \coloneqq \R(\J(\V(b)))}$. Lembre que~${\J(\V(a)) = \V(a) - (2^{\NZ(a)} - 1)}$.
+	Seja~$b \coloneqq \R(\J(\V(a)))$. Lembre que~${\J(\V(a)) = \V(a) - (2^{\NZ(a)} - 1)}$.
 
 	Se~$a_{\NZ(a)} = 2$, então~$\NZ(b) = \NZ(a)$ (e~$\V(b) \neq 0$), logo segue que~$$\V(a) - \J(\V(a)) = 2^{\NZ(a)} - 1 = 2^{\NZ(b)} - 1 = \V(b) - \J(\V(b)) = \J(\V(a)) - \J(\J(\V(a))).$$
 
@@ -278,7 +278,7 @@ Para encontrar o ancestral comum mais profundo de dois vértices~$u$ e~$v$, usam
 Dessa forma, conseguimos encontrar o ancestral de~$u$ com profundidade~$\Dep(c) + 1$, e o pai deste será~$c$. Veja o Código~\ref{lst:lca_skew}, e note sua similaridade com o Código~\ref{lst:lcapot2}.
 
 \begin{algorithm}[h]
-\caption{Ancestral Comum Mais Profundo usando representação skew-binary. \label{lst:lca_skew}}
+\caption{Primeiro Ancestral Comum usando representação skew-binary. \label{lst:lca_skew}}
 \begin{algorithmic}[1]
 	\Function{\API{LowestCommonAncestor}}{$u, v$}
 		\If{$\Dep(u) > \Dep(v)$}
@@ -303,14 +303,14 @@ Dessa forma, conseguimos encontrar o ancestral de~$u$ com profundidade~$\Dep(c) 
 \end{algorithmic}
 \end{algorithm}
 
-A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementações discutidas nesse capítulo. A Tabela~\ref{tab:la_comp} compara o consumo de tempo das implementações de~Ancestral de Nível e Ancestral Comum Mais Profundo apresentadas nesse trabalho.
+A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementações discutidas nesse capítulo. A Tabela~\ref{tab:la_comp} compara o consumo de tempo das implementações de~Ancestral de Nível e Primeiro Ancestral Comum apresentadas nesse trabalho.
 
 \newpage
 
 \begin{table}[t] \centering
 \begin{tabular}{|l|c|}
 	\hline
-	& Tempo/Espaço \\ \hline
+	Função & Tempo/Espaço \\ \hline
 	\funcAPI{AddLeaf}{u} & $\Oh(1) / \Oh(1)$ \\
 	\funcAPI{LevelAncestor}{k, u} & $\Oh(\lg n) $ \\
 	\funcAPI{LowestCommonAncestor}{u, v} & $\Oh(\lg n)$ \\ \hline
@@ -321,7 +321,7 @@ A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementaç�
 \begin{table}[t] \centering
 \begin{tabular}{|l|c|c|}
 	\hline
-	& Representação binária & Skew-binary \\ \hline
+	Função & Representação binária & Skew-binary \\ \hline
 	\funcAPI{AddLeaf}{u} & $\Oh(\lg n) / \Oh(\lg n)$ & $ \Oh(1) / \Oh(1)$ \\
 	\funcAPI{LevelAncestor}{k, u} & $\Oh(\lg n) $ & $\Oh(\lg n) $ \\
 	\funcAPI{LowestCommonAncestor}{u, v} & $\Oh(\lg n)$ & $\Oh(\lg n) $ \\ \hline

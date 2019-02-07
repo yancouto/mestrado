@@ -15,19 +15,19 @@
 Seja~$T \coloneqq (V, E)$ um grafo. Dizemos que~$T$ é uma árvore se é acíclico e conexo. Nesse caso, entre cada par de vértices de~$T$ existe exatamente um caminho. Uma árvore é enraizada quando fixamos algum vértice~${r \in V}$, chamado de raiz.
 
 Para propósitos de implementação e sem perda de generalidade, supomos que~$V = \{1, 2, \ldots, |V|\}$.
-Para cada vértice~${u \in V}$, os \deff{ancestrais} de~$u$ são os vértices no (único) caminho de~$u$ até~$r$. O~$(i-1)$-ésimo ancestral de~$u$ é o~$i$-ésimo vértice nesse caminho, ou seja,~$u$ é o $0$-ésimo ancestral de~$u$. Dizemos que o primeiro ancestral de~$u$, se~$u \neq r$, é o \deff{pai} de~$u$. Defina a função~${\Par: V \rightarrow V}$ tal que~$\Par(u)$ seja o pai do vértice~$u$, para todo~$u \in V \setminus \{r\}$; para o vértice~$r$, pode-se considerar que~$\Par(r) = r$. A~\deff{profundidade} de um vértice~$u$ é denotada por~$\Dep(u)$ e é o número de arestas no caminho de~$u$ até~$r$.
+Para cada vértice~${u \in V}$, os \deff{ancestrais} de~$u$ são os vértices no (único) caminho de~$u$ até~$r$. O~\mbox{$(i-1)$-ésimo} ancestral de~$u$ é o~$i$-ésimo vértice nesse caminho. Em particular,~$u$ é o $0$-ésimo ancestral de~$u$. Dizemos que o primeiro ancestral de~$u$, se~$u \neq r$, é o \deff{pai} de~$u$. Definimos a função~${\Par: V \rightarrow V}$ tal que~$\Par(u)$ é o pai do vértice~$u$, para todo~$u \in V \setminus \{r\}$; para o vértice~$r$, pode-se considerar que~$\Par(r) = r$. A~\deff{profundidade} de um vértice~$u$ é denotada por~$\Dep(u)$ e é o número de arestas no caminho de~$u$ até~$r$.
 
-O problema do Ancestral de Nível (no inglês, \textit{Level Ancestor}, abreviado LA), é o problema de encontrar, dados~$u \in V$ e~$k \in \Z$ tal que~$0 \leq k \leq \Dep(u)$, o~$k$-ésimo ancestral de~$u$, ou seja, o problema de avaliar a função
+O problema do Ancestral de Nível (no inglês, \textit{Level Ancestor}, abreviado LA), é o problema de encontrar, dados~$u \in V$ e~$k \in \mathbb{N}$ tal que~$k \leq \Dep(u)$, o~$k$-ésimo ancestral de~$u$, ou seja, o problema de avaliar a função
 $$\LA(k, u) \coloneqq \Par^k(u). $$
 
-O problema do Ancestral Comum de Maior Profundidade (no inglês, \textit{Lowest Common Ancestor}, abreviado LCA), é o problema de encontrar, dados~$u, v \in V$, o vértice~$w$ de maior profundidade que é ancestral de ambos~$u$ e~$v$, ou seja, o problema de avaliar a função
+O problema do Primeiro Ancestral Comum (no inglês, \textit{Lowest Common Ancestor}, abreviado LCA), é o problema de encontrar, dados~$u, v \in V$, o vértice~$w$ de maior profundidade que é ancestral de ambos~$u$ e~$v$, ou seja, o problema de avaliar a função
 $$\LCA(u, v) \coloneqq \argmax\{\Dep(w) : w \in V,\ w \text{ é ancestral de $u$ e $v$}\}. $$
 
 \section{Potências de funções} \label{sec:potfunc}
 
 Vamos considerar o problema, um pouco mais genérico, de, dada uma função~$f : [n] \rightarrow [n]$, que pode ser dada por um vetor de tamanho~$n$, por exemplo, construir um algoritmo que, após possivelmente algum pré-processamento sobre o vetor~$f$, responda consultas do tipo: dados~$i \in [n]$ e~$k \in [m] \cup \{0\}$, determinar~$f^k(i)$ de forma eficiente. Se o tempo de processamento é~$\Oh(p(n, m))$ e o tempo para responder cada consulta é~$\Oh(q(n, m))$, dizemos que a complexidade da solução é~$\angles{\Oh(p(n, m)), \Oh(q(n, m))}$.
 
-\subsection{Soluções simples}
+\subsection{Soluções simples} \label{subsec:anc_sol_simples}
 
 Uma solução simples é não fazer nenhum pré-processamento e sempre realizar as~$k$ iterações para determinar~$f^k(i)$. Esta solução tem complexidade~$\angles{\Oh(1),\Oh(m)}$. Outra solução simples é armazenar a resposta para todas as consultas possíveis em uma matriz~$M$ tal que~$M[k][i] = f^k(i)$ para todo~$i \in [n]$ e~$k \in [m] \cup \{0\}$. Esta matriz pode ser preenchida usando programação dinâmica em tempo~$\Oh(nm)$, já que sabemos que, se~$k > 0$, então~$f^k(i) = f(f^{k-1}(i))$, ou seja,
 $$M[k][i] = \left\{
@@ -43,7 +43,7 @@ ou seja, podemos preencher~$M$ iterando pelos seus índices em ordem não decres
 
 As soluções apresentadas funcionam da seguinte maneira: escolhe-se uma base~$(a_1, \ldots, a_x)$ tal que todo número entre~0 e~$m$ pode ser escrito como soma de zero ou mais destes números, e calcula-se (durante o pré-processamento)~$f^{a_j}(i)$ para todo~$i \in [n]$ e~$j \in [x]$. Dado um número~$k$, escreve-se este como~$k = a_{b_1} + a_{b_2} + \cdots + a_{b_y}$, e após isso calcula-se
 $$f^k(i) = f^{a_{b_1}}(f^{a_{b_2}}(\cdots(f^{a_{b_y}}(i))\cdots)).$$
-Os exemplos eram simples, e no primeiro exemplo escolhemos como base apenas~$(1)$, e o tempo de consulta foi grande, enquanto no segundo exemplo escolhemos~$(1, \ldots, m)$, e o tempo de pré-processamento foi grande.
+No primeiro exemplo da Subseção~\ref{subsec:anc_sol_simples} escolhemos como base apenas~$(1)$, e o tempo de consulta foi grande, enquanto no segundo exemplo escolhemos~$(1, \ldots, m)$, e o tempo de pré-processamento foi grande.
 
 Escolhendo a base de forma mais inteligente, é possível melhorar a complexidade. Cada número tem uma decomposição (única) em somas de potências de dois distintas (correspondente à sua representação binária), e existem apenas~$\floor{\lg m}$ potências de~2 entre~1 e~$m$. Portanto, podemos escolher a base~${(1, 2, 4, \ldots, 2^{\floor{\lg m}})}$. Para fazer o pré-processamento, utilizaremos programação dinâmica preenchendo uma matriz~$M$ tal que~${M[k][i] \coloneqq f^{2^k}(i)}$ para todo~$i \in [n]$ e~$0 \leq k \leq \floor{\lg m}$. Sabemos que~$f^x(f^x(i)) = f^{2x}(i)$, logo temos
 $$M[k][i] = \left\{
@@ -64,7 +64,7 @@ e também podemos preencher~$M$ iterando pelos seus índices em ordem não decre
 	Seja~$k > 1$ um inteiro e seja~$2^x$ a maior potência de dois menor ou igual a~$k$. Note que~$k - 2^x < 2^x$ (caso contrário~$2^{x+1} \leq k$), então pela hipótese de indução~$k - 2^x$ tem uma decomposição em potências de dois distintas, e nenhuma destas potências é~$2^x$, logo podemos adicionar esta potência à representação. Isto prova a existência. A unicidade segue de que a representação de~$k - 2^x$ é única pela hipótese de indução e, como~$\sum\limits_{0 \leq y < x}{2^{y}} = 2^x - 1 < 2^x$, temos que qualquer decomposição de~$k$ deve conter~$2^x$.
 \end{proof}
 
-A prova acima nos dá um algoritmo para encontrar uma decomposição em potências de dois de~$k$: basta encontrar a maior potência de dois menor ou igual a~$k$ e subtraí-la de~$k$, e repetir este algoritmo até~$k$ se tornar~0.
+A prova acima nos dá um algoritmo para encontrar uma decomposição em potências de dois de~$k$: basta encontrar a maior potência de dois menor ou igual a~$k$ e subtraí-la de~$k$, e repetir este procedimento até~$k$ se tornar~0.
 
 \begin{algorithm}
 	\caption{Solução para potência de função.} \label{lst:potfunclg}
@@ -98,12 +98,12 @@ O Código~\ref{lst:potfunclg} mostra a solução discutida, que tem complexidade
 
 \section{Ancestral de nível online para árvores}
 
-Como~$\Par$ é uma função de~$V$ em~$V$, é possível utilizar os algoritmos discutidos na Seção~\ref{sec:potfunc} para avaliar a função~$\LA$. Note que, para cada~$u \in V$, precisamos apenas calcular~$\Par^k(u)$ para~$k < \Dep(u)$, logo usamos~$n = m = |V|$. Estes algoritmos, porém, assumem que a função é conhecida de antemão, para realizar o pré-processamento, ou seja, a função~$\Par$ deve ser totalmente conhecida de antemão (e por conseguinte a árvore).
+Como~$\Par$ é uma função de~$V$ em~$V$, é possível utilizar os algoritmos discutidos na Seção~\ref{sec:potfunc} para avaliar a função~$\LA$. Note que, para cada~$u \in V$, precisamos apenas calcular~$\Par^k(u)$ para~$k < \Dep(u)$, logo usamos~$n = m = |V|$. Estes algoritmos, porém, supõem que a função é conhecida de antemão, para realizar o pré-processamento, ou seja, a função~$\Par$ deve ser totalmente conhecida de antemão (e por conseguinte a árvore).
 
 \newcommand{\jmp}{\mathit{jump}}
-Na Subseção~\ref{subsec:pot2}, usamos que~$M[k][u] = M[k-1][M[k-1][u]]$ pode ser calculada usando programação dinâmica pois depende de índices menores da primeira coordenada. No caso de árvores, porém, sabemos que~$f^{2^{k-1}}(u)$ é um ancestral de~$u$, logo para calcular os valores~$M[k][u]$ para todo~${0 \leq k < \floor{\lg \Dep(u)}}$ basta que os valores de~$M$ já estejam calculados para todos os ancestrais de~$u$, e então calculamos~$M[k][u]$ em ordem crescente de~$k$ (já que~$M[k][u]$ depende de~$M[k-1][u]$ além de seus ancestrais).
+Na Subseção~\ref{subsec:pot2}, vimos que~$M[k][u] = M[k-1][M[k-1][u]]$ pode ser calculada usando programação dinâmica pois depende de índices menores da primeira coordenada. No caso de árvores, porém, sabemos que~$f^{2^{k-1}}(u)$ é um ancestral de~$u$, logo para calcular os valores~$M[k][u]$ para todo~${0 \leq k < \floor{\lg \Dep(u)}}$ basta que os valores de~$M$ já estejam calculados para todos os ancestrais de~$u$, e então calculamos~$M[k][u]$ em ordem crescente de~$k$ (já que~$M[k][u]$ depende de~$M[k-1][u]$ além de seus ancestrais).
 
-Por esse motivo, o algoritmo pode ser implementado de forma online, com novas folhas podendo ser adicionadas à árvore. Para melhorar a notação neste caso, usamos que cada nó tem um vetor~$\jmp$ com os valores de~$M$, ou seja,~$u.\jmp[k] = M[k][u]$. Assim que uma folha~$u$ for adicionada, podemos calcular os valores de~$u.\jmp$, em tempo e espaço~${\Oh(\floor{\lg \Dep(u)})}$. A consulta continua da mesma forma.
+Por esse motivo, o algoritmo pode ser implementado de forma online, com novas folhas podendo ser adicionadas à árvore. Para melhorar a notação neste caso, usamos em cada nó um vetor~$\jmp$ com os valores de~$M$, ou seja,~${u.\jmp[k] = M[k][u] = \Par^{2^k}(u)}$. Assim que uma folha~$u$ for adicionada, podemos calcular os valores de~$u.\jmp$, em tempo e espaço~${\Oh(\floor{\lg \Dep(u)})}$. A consulta continua da mesma forma.
 
 \begin{algorithm}
 \caption{Solução para o problema do Ancestral de Nível.} \label{lst:lapot2}
@@ -156,15 +156,15 @@ O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, qua
 \section{Cálculo do ancestral comum mais profundo} \label{sec:lca_pot2}
 
 \newcommand{\kb}{k^\star}
-Sejam~$u, v \in V$ e~$c \in V$ o ancestral comum mais profundo de~$u$ e~$v$. Assuma, sem perda de generalidade que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' os vértices~$u$ e~$v$, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
-Assim, temos que~$\Dep(u) = \Dep(v)$ e, para encontrar o ancestral comum mais profundo de~$u$ e~$v$, devemos encontrar o menor~$\kb$ tal que~${\LA(\kb, u) = \LA(\kb, v)}$. Note que se~${k < \Dep(u) - 1}$ e~${\LA(k, u) = \LA(k, v)}$, então
+Sejam~$u, v \in V$ e~$c \in V$ o ancestral comum mais profundo de~$u$ e~$v$. Vamos supor, sem perda de generalidade, que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' os vértices~$u$ e~$v$, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
+Assim, podemos supor que~$\Dep(u) = \Dep(v)$ e, para encontrar o ancestral comum mais profundo de~$u$ e~$v$, devemos encontrar o menor~$\kb$ tal que~${\LA(\kb, u) = \LA(\kb, v)}$. Note que se~${k < \Dep(u) - 1}$ e~${\LA(k, u) = \LA(k, v)}$, então
 $${\LA(k + 1, u) = \Par(\LA(k, u)) = \Par(c) = \Par(\LA(k, v)) = \LA(k + 1, v).}$$
 Isso permitirá a utilização dos Jump Pointers para determinar tal~$\kb$ mínimo.
 
-Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de checar se~$x < \kb$ sem conhecer~$\kb$. Como, pela prova do Teorema~\ref{thm:pot2}, para decompor um número em soma de potências de dois distintas, basta determinar a maior potência de dois menor ou igual a esse número, adicioná-la à decomposição e repetir o algoritmo, e temos jump pointers para as potências de dois para todos os nós, conseguimos determinar a decomposição em potências de dois distintas de~${\kb - 1}$ (já que conseguimos testar~${x \leq \kb - 1}$ e não~${x \leq \kb}$), e de forma similar à função~\API{LevelAncestor} do Código~\ref{lst:lapot2}, podemos determinar o~\mbox{$(\kb-1)$-ésimo} ancestral de~$u$ e~$v$ em tempo~$\Oh(\lg \Dep(u))$.
+Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de checar se~$x < \kb$ sem conhecer~$\kb$. Como, pela prova do Teorema~\ref{thm:pot2}, para decompor um número em soma de potências de dois distintas, basta determinar a maior potência de dois menor ou igual a esse número, adicioná-la à decomposição e repetir. Como temos jump pointers para as potências de dois para todos os nós, conseguimos determinar a decomposição em potências de dois distintas de~${\kb - 1}$ (já que conseguimos testar~${x \leq \kb - 1}$ e não~${x \leq \kb}$), e de forma similar à função~\API{LevelAncestor} do Código~\ref{lst:lapot2}, podemos determinar o~\mbox{$(\kb-1)$-ésimo} ancestral de~$u$ e~$v$ em tempo~$\Oh(\lg \Dep(u))$.
 
 \begin{algorithm}
-\caption{Ancestral Comum Mais Profundo usando Jump Pointers. \label{lst:lcapot2}}
+\caption{Primeiro Ancestral Comum usando Jump Pointers. \label{lst:lcapot2}}
 \begin{algorithmic}[1]
 	\Function{\API{LowestCommonAncestor}}{$u, v$}
 		\If{$\Dep(u) > \Dep(v)$}
@@ -209,7 +209,7 @@ A Tabela~\ref{tab:la_pot2} mostra o consumo de tempo e espaço das implementaç�
 \begin{table}[h] \centering
 \begin{tabular}{|l|c|}
 	\hline
-	& Tempo/Espaço \\ \hline
+	Função & Tempo/Espaço \\ \hline
 	\funcAPI{AddLeaf}{u} & $\Oh(\lg n) / \Oh(\lg n)$ \\
 	\funcAPI{LevelAncestor}{k, u} & $\Oh(\lg n) $ \\
 	\funcAPI{LowestCommonAncestor}{u, v} & $\Oh(\lg n)$ \\ \hline
