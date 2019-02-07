@@ -593,27 +593,11 @@ O Código~\ref{lst:ops_deque_const} mostra as implementações das versões~\tex
 
 Note que as operações~\API{PushFront} e~\API{PopFront} copiam o topo da deque, e a função~\textsc{Check} copia o campo~$\V{next}$ deste elemento se for necessário modificá-lo. A função~\func{Fix}{a} modifica~$a$, mas está na verdade recebendo uma cópia do nó. Como a implementação é feita de acordo com a discussão na Seção~\ref{sec:implfunc}, garantimos que todo nó copiado é apenas apontado por outros nós copiados, e assim a implementação é funcional, e portanto persistente.
 
-\begin{table} \centering
-\begin{tabular}{|l|c|}
-	\hline
-	Operação & Tempo/Espaço \\ \hline
-	\funcAPI{Deque}{} & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{PushFront}{q, x} & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{PushBack}{q, x} & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{Front}{q} & $\Oh(1)$ \\
-	\funcAPI{Back}{q} & $\Oh(1)$ \\
-	\funcAPI{PopFront}{q} & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{PopBack}{q} & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{k-th}{q, k} & $\Oh(\lg n)$ \\ \hline
-\end{tabular}
-	\caption{Consumo de tempo e espaço da implementação deste capítulo, onde~$n$ é o tamanho da estrutura da deque persistente. \label{tab:deque3_persist}}
-\end{table}
-
 Os~\keyword{if}s das operações~\API{PopFront} e~\API{Front} checam os casos degenerados, já que, como a estrutura é regular, se uma das sub-deques de~$a$ é vazia então~$a$ é tanto o topo quanto o último nível da estrutura.
 
-A operação~\funcAPI{k-th}{d, k} não foi implementada, mas pode ser feita de forma um pouco mais complexa porém similar ao Código~\ref{lst:deque_kth}. A Tabela~\ref{tab:deque3_persist} mostra o consumo de tempo e espaço da implementação discutida neste capítulo. Note que a operação~\API{k-th} consome temporariamente espaço~$\Oh(\lg n)$ devido a sua pilha de recursão. A Tabela~\ref{tab:deque_persist_comp} compara o consumo de tempo e espaço de todas as deques persistentes apresentadas neste trabalho.
+A operação~\funcAPI{k-th}{d, k} não foi implementada, mas pode ser feita de forma um pouco mais complexa porém similar ao Código~\ref{lst:deque_kth}. A Tabela~\ref{tab:deque_persist_comp} compara o consumo de tempo e espaço de todas as deques persistentes apresentadas neste trabalho. Note que a operação~\API{k-th} da deque de Kaplan e Tarjan consome temporariamente espaço~$\Oh(\lg n)$ devido a sua pilha de recursão. 
 
-\begin{table} \centering
+\begin{table}[b] \centering
 \begin{tabular}{|l|c|c|c|c|}
 	\hline
 	Operação & Representação binária & Skew-binary & Recursiva & Kaplan e Tarjan  \\ \hline

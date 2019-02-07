@@ -303,20 +303,7 @@ Dessa forma, conseguimos encontrar o ancestral de~$u$ com profundidade~$\Dep(c) 
 \end{algorithmic}
 \end{algorithm}
 
-A Tabela~\ref{tab:la_skew} mostra o consumo de tempo e espaço das implementações discutidas nesse capítulo. A Tabela~\ref{tab:la_comp} compara o consumo de tempo das implementações de~Ancestral de Nível e Primeiro Ancestral Comum apresentadas nesse trabalho.
-
-\newpage
-
-\begin{table}[t] \centering
-\begin{tabular}{|l|c|}
-	\hline
-	Função & Tempo/Espaço \\ \hline
-	\funcAPI{AddLeaf}{u} & $\Oh(1) / \Oh(1)$ \\
-	\funcAPI{LevelAncestor}{k, u} & $\Oh(\lg n) $ \\
-	\funcAPI{LowestCommonAncestor}{u, v} & $\Oh(\lg n)$ \\ \hline
-\end{tabular}
-	\caption{Consumo de tempo e espaço da solução com skew-binary, onde~$n$ é o tamanho da árvore.} \label{tab:la_skew}
-\end{table}
+A Tabela~\ref{tab:la_comp} compara o consumo de tempo das implementações de~Ancestral de Nível e Primeiro Ancestral Comum apresentadas nesse trabalho.
 
 \begin{table}[t] \centering
 \begin{tabular}{|l|c|c|}
