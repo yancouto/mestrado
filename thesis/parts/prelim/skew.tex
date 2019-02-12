@@ -81,11 +81,12 @@ O lema mostra que subtração por~1 no valor de um número skew-binary canônico
 
 No problema do Ancestral de Nível, para avaliar~$\LA(k, u)$, temos um nó~$u$ de profundidade~$\Dep(u)$ e queremos determinar seu ancestral~$v$ de profundidade~${\Dep(v) = \Dep(u) - k}$. Na solução apresentada na Subseção~\ref{subsec:pot2}, cada nó tinha um ponteiro para seu $2^x$-ancestral, para todo~${x \in \floor{\lg\Dep(u)}}$, e o nó~$v$ era alcançado a partir de~$u$ pulando as potências de dois distintas da decomposição de~$k$.
 
+
 Este problema pode ser interpretado de outra forma. Temos um número~$x$ e queremos transformá-lo em~$y \leq x$, a cada passo diminuindo o valor de~$x$. Com esta interpretação, na solução da Subseção~\ref{subsec:pot2}, que tenta transformar~$\Dep(u)$ em~$\Dep(v)$, a partir de cada número podíamos subtrair qualquer potência de dois. Note que diminuir o valor de um número por~$z$ é equivalente a escolher o~$z$-ésimo ancestral de um nó.
 
 Vamos considerar uma solução alternativa para este problema, na qual a partir de um número~$x$ positivo podemos pular para os números~$x-1$ ou~$\J(x)$, onde~${\J(x) \coloneqq x - (2^{\NZ(\R(x))} - 1)}$, ou seja, se considerarmos~$\R(x)$, a representação skew-binary canônica de~$x$,~$\J(x)$ consiste em diminuir de um o dígito não nulo menos significativo de~$\R(x)$. Por exemplo, se~$x = 13$, então~${\R(x) = 120}$ e~${\J(x) = \V(110) = 10}$. A Figura~\ref{fig:ex_rj} dá os valores de~$\R$ e~$\J$ para números pequenos.
 
-\begin{figure}
+\begin{figure}[tbh]
 \centering
 \begin{tikzpicture}
 \begin{tabular}{|c||c|c|}
@@ -131,11 +132,12 @@ $15$ & $1000$ & $0$ \\
 \dedgel{14}{7}
 \path (0, -15) edge[shorten >=0.38cm] (0, 0);
 %\dedge{15}{0}
-\path (1, -2) rectangle (0, 16);
+\path (1, 0) rectangle (0, 1);
 \end{scope}
 \end{tikzpicture}
 \caption{Valores das funções~$\R$ e~$\J$ para valores pequenos. \label{fig:ex_rj}}
 \end{figure}
+
 
 Considere o seguinte algoritmo, que transforma~$x$ em~$y$ (inicialmente~$x > y$):
 \begin{algorithm}[h]

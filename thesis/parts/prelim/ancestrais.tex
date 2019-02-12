@@ -158,7 +158,7 @@ O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, qua
 \newcommand{\kb}{k^\star}
 Sejam~$u, v \in V$ e~$c \in V$ o ancestral comum mais profundo de~$u$ e~$v$. Vamos supor, sem perda de generalidade, que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' os vértices~$u$ e~$v$, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
 Assim, podemos supor que~$\Dep(u) = \Dep(v)$ e, para encontrar o ancestral comum mais profundo de~$u$ e~$v$, devemos encontrar o menor~$\kb$ tal que~${\LA(\kb, u) = \LA(\kb, v)}$. Note que se~${k < \Dep(u) - 1}$ e~${\LA(k, u) = \LA(k, v)}$, então
-$${\LA(k + 1, u) = \Par(\LA(k, u)) = \Par(c) = \Par(\LA(k, v)) = \LA(k + 1, v).}$$
+$${\LA(k + 1, u) = \Par(\LA(k, u)) = \Par(\LA(k, v)) = \LA(k + 1, v).}$$
 Isso permitirá a utilização dos Jump Pointers para determinar tal~$\kb$ mínimo.
 
 Se~${x < \kb}$ então~${\LA(x, u) \neq \LA(x, v)}$, ou seja, temos uma forma de checar se~$x < \kb$ sem conhecer~$\kb$. Como, pela prova do Teorema~\ref{thm:pot2}, para decompor um número em soma de potências de dois distintas, basta determinar a maior potência de dois menor ou igual a esse número, adicioná-la à decomposição e repetir. Como temos jump pointers para as potências de dois para todos os nós, conseguimos determinar a decomposição em potências de dois distintas de~${\kb - 1}$ (já que conseguimos testar~${x \leq \kb - 1}$ e não~${x \leq \kb}$), e de forma similar à função~\API{LevelAncestor} do Código~\ref{lst:lapot2}, podemos determinar o~\mbox{$(\kb-1)$-ésimo} ancestral de~$u$ e~$v$ em tempo~$\Oh(\lg \Dep(u))$.
