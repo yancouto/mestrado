@@ -132,7 +132,7 @@ Para remover um elemento do início de uma versão da deque indicada pelo par~$(
 
 \section{Acesso e inserção}
 
-Em cada nó da arborescência guardaremos: o pai do nó no campo~$\V{parent}$; sua profundidade no campo~$\V{depth}$; e seu valor associado, que é um dos valores armazenados na deque, no campo~$\V{val}$. O código~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente, e também realiza o pré-processamento necessário para o algoritmo de Ancestral de Nível funcionar, ou seja, chama a função~\API{AddLeaf} para o novo vértice, como discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
+Em cada nó da arborescência guardaremos: o pai do nó no campo~$\V{parent}$; sua profundidade no campo~$\V{depth}$; e seu valor associado, que é um dos valores armazenados na deque, no campo~$\V{val}$. O código~$\New \Call{Node}{x, p, d}$ cria um novo nó com valores~$x$,~$p$ e~$d$ nos campos~$\V{val}$,~$\V{parent}$ e~$\V{depth}$, respectivamente, e também realiza o pré-processamento necessário para o algoritmo de Ancestral de Nível funcionar, ou seja, chama a função~\API{AddLeaf} para o novo nó, como discutido nos Capítulos~\ref{cap:ancestrais} e~\ref{cap:skew}.
 
 Uma deque é representada por um par ordenado de nós. Usaremos~$(a, b)$ para criar uma deque associada aos nós~$a$ e~$b$, e estes nós podem ser acessados pelos campos~$\V{first}$ e~$\V{last}$.
 
@@ -215,8 +215,8 @@ Para implementar a operação~\funcAPI{k-th}{d, k}, é necessário comparar~$k-1
 
 \Function{\API{k-th}}{$d, k$}
 	\State $\V{mid} = \funcAPI{LCA}{d.\V{first}, d.\V{last}}$
-	\State $\ell_1 = d.\V{first}.\V{depth} - d.\V{mid}.\V{depth}$
-	\State $\ell_2 = d.\V{last}.\V{depth} - d.\V{mid}.\V{depth}$
+	\State $\ell_1 = d.\V{first}.\V{depth} - \V{mid}.\V{depth}$
+	\State $\ell_2 = d.\V{last}.\V{depth} - \V{mid}.\V{depth}$
 	\If{$k - 1 \leq \ell_1$}
 		\State \Return $\funcAPI{LevelAncestor}{k - 1, d.\V{first}}$
 	\Else

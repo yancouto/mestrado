@@ -52,7 +52,7 @@ O lema mostra que o menor e maior número de~$n$ dígitos em CSB são~$10^{n-1}$
 	Cada número natural tem uma representação única em CSB. Equivalentemente,~${\V: \CSB \rightarrow \mathbb{N}}$ é uma função bijetora.
 \end{theorem}
 \begin{proof}
-	Vamos provar que~$\V$ é injetora, ou seja, se~${a \neq b}$ então~${\V(a) \neq \V(b)}$. Suponha, sem perda de generalidade, que~$|a| \geq |b|$. Se~$|a| > |b|$, então, pelo~Lema~\ref{lem:csbdig},
+	Vamos provar que~$\V$ é injetora, ou seja, se~${a \neq b}$ então~${\V(a) \neq \V(b)}$. Assuma, sem perda de generalidade, que~$|a| \geq |b|$. Se~$|a| > |b|$, então, pelo~Lema~\ref{lem:csbdig},
 	$$ \V(a) \geq 2^{|a|} - 1 > 2^{|a|} - 2 \geq 2^{|b| + 1} - 2 \geq \V(b). $$
 	Se~$|a| = |b|$, considere~${i^\star = \max\{i \in [n] : a_i \neq b_i\}}$. Assuma, sem perda de generalidade, que~${a_{i^\star} > b_{i^\star}}$. Escreva~${a = \alpha a_{i^\star} \beta}$ e~${b = \alpha b_{i^\star} \gamma}$. Então
 	$$ \V(a) - \V(b) \stackrel{\text{(1)}}{\geq} (2^{i^\star} - 1) + \V(\beta) - \V(\gamma) \stackrel{\text{(2)}}{\geq} (2^{i^\star} - 1) - (2^{i^\star} - 2) = 1, $$
@@ -232,9 +232,9 @@ A seção anterior apresentou uma solução para o problema do Ancestral de Nív
 	Caso contrário,~${a_{\NZ(a)} = 2}$. Considere~${b \coloneqq a_n \cdots a_{\NZ(a) + 2} (a_{\NZ(a) + 1} + 1) 0^{\NZ(a)}}$. Pelo Lema~\ref{lem:csbsub} vale que~${\R(\V(b) - 1) = a}$, logo~${\V(b) = \V(a) + 1}$. Note que \vspace{-2ex}
 	\[
 	\begin{array}{ll}
-		\J(\V(b))     &= a_n \cdots a_{\NZ(a) + 1} 0^{\NZ(a)}, \\
-		\J(\V(a))     &= a_n \cdots a_{\NZ(a) + 1} 10^{\NZ(a)-1},\text{ e} \\
-		\J(\J(\V(a))) &= a_n \cdots a_{\NZ(a) + 1} 0^{\NZ(a)}. \\
+		\J(\V(b))     &= \V(a_n \cdots a_{\NZ(a) + 1} 0^{\NZ(a)}), \\
+		\J(\V(a))     &= \V(a_n \cdots a_{\NZ(a) + 1} 10^{\NZ(a)-1}),\text{ e} \\
+		\J(\J(\V(a))) &= \V(a_n \cdots a_{\NZ(a) + 1} 0^{\NZ(a)}). \\
 	\end{array}
 	\]
 	Portanto,~$\J(\V(a) + 1) = \J(\J(\V(a)))$.

@@ -14,7 +14,7 @@
 
 Seja~$T \coloneqq (V, E)$ um grafo. Dizemos que~$T$ é uma árvore se é acíclico e conexo. Nesse caso, entre cada par de vértices de~$T$ existe exatamente um caminho. Uma árvore é enraizada quando fixamos algum vértice~${r \in V}$, chamado de raiz.
 
-Para propósitos de implementação e sem perda de generalidade, supomos que~$V = \{1, 2, \ldots, |V|\}$.
+Para propósitos de implementação e sem perda de generalidade, assumimos que~$V = \{1, 2, \ldots, |V|\}$.
 Para cada vértice~${u \in V}$, os \deff{ancestrais} de~$u$ são os vértices no (único) caminho de~$u$ até~$r$. O~\mbox{$(i-1)$-ésimo} ancestral de~$u$ é o~$i$-ésimo vértice nesse caminho. Em particular,~$u$ é o $0$-ésimo ancestral de~$u$. Dizemos que o primeiro ancestral de~$u$, se~$u \neq r$, é o \deff{pai} de~$u$. Definimos a função~${\Par: V \rightarrow V}$ tal que~$\Par(u)$ é o pai do vértice~$u$, para todo~$u \in V \setminus \{r\}$; para o vértice~$r$, pode-se considerar que~$\Par(r) = r$. A~\deff{profundidade} de um vértice~$u$ é denotada por~$\Dep(u)$ e é o número de arestas no caminho de~$u$ até~$r$.
 
 O problema do Ancestral de Nível (no inglês, \textit{Level Ancestor}, abreviado LA), é o problema de encontrar, dados~$u \in V$ e~$k \in \mathbb{N}$ tal que~$k \leq \Dep(u)$, o~$k$-ésimo ancestral de~$u$, ou seja, o problema de avaliar a função
@@ -156,7 +156,7 @@ O Código~\ref{lst:lapot2} resolve o problema do Ancestral de Nível online, qua
 \section{Cálculo do ancestral comum mais profundo} \label{sec:lca_pot2}
 
 \newcommand{\kb}{k^\star}
-Sejam~$u, v \in V$ e~$c \in V$ o ancestral comum mais profundo de~$u$ e~$v$. Vamos supor, sem perda de generalidade, que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' os vértices~$u$ e~$v$, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
+Sejam~$u, v \in V$ e~$c \in V$ o ancestral comum mais profundo de~$u$ e~$v$. Assuma, sem perda de generalidade, que~${\Dep(v) \geq \Dep(u)}$. É óbvio que~${\Dep(c) \leq \Dep(u)}$, logo podemos ``nivelar'' os vértices~$u$ e~$v$, ou seja, trocar~$v$ por~${\LA(\Dep(v) - \Dep(u), v)}$.
 Assim, podemos supor que~$\Dep(u) = \Dep(v)$ e, para encontrar o ancestral comum mais profundo de~$u$ e~$v$, devemos encontrar o menor~$\kb$ tal que~${\LA(\kb, u) = \LA(\kb, v)}$. Note que se~${k < \Dep(u) - 1}$ e~${\LA(k, u) = \LA(k, v)}$, então
 $${\LA(k + 1, u) = \Par(\LA(k, u)) = \Par(\LA(k, v)) = \LA(k + 1, v).}$$
 Isso permitirá a utilização dos Jump Pointers para determinar tal~$\kb$ mínimo.
