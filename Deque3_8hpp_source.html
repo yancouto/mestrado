@@ -1,0 +1,245 @@
+<!-- HTML header for doxygen 1.8.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- For Mobile Devices -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+        <meta name="generator" content="Doxygen 1.8.6"/>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <title>Mestrado Yan Couto: Código-Fonte de /home/travis/build/yancouto/mestrado/source/persistence/Deque3.hpp</title>
+        <!--<link href="tabs.css" rel="stylesheet" type="text/css"/>-->
+        <script type="text/javascript" src="dynsections.js"></script>
+        <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+        <link href="doxygen.css" rel="stylesheet" type="text/css" />
+        <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
+        <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="doxy-boot.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand">Mestrado Yan Couto </a>
+                </div>
+            </div>
+        </nav>
+        <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+            <div class="content" id="content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 panel " style="padding-bottom: 15px;">
+                            <div style="margin-bottom: 15px;">
+<!-- end header part -->
+<!-- Gerado por Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Busca');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Página&#160;Principal</span></a></li>
+      <li><a href="annotated.html"><span>Estruturas&#160;de&#160;Dados</span></a></li>
+      <li class="current"><a href="files.html"><span>Arquivos</span></a></li>
+      <li><a href="pages.html"><span>Páginas&#160;relacionadas</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Busca" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>Lista&#160;de&#160;Arquivos</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Todos</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Estruturas de Dados</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Arquivos</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Funções</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variáveis</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Páginas</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_b2f33c71d4aa5e7af42a1ca61ff5af1b.html">source</a></li><li class="navelem"><a class="el" href="dir_c572ffdafd4e528358361c19f25fb79b.html">persistence</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">Deque3.hpp</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="Deque3_8hpp.html">Vá para a documentação deste arquivo.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#ifndef PERSISTENCE_DEQUE3_HPP_</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define PERSISTENCE_DEQUE3_HPP_</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Deque2_8hpp.html">Deque2.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>persistence {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>deque3 {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1SubDeque.html">   19</a></span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keyword">class </span><a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque</a> {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">int</span> size() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">bool</span> empty() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordtype">void</span> push_back(<span class="keyword">const</span> T &amp;x);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordtype">void</span> push_front(<span class="keyword">const</span> T &amp;x);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> pop_back();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> pop_front();</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">const</span> T&amp; front() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">const</span> T&amp; back() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> T&amp; operator [](<span class="keywordtype">int</span> i) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque</a>();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    T v[5];</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">int</span> i;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">int</span> size_;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;};</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">using</span> any = deque2::any;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Node.html">   70</a></span>&#160;<span class="keyword">class </span><a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Node.html#a8bff6fe9e565f75618abb2bab4b5d71c">   75</a></span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque&lt;any*&gt;</a> <a class="code" href="classpersistence_1_1deque3_1_1Node.html#a8bff6fe9e565f75618abb2bab4b5d71c">prefix</a>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Node.html#a9d54fe9ec8a9c71658d512a995d5fd8f">   79</a></span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *<a class="code" href="classpersistence_1_1deque3_1_1Node.html#a9d54fe9ec8a9c71658d512a995d5fd8f">child</a>;</div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Node.html#a9becef21c0e8ae064efc80cb13a1e923">   83</a></span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque&lt;any*&gt;</a> <a class="code" href="classpersistence_1_1deque3_1_1Node.html#a9becef21c0e8ae064efc80cb13a1e923">suffix</a>;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Node.html#a97c03e4ad22622875a61f653659c91d6">   88</a></span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *<a class="code" href="classpersistence_1_1deque3_1_1Node.html#a97c03e4ad22622875a61f653659c91d6">next</a>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Node.html#a67360d9a0bb26b21fb636eb32d983968">   94</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classpersistence_1_1deque3_1_1Node.html#a67360d9a0bb26b21fb636eb32d983968">size</a>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">int</span> level;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">int</span> ref_ct;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">void</span> add_ref();</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keyword">inline</span> <span class="keywordtype">void</span> rem_ref();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">void</span> safe_rem_ref();</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Node.html#ab8075bc30132e4f306cf76efea3b4892">Node</a>();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Node.html#ab8075bc30132e4f306cf76efea3b4892">Node</a>(<span class="keyword">const</span> <a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> &amp;o);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    ~<a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a>();</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;};</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Deque.html">  136</a></span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keyword">class </span><a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque</a> {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="classpersistence_1_1deque3_1_1Deque.html#a17192591e8dd11c67f9b37cb918fd7eb">  142</a></span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *<a class="code" href="classpersistence_1_1deque3_1_1Deque.html#a17192591e8dd11c67f9b37cb918fd7eb">node</a>;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#af2b57d7b209920b488a76c39709332ae">Deque</a>();</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">const</span> T&amp; <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#aaeb6c179606e3ea7f53736480aa39360">Front</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">const</span> T&amp; <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#a29de657951b6bbfd6df1bbe1f4f8d5a8">Back</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keyword">const</span> T&amp; <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#a4b34a5a8432e3dfa9173c732cd806b4c">K_th</a>(<span class="keywordtype">int</span> k) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque&lt;T&gt;</a> <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#a7410719c87f12706fa0c6ab82b7e6c60">PushFront</a>(<span class="keyword">const</span> T&amp; x) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque&lt;T&gt;</a> <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#ad556f0422cc64623f3d8e6b9b74574c9">PushBack</a>(<span class="keyword">const</span> T&amp; x) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque&lt;T&gt;</a> <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#ad967318bc7f4719c856ce8d86724965f">PopFront</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque&lt;T&gt;</a> <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#a88af3bb6953ad4a7a660931b39f88629">PopBack</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    ~<a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque</a>();</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#af2b57d7b209920b488a76c39709332ae">Deque</a>(<span class="keyword">const</span> <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque</a> &amp;o);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classpersistence_1_1deque3_1_1Deque.html">Deque</a> &amp;o);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <a class="code" href="classpersistence_1_1deque3_1_1Deque.html#af2b57d7b209920b488a76c39709332ae">Deque</a>(<a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *u);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;};</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="keywordtype">void</span> Check(<a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *a);</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a>* Copy(<span class="keyword">const</span> <a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *a);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="keywordtype">int</span> Digit(<span class="keyword">const</span> <a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *a, <span class="keywordtype">bool</span> last);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="keywordtype">void</span> Fix(<a class="code" href="classpersistence_1_1deque3_1_1Node.html">Node</a> *a);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="keywordtype">void</span> FixDeques(<a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque&lt;any*&gt;</a> &amp;l, <a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque&lt;any*&gt;</a> &amp;r,</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;               <a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque&lt;any*&gt;</a> &amp;L, <a class="code" href="classpersistence_1_1deque3_1_1SubDeque.html">SubDeque&lt;any*&gt;</a> &amp;R);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;} <span class="comment">// namespace deque3</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;} <span class="comment">// namespace persistence</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="preprocessor">#include &quot;Deque3.tpp&quot;</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="preprocessor">#endif // PERSISTENCE_DEQUE3_HPP_</span></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_a29de657951b6bbfd6df1bbe1f4f8d5a8"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#a29de657951b6bbfd6df1bbe1f4f8d5a8">persistence::deque3::Deque::Back</a></div><div class="ttdeci">const T &amp; Back() const </div><div class="ttdoc">Acesso ao último elemento. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html">persistence::deque3::Deque</a></div><div class="ttdoc">Deque persistente de Kaplan e Tarjan. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:136</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html_a8bff6fe9e565f75618abb2bab4b5d71c"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html#a8bff6fe9e565f75618abb2bab4b5d71c">persistence::deque3::Node::prefix</a></div><div class="ttdeci">SubDeque&lt; any * &gt; prefix</div><div class="ttdoc">Prefixo da deque. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:75</div></div>
+<div class="ttc" id="Deque2_8hpp_html"><div class="ttname"><a href="Deque2_8hpp.html">Deque2.hpp</a></div><div class="ttdoc">Implementação de uma deque persistente de acordo com o capítulo 4. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_ad556f0422cc64623f3d8e6b9b74574c9"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#ad556f0422cc64623f3d8e6b9b74574c9">persistence::deque3::Deque::PushBack</a></div><div class="ttdeci">Deque&lt; T &gt; PushBack(const T &amp;x) const </div><div class="ttdoc">Inserção no final. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html_ab8075bc30132e4f306cf76efea3b4892"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html#ab8075bc30132e4f306cf76efea3b4892">persistence::deque3::Node::Node</a></div><div class="ttdeci">Node()</div><div class="ttdoc">Construtor. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_ad967318bc7f4719c856ce8d86724965f"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#ad967318bc7f4719c856ce8d86724965f">persistence::deque3::Deque::PopFront</a></div><div class="ttdeci">Deque&lt; T &gt; PopFront() const </div><div class="ttdoc">Remoção do início. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html_a9becef21c0e8ae064efc80cb13a1e923"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html#a9becef21c0e8ae064efc80cb13a1e923">persistence::deque3::Node::suffix</a></div><div class="ttdeci">SubDeque&lt; any * &gt; suffix</div><div class="ttdoc">Sufixo da deque. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:83</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html">persistence::deque3::Node</a></div><div class="ttdoc">Nó da deque de Kaplan e Tarjan. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:70</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_a88af3bb6953ad4a7a660931b39f88629"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#a88af3bb6953ad4a7a660931b39f88629">persistence::deque3::Deque::PopBack</a></div><div class="ttdeci">Deque&lt; T &gt; PopBack() const </div><div class="ttdoc">Remoção do final. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html_a67360d9a0bb26b21fb636eb32d983968"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html#a67360d9a0bb26b21fb636eb32d983968">persistence::deque3::Node::size</a></div><div class="ttdeci">int size</div><div class="ttdoc">Tamanho da deque. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:94</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_a4b34a5a8432e3dfa9173c732cd806b4c"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#a4b34a5a8432e3dfa9173c732cd806b4c">persistence::deque3::Deque::K_th</a></div><div class="ttdeci">const T &amp; K_th(int k) const </div><div class="ttdoc">Acesso ao k-ésimo elemento. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1SubDeque_html"><div class="ttname"><a href="classpersistence_1_1deque3_1_1SubDeque.html">persistence::deque3::SubDeque</a></div><div class="ttdoc">Deque não persistente de até 5 elementos. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:19</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_aaeb6c179606e3ea7f53736480aa39360"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#aaeb6c179606e3ea7f53736480aa39360">persistence::deque3::Deque::Front</a></div><div class="ttdeci">const T &amp; Front() const </div><div class="ttdoc">Acesso ao primeiro elemento. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_a17192591e8dd11c67f9b37cb918fd7eb"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#a17192591e8dd11c67f9b37cb918fd7eb">persistence::deque3::Deque::node</a></div><div class="ttdeci">Node * node</div><div class="ttdoc">Nó principal. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:142</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_af2b57d7b209920b488a76c39709332ae"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#af2b57d7b209920b488a76c39709332ae">persistence::deque3::Deque::Deque</a></div><div class="ttdeci">Deque()</div><div class="ttdoc">Construtor vazio. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Deque_html_a7410719c87f12706fa0c6ab82b7e6c60"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Deque.html#a7410719c87f12706fa0c6ab82b7e6c60">persistence::deque3::Deque::PushFront</a></div><div class="ttdeci">Deque&lt; T &gt; PushFront(const T &amp;x) const </div><div class="ttdoc">Inserção no início. </div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html_a9d54fe9ec8a9c71658d512a995d5fd8f"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html#a9d54fe9ec8a9c71658d512a995d5fd8f">persistence::deque3::Node::child</a></div><div class="ttdeci">Node * child</div><div class="ttdoc">Sub-deque central. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:79</div></div>
+<div class="ttc" id="classpersistence_1_1deque3_1_1Node_html_a97c03e4ad22622875a61f653659c91d6"><div class="ttname"><a href="classpersistence_1_1deque3_1_1Node.html#a97c03e4ad22622875a61f653659c91d6">persistence::deque3::Node::next</a></div><div class="ttdeci">Node * next</div><div class="ttdoc">Próximo nó na pilha de nós. </div><div class="ttdef"><b>Definition:</b> Deque3.hpp:88</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.8-->
+<!-- start footer part -->
+</div>
+</div>
+</div>
+</div>
+</div>
+<hr class="footer"/><address class="footer"><small>
+Gerado em Quinta, 30 de Maio de 2019 21:41:41 para Mestrado Yan Couto por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.6
+</small></address>
+</body>
+</html>

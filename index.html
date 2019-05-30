@@ -1,0 +1,124 @@
+<!-- HTML header for doxygen 1.8.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- For Mobile Devices -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+        <meta name="generator" content="Doxygen 1.8.6"/>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <title>Mestrado Yan Couto: Documentação do projeto de mestrado</title>
+        <!--<link href="tabs.css" rel="stylesheet" type="text/css"/>-->
+        <script type="text/javascript" src="dynsections.js"></script>
+        <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+        <link href="doxygen.css" rel="stylesheet" type="text/css" />
+        <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
+        <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="doxy-boot.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand">Mestrado Yan Couto </a>
+                </div>
+            </div>
+        </nav>
+        <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+            <div class="content" id="content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 panel " style="padding-bottom: 15px;">
+                            <div style="margin-bottom: 15px;">
+<!-- end header part -->
+<!-- Gerado por Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Busca');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li class="current"><a href="index.html"><span>Página&#160;Principal</span></a></li>
+      <li><a href="annotated.html"><span>Estruturas&#160;de&#160;Dados</span></a></li>
+      <li><a href="files.html"><span>Arquivos</span></a></li>
+      <li><a href="pages.html"><span>Páginas&#160;relacionadas</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Busca" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div><!-- top -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Todos</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Estruturas de Dados</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Arquivos</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Funções</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variáveis</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Páginas</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">Documentação do projeto de mestrado </div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p>Implementei todas as estruturas de dados discutidas na minha <a href="thesis.pdf">tese de mestrado</a>. As implementações foram feitas em C++, e tentam ser o mais fiel possível ao pseudocódigo apresentado na tese, destacando as diferenças quando estas existem.</p>
+<h1><a class="anchor" id="persist"></a>
+Implementações Persistentes</h1>
+<h2><a class="anchor" id="pilhap"></a>
+Pilha</h2>
+<p>A <a class="el" href="classpersistence_1_1stack_1_1Stack.html">pilha</a> é a estrutura de dados mais simples, e, implementada usando lista ligada, já é automaticamente persistente. Para acessar o k-ésimo elemento usando esta implementação, porém, é necessário usar técnicas mais avançadas <a class="el" href="citelist.html#CITEREF_Myers83">[3]</a> .</p>
+<h2><a class="anchor" id="filap"></a>
+Fila</h2>
+<p>Como a implementação de pilha possui acesso ao k-ésimo elemento, é possível implementar uma <a class="el" href="classpersistence_1_1queue_1_1Queue.html">fila</a> usando apenas essa implementação e um inteiro indicando o tamanho atual da fila.</p>
+<h2><a class="anchor" id="dequep"></a>
+Deque</h2>
+<p>A deque é uma lista na qual é possível inserir e remover elementos das duas pontas. Damos 3 implementações para uma deque persistente. <a class="el" href="classpersistence_1_1deque1_1_1Deque.html">A primeira</a> é similar à implementação das pilhas e filas, usando a mesma técnica. <a class="el" href="classpersistence_1_1deque2_1_1Deque.html">A segunda</a> tem o mesmo consumo de tempo que a primeira, apesar de ter mais casos a ser tratados. A terceira implementação é uma expansão da segunda, e melhora o tempo consumido por operação.</p>
+<h2><a class="anchor" id="arnp"></a>
+Árvore Rubro-Negra</h2>
+<p>Uma <a class="el" href="classpersistence_1_1red__black__tree_1_1RedBlackTree.html">árvore rubro-negra</a> é uma árvore de busca binária balanceada. A implementação é parcialmente persistente, e é feita usando o método de Node copying <a class="el" href="citelist.html#CITEREF_DriscollSST1989">[1]</a> . Por ser uma implementação parcialmente persistente, e como as cores dos nós servem apenas para auxiliar em seu balanceamento, estas não são armazenadas de forma persistente e conseguimos assim consumir espaço constante por operação de modificação.</p>
+<h1><a class="anchor" id="retro"></a>
+Implementações Retroativas</h1>
+<p>Nestas implementações, apresentadas na Parte III, usamos que o tempo é indicado por um inteiro.</p>
+<h2><a class="anchor" id="filar"></a>
+Fila</h2>
+<p>A <a class="el" href="classretroactivity_1_1queue_1_1Queue.html">fila</a> é a estrutura mais simples de ser implementada de forma persistente. Para ser implementada desta forma, é preciso utilizar uma <a class="el" href="classaux_1_1OrderedMap.html">ED auxiliar</a> que pode ser implementada com uma ABB. </p>
+</div></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.8-->
+<!-- start footer part -->
+</div>
+</div>
+</div>
+</div>
+</div>
+<hr class="footer"/><address class="footer"><small>
+Gerado em Quinta, 30 de Maio de 2019 21:41:41 para Mestrado Yan Couto por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.6
+</small></address>
+</body>
+</html>
