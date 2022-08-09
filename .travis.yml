@@ -1,4 +1,4 @@
-dist: trusty
+os: linux
 branches:
     only: master
 language: r
@@ -21,7 +21,7 @@ script:
     - make full NO_VALGRIND=true NO_QUALI=true
 deploy:
     provider: pages
-    skip_cleanup: true
+    cleanup: true
     github_token: $GITHUB_TOKEN
     local_dir: docs/html/
     on:

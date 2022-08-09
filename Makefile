@@ -5,6 +5,7 @@ ifndef NO_VALGRIND
 endif
 	cd docs; doxygen
 	$(MAKE) full -C thesis
+	$(MAKE) full -C thesis_english
 ifndef NO_QUALI
 	$(MAKE) full -C quali
 endif
