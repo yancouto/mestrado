@@ -1,12 +1,13 @@
 \documentclass[main.tex]{subfiles}
 
+\begin{document}
+
 \providecommand{\Par}{\operatorname{Parent}}
 \newcommand{\LA}{\operatorname{LA}}
 \newcommand{\Dep}{\operatorname{D}}
 \newcommand{\LCA}{\operatorname{LCA}}
 \newcommand{\argmax}{\operatorname{argmax}}
 
-\begin{document}
 
 \chapter{Ancestors in trees} \label{cap:ancestrais}
 
@@ -164,7 +165,7 @@ Thus, we can assume that~$\Dep(u) = \Dep(v)$ and, to find the lowest common ance
 $${\LA(k + 1, u) = \Par(\LA(k, u)) = \Par(\LA(k, v)) = \LA(k + 1, v).}$$
 This will allow the jump pointers to be used to determine such minimal~$\kb$.
 
-If~${x < \kb}$ then~${\LA(x, u) \neq \LA(x, v)}$, that is, we have a way to check whether~$x < \kb$ without knowing~$\kb$. Just like in the proof of Theorem~\ref{thm:pot2}, to decompose a number as a sum of distinct powers of two, we simply determine the greatest power of two less than or equal to that number, add it to the decomposition, and repeat. Since we have jump pointers to the powers of two for all nodes, we can determine the decomposition as a sum of powers of two for~${\kb - 1}$ (since we can test~${x \leq \kb - 1}$ and not~${x \leq \kb}$), and similarly to the function~\API{LevelAncestor} of Code listing~\ref{lst: lapot2}, we can determine the~\mbox{$(\kb-1)$-th} ancestor of~$u$ and~$v$ in time~$\Oh(\lg \Dep(u))$.
+If~${x < \kb}$ then~${\LA(x, u) \neq \LA(x, v)}$, that is, we have a way to check whether~$x < \kb$ without knowing~$\kb$. Just like in the proof of Theorem~\ref{thm:pot2}, to decompose a number as a sum of distinct powers of two, we simply determine the greatest power of two less than or equal to that number, add it to the decomposition, and repeat. Since we have jump pointers to the powers of two for all nodes, we can determine the decomposition as a sum of powers of two for~${\kb - 1}$ (since we can test~${x \leq \kb - 1}$ and not~${x \leq \kb}$), and similarly to the function~\API{LevelAncestor} of Code listing~\ref{lst:lapot2}, we can determine the~\mbox{$(\kb-1)$-th} ancestor of~$u$ and~$v$ in time~$\Oh(\lg \Dep(u))$.
 
 
 \begin{algorithm}
